@@ -1,5 +1,8 @@
 # 프로젝트 가이드 — 공통 지침 (AGENTS.md)
 
+- 현재 상태 갱신: 2026-10-16 (Asia/Seoul)
+> **현재 기준 · 2026-10-16:** 개발용 PoC 기반 구현. 실제 AI·시각/연구·운영은 미완료. 현재 작업은 TASK-016과 해당 예산/전송 정책 결정이다. 과거 작업 기록은 당시 이력으로 보존한다.
+
 ## 작업 시작·종료 규칙
 
 사용자가 말하는 **프로젝트 가이드**는 저장소 `docs/` 폴더의 `AGENTS.md`와 아래 번호 문서 12개를 합친 **전체 13개 문서 세트**를 뜻한다. 개별 문서는 파일명 또는 역할로 구분하며 기존 파일명은 유지한다. 저장소 루트의 `AGENTS.md`는 이 공통 지침을 읽도록 연결하는 진입점이며 13개 본문에 포함하지 않는다.
@@ -31,14 +34,14 @@
 - 기준 자료: 사용자가 제공한 [FactLens AI 기획서 원문](../references/FactLens_AI_기획서_원문.md)(2026년 10월 작성, 졸업프로젝트 제안·개발 계획 초안). 2026-10-15 검토·반영. 원문은 변경하지 않고 보존하며, 후속 결정은 번호 문서에 기록한다.
 - 목적: 영상의 개별 사실 주장과 맥락 왜곡 가능성을 외부 근거와 대조하고, 해당 영상 구간·인용문·근거 URL·판단 한계를 설명하는 의사결정 지원 서비스다. 절대적 진실 보증이나 딥페이크 판별기를 목표로 바꾸지 않는다.
 - 대상 사용자군: 일반 뉴스/SNS 이용자, 대학생·연구자, 팩트체크 종사자, 미디어 리터러시 교육기관. MVP의 일차 사용자와 검증 주제는 후속 범위 검토에서 좁힌다.
-- 초기 기획 상태(아래 후속 구현 기록 이전): 기획 기준 자료와 개발 도구·문서만 존재했다. 아래 파이프라인·API·DB·화면은 **기획 요구 또는 제안이며 제품 구현·성능 검증은 아직 없다**. 원문 반영을 모든 기술 선택에 대한 승인으로 간주하지 않는다.
+- 현재 상태: 업로드·미디어 검사·작업/삭제·보고서 UI·제한적인 정형 수치 검증을개발용 PoC 기반으로 구현했다. 실제 STT/검색/LLM 연결·시각 분석·연구 성능 평가·운영 배포는 미완료다. 아래 원칙은 최종 요구이며 구현 사실은 각 문서의 현재 구현 절과 10의 검증 기록을 따른다.
 
 ### 범위와 진행 순서
 
-- 입력: 최종 MVP의 필수 입력은 MP4 및 MP3/WAV 직접 업로드다. 초기 평가 대상은 1~3분 한국어 뉴스형 영상이다. 이는 기획상 목표이며 파일 크기·최대 길이의 확정 제한값은 별도 결정한다.
+- 입력: 최종 MVP의 필수 입력은 MP4 및 MP3/WAV 직접 업로드다. 초기 평가 대상은 1~3분 한국어 뉴스형 영상이다. 개발용 구현의 제한은 100 MiB·180초다. 운영 제한과 연구 데이터 범위는 별도 검토한다.
 - 지원 영상 URL·기사 URL·YouTube 등은 확장 범위다. 초기 업로드 경로보다 먼저 만들지 않으며 플랫폼 정책·접근 권한을 확인한다. 다국어·실시간 방송·일괄 처리·팀 검토·API 상품화·C2PA도 후속 제안이다.
 - 기획 단계: 음성 팩트체크 PoC → 자막/화면 PoC → 근거 Validator·교차검증·판정 규칙 PoC → 웹 MVP와 비교 평가. 최종 MVP의 필수 항목을 단계 축소 과정에서 조용히 제외하지 않는다.
-- 우선 기준 문서: [01 시스템 개요](01_시스템_개요.md), [02 기능 설계](02_기능_설계.md), [05 업무 플로우](05_업무_플로우.md). 다음 작업은 `99_해야할일..md`의 TASK-001 잔여 범위 정리다. 이미 제공된 프로젝트 목적을 다시 처음부터 묻지 않는다.
+- 우선 기준 문서: [01 시스템 개요](01_시스템_개요.md), [02 기능 설계](02_기능_설계.md), [05 업무 플로우](05_업무_플로우.md). 다음 작업은 `99_해야할일..md`의 TASK-016 실제 AI 연결이며 TASK-001의 유료 예산 결정을 함께 진행한다. 이미 제공된 프로젝트 목적을 다시 처음부터 묻지 않는다.
 
 ### 분석과 판정의 필수 원칙
 
@@ -52,7 +55,7 @@
 
 ### 제안 스택과 미결정 항목
 
-원문 제안은 Vue 3 + TypeScript + Vite, Node.js API(Express **또는** NestJS), Python + FastAPI AI Worker, PostgreSQL, Redis/작업 큐, 로컬 **또는** S3 호환 스토리지, FFmpeg/OpenCV/PaddleOCR, OpenAI API, Google Fact Check Tools API·Cloud Vision Web Detection, Docker다. 이는 검토 기준이며 설치·계약·제공자 인증·호환성은 미검증이다. `DEC-002`에서 대안과 PoC 비용을 비교해 구체화한다. Redis 큐 라이브러리·인증 방식·배포처·API 스키마·삭제/보관 기간은 미결정이다.
+원문 제안은 Vue 3 + TypeScript + Vite, Node.js API(Express **또는** NestJS), Python + FastAPI AI Worker, PostgreSQL, Redis/작업 큐, 로컬 **또는** S3 호환 스토리지, FFmpeg/OpenCV/PaddleOCR, OpenAI API, Google Fact Check Tools API·Cloud Vision Web Detection, Docker다. 원문 제안은 보존한다. 개발용 DEC-002는 Vue/Express/Python 프로세스 Worker/PostgreSQL/Redis/비공개 로컬 볼륨/Compose로 구체화했다. FastAPI 서버는 만들지 않았다. 개발용 API 계약과 기본 24시간 보관은 구현됐으며 실제 AI 제공자·가격/예산·운영 인증/배포/백업은 미결정이다.
 
 제품의 역할별 AI Agent는 설계 대상 모듈이다. 이 명칭이 개발 작업에서 서브에이전트를 자동 생성하라는 지시는 아니다. 개발용 OmniRoute·Headroom·Strix를 제품 필수 의존성으로 넣지 않는다.
 
@@ -94,7 +97,7 @@ Read `devtools/README.ko.md` for the installed tools and limitations. Run `bash 
 - Use Ponytail for explicit simplicity/review requests. Use LazyCodex skills for explicit LazyCodex planning/execution requests. Choose one lead workflow per task; do not stack competing autonomous loops.
 - Use CodeGraph for code navigation after source files exist; use normal file tools when the graph is empty.
 - Use Iron Laws for offline static security and quality checks. Preserve its exit code and report coverage limits.
-- Use Strix only against user-authorized targets. It needs an LLM provider and Docker for local scans. No live scan has been validated in this empty repository.
+- Use Strix only against user-authorized targets. It needs an LLM provider and Docker for local scans. No live scan has been validated against the product; offline findings remain unresolved as documented in 09/10.
 - OmniRoute and Headroom are optional local services. Start them with `python3 devtools/start-services.py`. They are not the website server. Provider authentication and actual inference are separate from local readiness.
 
 Project MCP settings are in `.codex/config.toml`; discovery requires a new Codex session and project trust. Installing CLI tools or linking skills does not activate lifecycle hooks. LazyCodex/Ponytail native lifecycle hooks have not been installed or trusted in this managed cloud instance. Do not bypass hook trust or change sandbox/approval settings to activate them.
@@ -210,3 +213,8 @@ Start each project task by reading [00_문서_가이드.md](00_문서_가이드.
 - 사용자 구현 계획 승인으로 apps/api·apps/worker·apps/web과 Compose 개발 실행을 추가했다. 업로드·형식/시간 검사·작업/삭제·근거/판정 규칙·한국어 보고서 UI를 구현했다.
 - 실제 STT/검색/LLM은 미설정으로 실패 처리한다. 가상 예시와 실제 분석을 구분하며 운영 인증/배포·연구 성능은 완료가 아니다.
 - 상세 인터페이스·실행 명령은 구현 계획과 README, 검증 근거는 10, 남은 일은 99의 최신 기록을 따른다. 아래 이전 미구현 서술은 당시 기획 이력이다.
+
+### 프로젝트 가이드 현재 상태 동기화 (2026-10-16)
+
+- 사용자 요청에 따라 13개 문서의 상단 기준·본문 표·후속 TASK를 코드/기존 검증 기록과 맞췄다. 이전 기획/작업 이력은 보존하고 실제 AI·연구 성능·운영 미완료를 구분했다.
+- 새 재개 지점은 TASK-016(실제 AI 연결), 운영 공개 준비는 TASK-017이다. 이번에는 문서 검증만 수행하며 제품 코드·외부 서비스 설정·원격 push는 변경하지 않는다.
