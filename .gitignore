@@ -1,0 +1,7 @@
+# Generated development-tool data and machine-local skill links
+.agents/skills/
+.codegraph/
+strix_runs/
+.env
+.env.*
+!.env.example
