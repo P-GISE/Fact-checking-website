@@ -5,3 +5,13 @@ strix_runs/
 .env
 .env.*
 !.env.example
+
+node_modules/
+dist/
+.venv/
+__pycache__/
+.pytest_cache/
+.superpowers/
+test-results/
+playwright-report/
+.data/

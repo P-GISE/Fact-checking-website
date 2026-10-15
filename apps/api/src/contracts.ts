@@ -1,0 +1,6 @@
+import { z } from 'zod';
+export const verdictSchema=z.enum(['CONFIRMED','REFUTED','INSUFFICIENT','REVIEW_REQUIRED','EXCLUDED']);
+export const evidenceSchema=z.object({url:z.string().url(),title:z.string(),quote:z.string(),position:z.number().int().nonnegative(),publisher:z.string().nullable(),publishedAt:z.string().nullable(),relation:z.enum(['SUPPORTED','REFUTED','INSUFFICIENT']),usable:z.boolean(),reasons:z.array(z.string()),lineage:z.string()});
+export const claimSchema=z.object({id:z.string(),text:z.string().min(1),startSeconds:z.number().nonnegative(),endSeconds:z.number().nonnegative(),subject:z.string().nullable().default(null),period:z.string().nullable().default(null),metric:z.string().nullable().default(null),value:z.string().nullable().default(null),unit:z.string().nullable().default(null),eligibility:z.enum(['checkable','excluded']).default('checkable'),verdict:verdictSchema.default('INSUFFICIENT'),evidence:z.array(evidenceSchema).default([])}).refine(c=>c.endSeconds>=c.startSeconds,{message:'invalid time range'});
+export const resultSchema=z.object({scope:z.literal('audio_only'),demo:z.boolean().default(false),claims:z.array(claimSchema).max(5),limitations:z.array(z.string()),usage:z.record(z.string(),z.unknown()).default({})});
+export type Result= z.infer<typeof resultSchema>;

@@ -1,0 +1,26 @@
+name: factlens
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: factlens
+      POSTGRES_PASSWORD: development
+      POSTGRES_DB: factlens
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U factlens]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: [redisdata:/data]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+volumes:
+  pgdata:
+  redisdata:
