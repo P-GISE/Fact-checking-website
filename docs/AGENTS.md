@@ -31,7 +31,7 @@
 - 기준 자료: 사용자가 제공한 [FactLens AI 기획서 원문](../references/FactLens_AI_기획서_원문.md)(2026년 10월 작성, 졸업프로젝트 제안·개발 계획 초안). 2026-10-15 검토·반영. 원문은 변경하지 않고 보존하며, 후속 결정은 번호 문서에 기록한다.
 - 목적: 영상의 개별 사실 주장과 맥락 왜곡 가능성을 외부 근거와 대조하고, 해당 영상 구간·인용문·근거 URL·판단 한계를 설명하는 의사결정 지원 서비스다. 절대적 진실 보증이나 딥페이크 판별기를 목표로 바꾸지 않는다.
 - 대상 사용자군: 일반 뉴스/SNS 이용자, 대학생·연구자, 팩트체크 종사자, 미디어 리터러시 교육기관. MVP의 일차 사용자와 검증 주제는 후속 범위 검토에서 좁힌다.
-- 현재 상태: 기획 기준 자료와 개발 도구·문서만 존재한다. 아래 파이프라인·API·DB·화면은 **기획 요구 또는 제안이며 제품 구현·성능 검증은 아직 없다**. 원문 반영을 모든 기술 선택에 대한 승인으로 간주하지 않는다.
+- 초기 기획 상태(아래 후속 구현 기록 이전): 기획 기준 자료와 개발 도구·문서만 존재했다. 아래 파이프라인·API·DB·화면은 **기획 요구 또는 제안이며 제품 구현·성능 검증은 아직 없다**. 원문 반영을 모든 기술 선택에 대한 승인으로 간주하지 않는다.
 
 ### 범위와 진행 순서
 
@@ -83,7 +83,7 @@
 
 ## 현재 개발 환경
 
-This repository currently has no application implementation. Do not interpret an empty index or a no-findings report as validation of a website.
+The repository now has a private audio web PoC foundation in apps/. Live STT/search/LLM providers remain disabled; do not treat demo reports or passing fixture tests as real AI analysis or research validation.
 
 Read `devtools/README.ko.md` for the installed tools and limitations. Run `bash devtools/install.sh` to refresh development tools, then `source devtools/activate.sh`. Tools and upstream source caches are retained under `/workspace/.devtools`, outside this checkout. Each cloud task is already isolated; use this checkout and do not create Git worktrees unless the user requests one.
 
@@ -191,3 +191,22 @@ Start each project task by reading [00_문서_가이드.md](00_문서_가이드.
 - 사용자 승인에 따라 루트 AGENTS 연결, 01의 비교 적합성/단위 환산/반박 관계 구분, 99의 단계별 구현·평가·공개 선행 조건을 수정했다.
 - 본문 13개는 docs/에 유지하며 루트 진입점은 안내만 제공한다. 제품 코드·기획서 원문·미결정 기술 선택은 변경하지 않는다.
 - 관련 위험과 파일 점검 현황을 갱신하고 검증 후 GitHub main에 반영한다.
+
+### 프로젝트 가이드 재독 (2026-10-15)
+
+- 사용자 요청으로 docs/의 프로젝트 가이드 13개를 읽고 목적·필수 입력·분석/판정 원칙·후보 구조·작업 선행 조건을 확인했다.
+- 설계와 제품 구현 상태는 변경하지 않았다. 다음 제품 작업은 TASK-001 잔여 범위/자원 결정이다. 읽기 확인 근거와 한계는 10의 재독 기록을 따른다.
+
+### 제작 착수 설계 (2026-10-15)
+
+- 사용자 제작 요청에 따라 01 §9에 첫 음성 검증 수직 기능의 접근 비교·구성·제약 제안·검증 기준을 작성했다. 검토 대기이며 제품 코드/배포는 미실행이다.
+
+### 첫 구현 계획 작성 (2026-10-16)
+
+- 사용자 진행 지시로 01 §9의 첫 설계안을 채택하고 구현 계획을 작성했다. 기존 기획을 보존하며 유료 제공자/예산과 운영 권한 미결정은 유지한다. 제품 코드는 아직 작성하지 않았다.
+
+### 첫 음성 웹 PoC 구현 (2026-10-16)
+
+- 사용자 구현 계획 승인으로 apps/api·apps/worker·apps/web과 Compose 개발 실행을 추가했다. 업로드·형식/시간 검사·작업/삭제·근거/판정 규칙·한국어 보고서 UI를 구현했다.
+- 실제 STT/검색/LLM은 미설정으로 실패 처리한다. 가상 예시와 실제 분석을 구분하며 운영 인증/배포·연구 성능은 완료가 아니다.
+- 상세 인터페이스·실행 명령은 구현 계획과 README, 검증 근거는 10, 남은 일은 99의 최신 기록을 따른다. 아래 이전 미구현 서술은 당시 기획 이력이다.

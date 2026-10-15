@@ -1,7 +1,7 @@
 # 04. API 명세
 
 - 문서 상태: 초안 — 제품 API 미정
-- 제품 구현: 미구현
+- 제품 구현: 개발용 업로드·작업·조회·삭제 API 구현; 실제 AI 제공자 미연결
 - 관련: [기능](02_기능_설계.md), [DB](03_데이터베이스_설계.md), [프런트엔드](06_프런트엔드_구조.md), [백엔드](07_백엔드_구조.md)
 
 ## 기획서 제안 경로 — 미구현
@@ -23,7 +23,7 @@
 
 ## 1. 현재 API 구분
 
-현재 구현된 제품 API와 제품 base URL은 없다. 원문에 제안된 경로는 아래 초안 계약 목록에 분리해 기록한다. 아래는 기존 개발 도구의 내부 상태 점검 경로이며 제품 계약이 아니다.
+개발용 제품 API는 apps/api/src/app.ts에 구현돼 있다. Compose의 /api 경로는 http://127.0.0.1:8080/api에서 접근한다. 운영 base URL은 없다. 원문에 제안된 경로는 아래 초안 계약 목록에 분리해 기록한다. 아래는 기존 개발 도구의 내부 상태 점검 경로이며 제품 계약이 아니다.
 
 | 소유 도구 | 내부 경로 | 확인 용도 | 근거 |
 |---|---|---|---|
@@ -93,3 +93,11 @@
 작업 오류, 근거 부족, 근거 충돌, 음성 파일의 시각 분석 해당 없음은 다른 의미로 표현한다. 분석 처리 완료를 사실 확인 성공으로 응답하지 않는다. 상세 오류/판정 스키마는 02/03/05/07과 함께 정한다.
 
 지원 URL은 확장 요구이며 현재 필수 요청 필드로 만들지 않는다. 소유권·권한 없는 분석/미디어 접근의 거부 사례는 모든 자원 API 계약에서 검토한다.
+
+## 7. 개발용 실행 계약 (2026-10-16)
+
+- 구현: 기존 API-001~008 및 GET /api/analyses(최근 50건), GET /api/media/:id(Range 재생), GET /api/health. 운영 인증 없는 loopback 전용이며 동일 origin 및 허용된 localhost Origin만 허용한다.
+- POST /api/media/upload: multipart file → 201 {mediaId}. POST /api/analyses: {mediaId,externalProcessingConsent:true}, 선택 Idempotency-Key → 202 {id}. 동일 미디어는 같은 작업을 반환한다. 재분석은 새 업로드다.
+- 조회는 JSON AnalysisView(scope=audio_only, demo, status/stage, timestamps, claims, limitations, usage, error), 삭제 성공 204. 삭제/만료 조회 404, UUID/동의 오류 400, 크기 413, 확장자 415, 자원 충돌 409, 예상치 못한 오류 500.
+- 실제 컨테이너/길이 검사는 비동기 Worker에서 수행한다. 제공자 미설정은 작업 failed/error.code=PROVIDER_NOT_CONFIGURED이며 API 자체 연결 실패와 구분한다.
+- 정확한 타입과 오류 경계는 apps/api/src/contracts.ts·app.ts, Python 경계는 contracts.py. OpenAPI 및 운영 인증은 후속이다.
