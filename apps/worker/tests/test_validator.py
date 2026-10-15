@@ -37,3 +37,7 @@ def test_percent_and_percentage_points_not_interchangeable():
 
 def test_ambiguous_precision_abstains():
     assert decide(claim(),[validate_evidence(claim(),document('49.99'))])=='REVIEW_REQUIRED'
+
+def test_multiple_percent_values_in_quote_are_ambiguous():
+    d=document('50');d.text=d.quote='2025년 한국 고용률은 5%에서 50%로 변했다'
+    assert not validate_evidence(claim(),d).usable

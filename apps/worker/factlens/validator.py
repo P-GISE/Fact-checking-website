@@ -33,6 +33,10 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
         if not candidate or candidate not in d.quote:reasons.append(f'{attr.upper()}_NOT_IN_QUOTE')
         if not expected or expected!=candidate:reasons.append(f'{attr.upper()}_MISMATCH')
     if not re.search(r'(?<![\d.])'+re.escape(f.value)+r'(?![\d.])',d.quote):reasons.append('VALUE_NOT_IN_QUOTE')
+    # Initial PoC accepts only a canonical unambiguous numeric record.
+    # Natural-language interpretation/negation needs a reviewed extraction contract.
+    canonical=f'{f.period} {f.subject} {f.metric} {f.value}{f.unit}'
+    if d.quote.strip()!=canonical:reasons.append('CONTEXT_REVIEW_REQUIRED')
     relation='INSUFFICIENT'
     try:
         a,b=Decimal(claim.value or ''),Decimal(f.value)

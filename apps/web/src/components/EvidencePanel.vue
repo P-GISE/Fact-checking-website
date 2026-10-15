@@ -1,0 +1,6 @@
+<script setup lang="ts">
+import type {Claim} from '../types';
+defineProps<{claim:Claim;demo:boolean}>();
+function safeUrl(url:string){try{const parsed=new URL(url);return ['http:','https:'].includes(parsed.protocol)?url:undefined;}catch{return undefined;}}
+</script>
+<template><aside class="evidence-panel" aria-labelledby="evidence-title"><div class="section-label">EVIDENCE <span>원문과 비교</span></div><h3 id="evidence-title">근거 대조</h3><p class="original-claim">{{claim.text}}</p><article v-for="(e,i) in claim.evidence" :key="i" class="source-card"><span class="small-label">{{demo?'가상 근거 · 설명용':e.usable?'원문 인용 확인':'확정 근거로 사용하지 않음'}}</span><blockquote>{{e.quote}}</blockquote><p>{{e.title}}</p><div class="source-meta">{{e.publisher??'발행 주체 미확인'}} · {{e.publishedAt??'날짜 미확인'}}<br>인용 위치 {{e.position}}</div><p v-if="e.reasons.length" class="muted">검증 제한: {{e.reasons.join(', ')}}</p><a v-if="!demo&&safeUrl(e.url)" :href="safeUrl(e.url)" target="_blank" rel="noopener noreferrer">원문 열기 ↗</a><span v-else-if="demo" class="muted">설명용 가상 자료이며 실제 출처가 아닙니다.</span></article><p v-if="!claim.evidence.length" class="empty-evidence">{{claim.verdict==='EXCLUDED'?'의견·전망은 사실 검증 대상에서 제외합니다.':'확정에 사용할 근거가 없습니다. 자료 부족은 거짓을 의미하지 않습니다.'}}</p><div class="evidence-note">판정은 확인된 근거 범위에 한정됩니다. 근거의 강도는 진실 확률이 아닙니다.</div></aside></template>

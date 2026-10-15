@@ -21,6 +21,71 @@ services:
       interval: 2s
       timeout: 2s
       retries: 30
+  media-init:
+    image: alpine:3.21
+    user: '0:0'
+    command: sh -c 'mkdir -p /data/media && chown 1000:1000 /data/media && chmod 700 /data/media'
+    volumes: [media:/data]
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+      secrets: [proxy_ca]
+    user: '1000:1000'
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      DATABASE_URL: postgresql://factlens:development@postgres:5432/factlens
+      REDIS_URL: redis://redis:6379
+      NODE_EXTRA_CA_CERTS: /run/secrets/proxy_ca
+    volumes: [media:/data]
+    secrets: [proxy_ca]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      media-init: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+      secrets: [proxy_ca]
+    user: '1000:1000'
+    read_only: true
+    tmpfs: [/tmp]
+    pids_limit: 128
+    cpus: 1
+    mem_limit: 768m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      DATABASE_URL: postgresql://factlens:development@postgres:5432/factlens
+      REDIS_URL: redis://redis:6379
+      SSL_CERT_FILE: /run/secrets/proxy_ca
+    volumes: [media:/data]
+    secrets: [proxy_ca]
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      secrets: [proxy_ca]
+    ports: ['127.0.0.1:8080:8080']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      api: {condition: service_healthy}
+secrets:
+  proxy_ca:
+    file: ${PROXY_CA_FILE:-/etc/ssl/certs/ca-certificates.crt}
 volumes:
+  media:
   pgdata:
   redisdata:
