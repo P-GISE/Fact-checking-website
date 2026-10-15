@@ -2,7 +2,7 @@
 
 ## 작업 시작·종료 규칙
 
-사용자가 말하는 **프로젝트 가이드**는 저장소 루트의 `AGENTS.md`와 아래 번호 문서 12개를 합친 **전체 13개 문서 세트**를 뜻한다. 개별 문서는 파일명 또는 역할로 구분하며 기존 파일명은 유지한다.
+사용자가 말하는 **프로젝트 가이드**는 저장소 `docs/` 폴더의 `AGENTS.md`와 아래 번호 문서 12개를 합친 **전체 13개 문서 세트**를 뜻한다. 개별 문서는 파일명 또는 역할로 구분하며 기존 파일명은 유지한다.
 
 - `AGENTS.md`: 공통 작업 지침
 - `00_문서_가이드.md`: 문서 운영 규칙
@@ -28,7 +28,7 @@
 ## FactLens AI 프로젝트 기준
 
 - 제품명: **FactLens AI** — 멀티모달 인공지능 기반 영상 허위정보 탐지 및 근거 교차검증 플랫폼.
-- 기준 자료: 사용자가 제공한 [FactLens AI 기획서 원문](references/FactLens_AI_기획서_원문.md)(2026년 10월 작성, 졸업프로젝트 제안·개발 계획 초안). 2026-10-15 검토·반영. 원문은 변경하지 않고 보존하며, 후속 결정은 번호 문서에 기록한다.
+- 기준 자료: 사용자가 제공한 [FactLens AI 기획서 원문](../references/FactLens_AI_기획서_원문.md)(2026년 10월 작성, 졸업프로젝트 제안·개발 계획 초안). 2026-10-15 검토·반영. 원문은 변경하지 않고 보존하며, 후속 결정은 번호 문서에 기록한다.
 - 목적: 영상의 개별 사실 주장과 맥락 왜곡 가능성을 외부 근거와 대조하고, 해당 영상 구간·인용문·근거 URL·판단 한계를 설명하는 의사결정 지원 서비스다. 절대적 진실 보증이나 딥페이크 판별기를 목표로 바꾸지 않는다.
 - 대상 사용자군: 일반 뉴스/SNS 이용자, 대학생·연구자, 팩트체크 종사자, 미디어 리터러시 교육기관. MVP의 일차 사용자와 검증 주제는 후속 범위 검토에서 좁힌다.
 - 현재 상태: 기획 기준 자료와 개발 도구·문서만 존재한다. 아래 파이프라인·API·DB·화면은 **기획 요구 또는 제안이며 제품 구현·성능 검증은 아직 없다**. 원문 반영을 모든 기술 선택에 대한 승인으로 간주하지 않는다.
@@ -101,7 +101,7 @@ Project MCP settings are in `.codex/config.toml`; discovery requires a new Codex
 
 ## Documentation workflow
 
-Start each project task by reading [00_문서_가이드.md](00_문서_가이드.md), [99_해야할일..md](99_해야할일..md), and the relevant design documents. The numbered Korean documents live at the repository root. Preserve the exact requested filename `99_해야할일..md`.
+Start each project task by reading [00_문서_가이드.md](00_문서_가이드.md), [99_해야할일..md](99_해야할일..md), and the relevant design documents. The project guide files, including AGENTS.md, live in docs/. Run development commands from the repository root. Preserve the exact requested filename `99_해야할일..md`.
 
 - Apply Superpowers to clarify intent, design, plan, implement, and verify as appropriate. This document setup authorizes documentation work; it does not approve undecided product architecture or start product implementation.
 - Use 01 for purpose/scope/decisions, 02 for features/acceptance, 03 for data, 04 for API contracts, 05 for flows, 06 for frontend, 07 for backend, 08 for operations, 09 for risks, 10 for file checks, and 99 for actionable tasks. Follow the change-impact table in 00.
@@ -162,3 +162,9 @@ Start each project task by reading [00_문서_가이드.md](00_문서_가이드.
 
 - 사용자 요청으로 프로젝트 가이드 13개, 보존 원문, 참조 개발 도구 및 설정을 GitHub main에 반영한다. 생성 캐시·환경 비밀 파일은 제외한다.
 - 커밋 전 상대 링크·원문 해시·문서 구조와 설정/스크립트 정적 검사를 수행하고, 푸시 후 원격 main과 로컬 커밋의 일치를 확인한다. 제품 배포는 별도다.
+
+### 프로젝트 가이드 폴더 정리 (2026-10-15)
+
+- 사용자 요청으로 가이드 13개를 docs/로 이동했다. 문서 간 링크는 유지하고 저장소 루트의 references·devtools·설정 파일 링크는 상위 상대 경로로 수정했다.
+- 루트 README에서 docs/00 문서 가이드로 진입한다. 개발 명령은 저장소 루트에서 실행한다.
+- 파일명·원문·제품 설계는 보존하며 링크/배치 검증 후 GitHub main에 반영한다.
