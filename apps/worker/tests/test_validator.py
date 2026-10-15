@@ -41,3 +41,7 @@ def test_ambiguous_precision_abstains():
 def test_multiple_percent_values_in_quote_are_ambiguous():
     d=document('50');d.text=d.quote='2025년 한국 고용률은 5%에서 50%로 변했다'
     assert not validate_evidence(claim(),d).usable
+
+def test_cropped_quote_cannot_hide_correction_context():
+    d=document('50');d.text=d.quote+'라는 주장은 잘못됐다. 실제 고용률은 5%다.'
+    assert not validate_evidence(claim(),d).usable

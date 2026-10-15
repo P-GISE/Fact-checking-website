@@ -33,3 +33,8 @@ def test_duration_limit(tmp_path):
     p=tmp_path/'long.wav'
     subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','anullsrc=r=8000:cl=mono','-t','180.01',str(p)],check=True)
     with pytest.raises(ValueError,match='DURATION_LIMIT'):probe_media(p)
+
+def test_renamed_quicktime_is_not_mp4(wav,tmp_path):
+    p=tmp_path/'not-mp4.mp4'
+    subprocess.run(['ffmpeg','-v','error','-i',str(wav),'-f','mov',str(p)],check=True)
+    with pytest.raises(ValueError,match='FORMAT_MISMATCH'):probe_media(p)

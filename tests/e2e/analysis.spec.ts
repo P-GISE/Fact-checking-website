@@ -59,3 +59,17 @@ test('persisted report links claim time to player and renders evidence as text',
   await pool.end();rmSync(dir,{recursive:true});
  }
 });
+
+test('late polling response cannot replace a newly selected example',async({page})=>{
+ const item={id:'late',status:'queued',stage:'queued',createdAt:'2026-10-16T00:00:00Z',expiresAt:'',scope:'audio_only',demo:false,error:null,claims:[],limitations:[],usage:{}};
+ await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
+ let pending:import('@playwright/test').Route|undefined;
+ await page.route('**/api/analyses/late',async route=>{pending=route;});
+ await page.goto('/');await page.locator('.history-item').first().click();
+ await expect.poll(()=>Boolean(pending)).toBe(true);
+ await page.getByRole('button',{name:'예시 보고서 보기'}).click();
+ const response=page.waitForResponse(r=>r.url().endsWith('/api/analyses/late'));
+ await pending!.fulfill({json:item});await response;
+ await page.waitForTimeout(100);
+ await expect(page.getByText('가상 예시 · 실제 분석 결과가 아닙니다')).toBeVisible();
+});

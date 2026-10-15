@@ -36,7 +36,7 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
     # Initial PoC accepts only a canonical unambiguous numeric record.
     # Natural-language interpretation/negation needs a reviewed extraction contract.
     canonical=f'{f.period} {f.subject} {f.metric} {f.value}{f.unit}'
-    if d.quote.strip()!=canonical:reasons.append('CONTEXT_REVIEW_REQUIRED')
+    if d.quote.strip()!=canonical or d.text.strip()!=canonical:reasons.append('CONTEXT_REVIEW_REQUIRED')
     relation='INSUFFICIENT'
     try:
         a,b=Decimal(claim.value or ''),Decimal(f.value)

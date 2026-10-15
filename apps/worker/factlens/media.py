@@ -21,6 +21,8 @@ def probe_media(path: Path, timeout_seconds: int = 20) -> MediaInfo:
         expected={'.mp4':'mp4','.mp3':'mp3','.wav':'wav'}.get(path.suffix.lower())
         if not expected or expected not in fmt.split(','):
             raise ValueError('FORMAT_MISMATCH')
+        if expected=='mp4' and data['format'].get('tags',{}).get('major_brand','').strip() not in {'isom','iso2','iso3','iso4','iso5','iso6','iso7','iso8','iso9','mp41','mp42','avc1','dash'}:
+            raise ValueError('FORMAT_MISMATCH')
         if not 0 < duration <= 180:
             raise ValueError('DURATION_LIMIT')
         # Decode the entire stream before any external call. Reject truncated/invalid media.
