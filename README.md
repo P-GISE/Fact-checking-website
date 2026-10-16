@@ -55,3 +55,5 @@ E2E_BASE_URL=http://127.0.0.1:8080 npm run test:e2e
 브라우저 테스트는 시스템 `/usr/bin/chromium`을 기본 사용합니다. 다른 머신에서는 `CHROMIUM_PATH`로 설치된 Chromium 경로를 지정합니다. PostgreSQL 테스트와 E2E는 같은 DB에서 병렬 실행하지 않습니다. 전체 Compose가 실행 중이라면 단위/DB 테스트 전 `docker compose stop worker`로 소비자를 멈추고, 테스트 후 동일한 Compose 파일 조합의 `start worker`로 복구합니다. `up`에서 파일 조합을 바꾸면 DB 포트 매핑이 달라질 수 있습니다. 테스트 명령은 위 환경 변수와 FFmpeg/ffprobe가 필요합니다.
 
 실제 AI 연결의 다음 단계는 제공자·모델·가격/예산·전송/보관 정책 선택과 어댑터 구현입니다. API 키를 Git이나 채팅에 넣지 않습니다. AWS·Cloudflare·Tailscale의 실제 배포/접속은 아직 검증하지 않았습니다.
+
+제공자 연결 준비용 비용 경계는 `apps/worker/factlens/metered.py`에 있습니다. 선택된 SDK의 가격 기반 호출 상한·동일 통화 예산과 `ChargedResult` 사용량 영수증이 필요하며, 이 모듈만으로 제공자나 청구가 활성화되지는 않습니다. 실패/사용량 미확인 시 예약은 유지되고 월 경계에서도 건당 한도는 초기화되지 않습니다.

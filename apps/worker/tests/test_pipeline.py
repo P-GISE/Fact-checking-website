@@ -30,3 +30,17 @@ def test_out_of_media_timestamp_rejected(tmp_path):
         def extract(self,segments):return [Claim(id=str(uuid4()),text='x',startSeconds=0,endSeconds=9)]
     with pytest.raises(ValueError,match='CLAIM_OUT_OF_RANGE'):
         run_analysis({'consent':True,'path':str(tmp_path/'a.wav'),'duration':1},WrongTime())
+
+def test_pipeline_preserves_metered_provider_usage(tmp_path):
+    from factlens.metered import BudgetedCall, BudgetedProviders, ChargedResult
+    from test_metered import Accounting
+    class Priced:
+        def transcribe(self,path):return ChargedResult([{'text':'주장','start':0,'end':1}],10)
+        def extract(self,segments):return ChargedResult([Claim(id=str(uuid4()),text='주장',startSeconds=0,endSeconds=1)],20)
+        def search(self,claim):return ChargedResult([],5)
+    accounting=Accounting()
+    billing=BudgetedCall(uuid4(),job_limit=100,month_limit=100,reserve=accounting.reserve,settle=accounting.settle)
+    providers=BudgetedProviders(Priced(),billing,max_call_micros={'transcribe':15,'extract':25,'search':10})
+    result=run_analysis({'consent':True,'path':str(tmp_path/'a.wav'),'duration':1},providers)
+    assert result.usage['actualMicros']==35
+    assert result.usage['unknownUsageCalls']==0
