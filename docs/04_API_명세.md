@@ -1,5 +1,8 @@
 # 04. API 명세
 
+> **최신 연결 상태 · 2026-10-16:** 승인된 OpenAI/Brave SDK와 예산 경계 구현. 기본 비활성화. 키·네트워크·실자료 검증은 대기. 상세는 문서 마지막의 최신 기록 참조.
+
+
 - 현재 상태 갱신: 2026-10-16 (Asia/Seoul)
 - 문서 상태: 검토 중 — 개발용 API 구현, 운영 인증/공통 계약 후속
 - 제품 구현: 개발용 업로드·작업·조회·삭제 API 구현; 실제 AI 제공자 미연결
@@ -104,3 +107,7 @@
 - 조회는 JSON AnalysisView(scope=audio_only, demo, status/stage, timestamps, claims, limitations, usage, error), 삭제 성공 204. 삭제/만료 조회 404, UUID/동의 오류 400, 크기 413, 확장자 415, 자원 충돌 409, 예상치 못한 오류 500.
 - 실제 컨테이너/길이 검사는 비동기 Worker에서 수행한다. 제공자 미설정은 작업 failed/error.code=PROVIDER_NOT_CONFIGURED이며 API 자체 연결 실패와 구분한다.
 - 정확한 타입과 오류 경계는 apps/api/src/contracts.ts·app.ts, Python 경계는 contracts.py. OpenAPI 및 운영 인증은 후속이다.
+
+## 승인된 실제 제공자 연결 후속 (2026-10-16)
+
+작업 실패 errorCode에 BUDGET_EXCEEDED, BILLING_REVIEW_REQUIRED, PROVIDER_AUTH_FAILED, PROVIDER_RATE_LIMITED, PROVIDER_MODEL_UNAVAILABLE, PROVIDER_INPUT_LIMIT, PROVIDER_RESPONSE_INVALID, PROVIDER_REQUEST_FAILED, PROVIDER_SEARCH_LIMIT를 연결했다. 작업 조회의 failed 상태이며 업로드 HTTP 응답과 구분한다. SDK 예외 원문·인증 키는 응답에 포함하지 않는다. health의 providerConfigured=false는 아직 준비 상태를 동적으로 확인하지 않는 보수적인 표시다.

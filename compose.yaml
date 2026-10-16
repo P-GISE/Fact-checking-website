@@ -68,6 +68,11 @@ services:
       DATABASE_URL: postgresql://factlens:development@postgres:5432/factlens
       REDIS_URL: redis://redis:6379
       SSL_CERT_FILE: /run/secrets/proxy_ca
+      FACTLENS_AI_MODE: ${FACTLENS_AI_MODE:-disabled}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      BRAVE_SEARCH_API_KEY: ${BRAVE_SEARCH_API_KEY:-}
+      FACTLENS_JOB_BUDGET_MICROS: ${FACTLENS_JOB_BUDGET_MICROS:-200000}
+      FACTLENS_MONTH_BUDGET_MICROS: ${FACTLENS_MONTH_BUDGET_MICROS:-20000000}
     volumes: [media:/data]
     secrets: [proxy_ca]
     depends_on:

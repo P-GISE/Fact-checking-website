@@ -54,6 +54,12 @@ E2E_BASE_URL=http://127.0.0.1:8080 npm run test:e2e
 
 브라우저 테스트는 시스템 `/usr/bin/chromium`을 기본 사용합니다. 다른 머신에서는 `CHROMIUM_PATH`로 설치된 Chromium 경로를 지정합니다. PostgreSQL 테스트와 E2E는 같은 DB에서 병렬 실행하지 않습니다. 전체 Compose가 실행 중이라면 단위/DB 테스트 전 `docker compose stop worker`로 소비자를 멈추고, 테스트 후 동일한 Compose 파일 조합의 `start worker`로 복구합니다. `up`에서 파일 조합을 바꾸면 DB 포트 매핑이 달라질 수 있습니다. 테스트 명령은 위 환경 변수와 FFmpeg/ffprobe가 필요합니다.
 
-실제 AI 연결의 다음 단계는 제공자·모델·가격/예산·전송/보관 정책 선택과 어댑터 구현입니다. API 키를 Git이나 채팅에 넣지 않습니다. AWS·Cloudflare·Tailscale의 실제 배포/접속은 아직 검증하지 않았습니다.
+OpenAI whisper-1/gpt-4.1-mini + Brave 어댑터와 월 $20·건당 $0.20 예산 경계를 구현했습니다. 실제 호출은 키·네트워크·전송/보관 정책 확인 후 검증해야 합니다. API 키를 Git이나 채팅에 넣지 않습니다. AWS·Cloudflare·Tailscale의 실제 배포/접속은 아직 검증하지 않았습니다.
 
 제공자 연결 준비용 비용 경계는 `apps/worker/factlens/metered.py`에 있습니다. 선택된 SDK의 가격 기반 호출 상한·동일 통화 예산과 `ChargedResult` 사용량 영수증이 필요하며, 이 모듈만으로 제공자나 청구가 활성화되지는 않습니다. 실패/사용량 미확인 시 예약은 유지되고 월 경계에서도 건당 한도는 초기화되지 않습니다.
+
+## 승인 프로필 설정
+
+기본 `FACTLENS_AI_MODE=disabled`입니다. 안전한 로컬 `.env`에 `FACTLENS_AI_MODE=openai_brave`, `OPENAI_API_KEY`, `BRAVE_SEARCH_API_KEY`를 설정하고 동일한 Compose 파일 조합으로 Worker를 재생성하세요. 예산 변수 기본값은 `FACTLENS_JOB_BUDGET_MICROS=200000`, `FACTLENS_MONTH_BUDGET_MICROS=20000000`이며 승인 상한을 높일 수 없습니다. 키는 Worker에만 전달합니다.
+
+현재 환경에는 키와 `api.openai.com`/`api.search.brave.com` 아웃바운드 허용이 없어 실제 유료 호출은 검증하지 않았습니다. 근거 원문 접근 정책도 필요합니다. 프록시/CA는 유지합니다. [운영 설정과 실자료 검증 절차](docs/08_운영_배포.md)를 따르세요. 정형 원문만 인정하는 현재 Validator 때문에 일반 웹문서는 검증 불충분이 될 수 있습니다.

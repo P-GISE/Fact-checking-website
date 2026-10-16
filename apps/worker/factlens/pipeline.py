@@ -39,5 +39,7 @@ def run_analysis(job:dict,providers,stage=lambda name:True)->AnalysisResult:
         advance('validating_evidence')
         c.evidence=[validate_evidence(c,d) for d in documents[:5]]
         c.verdict=decide(c,c.evidence)
+    limitations.extend(getattr(providers, 'limitations', []))
+    limitations = list(dict.fromkeys(limitations))
     usage = providers.usage() if callable(getattr(providers, 'usage', None)) else {'billing':'not_configured'}
     return AnalysisResult(claims=claims,limitations=limitations,usage=usage)

@@ -44,3 +44,9 @@ def test_pipeline_preserves_metered_provider_usage(tmp_path):
     result=run_analysis({'consent':True,'path':str(tmp_path/'a.wav'),'duration':1},providers)
     assert result.usage['actualMicros']==35
     assert result.usage['unknownUsageCalls']==0
+
+def test_provider_limitations_are_preserved(tmp_path):
+    class Restricted(TestProviders):
+        limitations=['원문 접근 실패를 반박 근거로 쓰지 않습니다.']
+    result=run_analysis({'consent':True,'path':str(tmp_path/'a.wav'),'duration':1},Restricted())
+    assert '원문 접근 실패를 반박 근거로 쓰지 않습니다.' in result.limitations

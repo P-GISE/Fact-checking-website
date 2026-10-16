@@ -9,7 +9,7 @@ import {example} from './example';
 const analysis=ref<Analysis|null>(null),history=ref<Analysis[]>([]),busy=ref(false),error=ref(''),notice=ref('');
 let timer:ReturnType<typeof setTimeout>|undefined;
 let generation=0;
-const messages:Record<string,string>={PROVIDER_NOT_CONFIGURED:'AI 제공자 연결이 필요합니다.',SIZE_LIMIT:'100 MiB 이하 파일을 선택해 주세요.',DURATION_LIMIT:'3분 이하 파일을 선택해 주세요.',INVALID_MEDIA:'파일이 손상됐거나 지원하지 않는 미디어입니다.',FORMAT_MISMATCH:'파일 확장자와 실제 형식이 다릅니다.',NO_AUDIO:'분석할 음성 트랙이 없습니다.',TIMEOUT:'작업 제한 시간을 초과했습니다.',NETWORK_ERROR:'연결을 확인한 뒤 다시 시도해 주세요.'};
+const messages:Record<string,string>={BUDGET_EXCEEDED:'분석 1건 또는 월 예산 한도에 도달했습니다.',BILLING_REVIEW_REQUIRED:'사용량 정산을 확인해야 합니다. 추가 유료 호출을 중단했습니다.',PROVIDER_AUTH_FAILED:'AI 또는 검색 API 인증 정보를 확인해 주세요.',PROVIDER_RATE_LIMITED:'제공자 호출 제한에 도달했습니다. 자동으로 재시도하지 않습니다.',PROVIDER_MODEL_UNAVAILABLE:'선택한 모델을 이 계정에서 사용할 수 없습니다.',PROVIDER_INPUT_LIMIT:'제공자 입력 제한을 초과해 추가 전송을 중단했습니다.',PROVIDER_RESPONSE_INVALID:'제공자 응답을 검증하지 못해 판정을 만들지 않았습니다.',PROVIDER_REQUEST_FAILED:'제공자 연결에 실패했습니다. 네트워크 허용 정책과 연결 상태를 확인해 주세요.',PROVIDER_SEARCH_LIMIT:'분석당 검색 횟수 제한에 도달했습니다.',PROVIDER_NOT_CONFIGURED:'AI 제공자 연결이 필요합니다.',SIZE_LIMIT:'100 MiB 이하 파일을 선택해 주세요.',DURATION_LIMIT:'3분 이하 파일을 선택해 주세요.',INVALID_MEDIA:'파일이 손상됐거나 지원하지 않는 미디어입니다.',FORMAT_MISMATCH:'파일 확장자와 실제 형식이 다릅니다.',NO_AUDIO:'분석할 음성 트랙이 없습니다.',TIMEOUT:'작업 제한 시간을 초과했습니다.',NETWORK_ERROR:'연결을 확인한 뒤 다시 시도해 주세요.'};
 function message(code:string){return messages[code]??'처리를 완료하지 못했습니다. 파일과 연결 상태를 확인해 주세요.';}
 async function refreshHistory(){try{history.value=await listAnalyses();}catch{error.value='분석 이력에 연결할 수 없습니다. 서버 실행 상태를 확인해 주세요.';}}
 function clearPoll(){generation++;if(timer)clearTimeout(timer);}

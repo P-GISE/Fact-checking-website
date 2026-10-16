@@ -73,3 +73,12 @@ test('late polling response cannot replace a newly selected example',async({page
  await page.waitForTimeout(100);
  await expect(page.getByText('가상 예시 · 실제 분석 결과가 아닙니다')).toBeVisible();
 });
+
+test('budget rejection is explained without suggesting successful analysis',async({page})=>{
+ const item={id:'budget',status:'failed',stage:'failed',createdAt:'2026-10-16T00:00:00Z',expiresAt:'',scope:'audio_only',demo:false,error:{code:'BUDGET_EXCEEDED',message:'BUDGET_EXCEEDED'},claims:[],limitations:[],usage:{}};
+ await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
+ await page.route('**/api/analyses/budget',route=>route.fulfill({json:item}));
+ await page.goto('/');await page.locator('.history-item').first().click();
+ await expect(page.getByRole('heading',{name:'분석 1건 또는 월 예산 한도에 도달했습니다.'})).toBeVisible();
+ await expect(page.getByText('이 작업의 실제 AI 분석은 완료되지 않았습니다.')).toBeVisible();
+});
