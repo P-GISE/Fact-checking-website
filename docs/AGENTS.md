@@ -224,3 +224,7 @@ Start each project task by reading [00_문서_가이드.md](00_문서_가이드.
 - 사용자 재개 요청으로 승인된 구현 계획 Task 5를 이어갔다. 환경은 connected/running, 네트워크 정책 enforced였으나 secret/runtime variable/outbound identity 바인딩은 비어 있었다. 인증값은 읽거나 출력하지 않았다.
 - metered.py의 BudgetedCall/BudgetedProviders를 구현하고 파이프라인에 사용량 전달을 연결했다. 예산 예약 전 외부 작업 호출 금지, 실패/미확인 사용량 예약 유지, 실제 비용 정산 및 초과시 후속 호출 차단을 검증한다.
 - 실제 제공자·모델·가격/통화·월/건 한도는 사용자 답변 대기다. 이번 구현은 SDK/외부 유료 호출을 활성화하지 않는다.
+
+### 제공자·예산 추천 (2026-10-16)
+
+- 사용자 미정 답변에 따라 공식 가격/기능 자료를 조사하고 01 §11에 OpenAI whisper-1/gpt-4.1-mini + Brave Search, AI API 월 $20·건 $0.20 추천안을 기록했다. 미확정이며 실제 호출/키 설정은 하지 않았다.
