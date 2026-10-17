@@ -173,9 +173,13 @@ class LiveProviders:
         try:results=response.json().get('web',{}).get('results',[])
         except (ValueError,TypeError,AttributeError) as exc:raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID') from exc
         if not isinstance(results,list):raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID')
+        documents=[];seen=set()
         for candidate in results[:3]:
             try:
                 document=self.fetch(urldefrag(candidate['url'])[0])
+                final_url=urldefrag(document['url'])[0]
+                if final_url in seen:continue
+                seen.add(final_url)
                 original=document['text']
                 excerpt=original.encode()[:18000].decode(errors='ignore')
                 if excerpt!=original:self.limitations.append('원문 일부만 구조화 대상으로 전송했습니다. 원문 전체 문맥 검증 제한을 유지합니다.')
@@ -183,9 +187,16 @@ class LiveProviders:
                 self.limitations.append('검색 후보 원문에 접근하지 못했습니다. 접근 실패를 반박 근거로 사용하지 않습니다.')
                 continue
             fact=self._structured('원문에서 주장과 비교할 직접 인용을 원문 그대로 추출하고 기간/대상/항목/수치/단위를 구조화하라. 없으면 quote를 빈 문자열, 나머지 미확인 값은 null로 둬라. publisher와 publishedAt도 원문에 직접 존재하는 값만 쓰고 외부 지식으로 채우지 마라.',{'claim':claim.text,'document':excerpt},SourceFact)
-            if not fact.quote or fact.quote not in original:return []
-            return [EvidenceDocument(url=document['url'],title=document['title'],text=original,quote=fact.quote,position=original.index(fact.quote),publisher=fact.publisher if fact.publisher and fact.publisher in original else None,publishedAt=fact.publishedAt if fact.publishedAt and fact.publishedAt in original else None,fact=Fact(subject=fact.subject or '',period=fact.period or '',metric=fact.metric or '',value=fact.value or '',unit=fact.unit or ''),lineage=document['lineage'])]
-        return []
+            if not fact.quote or fact.quote not in original:
+                self.limitations.append('검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다.')
+                continue
+            documents.append(EvidenceDocument(url=final_url,title=document['title'],text=original,quote=fact.quote,position=original.index(fact.quote),publisher=fact.publisher if fact.publisher and fact.publisher in original else None,publishedAt=fact.publishedAt if fact.publishedAt and fact.publishedAt in original else None,fact=Fact(subject=fact.subject or '',period=fact.period or '',metric=fact.metric or '',value=fact.value or '',unit=fact.unit or ''),lineage=document['lineage']))
+        return documents
+
+    def versions(self):
+        return {'providerProfile':'openai_brave','speechModel':'whisper-1','languageModel':MODEL,
+                'claimPromptVersion':'claim-structured-v1','evidencePromptVersion':'evidence-structured-v1',
+                'retrievalVersion':'brave-candidates-v2'}
 
     def usage(self):
         return {**self.billing.usage(),'currency':'USD','costBasis':'published_tariff_not_invoice','providerProfile':'openai_brave','model':MODEL,'priceDate':'2026-10-16'}
