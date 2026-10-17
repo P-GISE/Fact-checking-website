@@ -1,7 +1,7 @@
 from pathlib import Path
 from uuid import UUID
 from factlens.contracts import Claim, AnalysisResult
-from factlens.validator import validate_evidence
+from factlens.validator import validate_evidence, RULE_VERSION
 from factlens.decision import decide
 
 class ProviderUnavailable(RuntimeError):pass
@@ -23,7 +23,7 @@ def run_analysis(job:dict,providers,stage=lambda name:True)->AnalysisResult:
     segments=providers.transcribe(Path(job['path']))
     advance('extracting')
     claims=[Claim.model_validate(c) for c in providers.extract(segments)]
-    limitations=['음성만 분석했습니다. 자막·화면 맥락은 검증하지 않았습니다.']
+    limitations=['음성만 분석했습니다. 자막·화면 맥락은 검증하지 않았습니다.','정형 수치 발화와 전체 전사 맥락이 일치하는 범위만 확정 비교합니다. 일반 발언은 검토 또는 유보합니다.']
     if len(claims)>5:limitations.append('최대 5개 주장만 검증했습니다.')
     claims=claims[:5]
     ids=set()
@@ -42,4 +42,4 @@ def run_analysis(job:dict,providers,stage=lambda name:True)->AnalysisResult:
     limitations.extend(getattr(providers, 'limitations', []))
     limitations = list(dict.fromkeys(limitations))
     usage = providers.usage() if callable(getattr(providers, 'usage', None)) else {'billing':'not_configured'}
-    return AnalysisResult(claims=claims,limitations=limitations,usage=usage)
+    return AnalysisResult(claims=claims,limitations=limitations,usage=usage,versions={'ruleVersion':RULE_VERSION})

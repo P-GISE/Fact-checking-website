@@ -17,6 +17,7 @@ class EvidenceCheck(BaseModel):
 class Claim(BaseModel):
     id: str
     text: str = Field(min_length=1)
+    contextText: str | None = None
     startSeconds: float = Field(ge=0, allow_inf_nan=False)
     endSeconds: float = Field(ge=0, allow_inf_nan=False)
     subject: str | None = None
@@ -40,3 +41,4 @@ class AnalysisResult(BaseModel):
     claims: list[Claim] = Field(max_length=5)
     limitations: list[str]
     usage: dict = Field(default_factory=dict)
+    versions: dict[str,str] = Field(default_factory=dict)

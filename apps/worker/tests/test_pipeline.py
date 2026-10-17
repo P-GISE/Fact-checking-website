@@ -50,3 +50,11 @@ def test_provider_limitations_are_preserved(tmp_path):
         limitations=['원문 접근 실패를 반박 근거로 쓰지 않습니다.']
     result=run_analysis({'consent':True,'path':str(tmp_path/'a.wav'),'duration':1},Restricted())
     assert '원문 접근 실패를 반박 근거로 쓰지 않습니다.' in result.limitations
+
+
+def test_new_results_record_actual_rule_version_without_relabeling_old_results(tmp_path):
+    from factlens.contracts import AnalysisResult
+    result=run_analysis({'consent':True,'path':str(tmp_path/'a.wav'),'duration':1},TestProviders())
+    assert result.versions['ruleVersion']=='audio-numeric-canonical-v2'
+    old=AnalysisResult(claims=[],limitations=[])
+    assert old.versions=={}

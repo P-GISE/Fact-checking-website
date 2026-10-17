@@ -130,3 +130,5 @@ GET /api/media/:id는 정상 Range(206)를 유지한다. DB 경로가 해당 UUI
 GET /api/media/:id의 유효하지 않은 Range는 416을 보존하도록 수정했다. 정상 full/Range 제공과 파일 부재/거부의 404는 유지한다.
 
 검증 근거: [10 §30](10_파일_점검_현황.md#30-응답-중단-파일-정리와-range-오류-검증-2026-10-17).
+
+TASK-020 추가 필드: 주장 contextText는 서버가 보존한 전체 입력 전사(nullable legacy), 결과 versions는 문자열 record이며 신규 결과 ruleVersion=audio-numeric-canonical-v2다. 기존 결과에 버전/context를 소급 생성하지 않고 각각 {} / null로 읽는다.

@@ -42,7 +42,7 @@ test('persisted report links claim time to player and renders evidence as text',
   const u=await request.post('/api/media/upload',{multipart:{file:{name:'report.wav',mimeType:'audio/wav',buffer:readFileSync(file)}}});
   const mediaId=(await u.json()).mediaId;
   const {randomUUID}=await import('node:crypto');id=randomUUID();
-  const result={scope:'audio_only',demo:false,claims:[{id:randomUUID(),text:'테스트 자료의 주장',startSeconds:12,endSeconds:18,subject:null,period:null,metric:null,value:null,unit:null,eligibility:'checkable',verdict:'INSUFFICIENT',evidence:[{url:'javascript:alert(1)',title:'테스트 자료',quote:'<img src=x onerror="window.injected=true">',position:0,publisher:null,publishedAt:null,relation:'INSUFFICIENT',usable:false,reasons:['QUOTE_NOT_VERIFIED'],lineage:'test'}]}],limitations:['테스트 전용 고정 출력. 실제 AI 추론 아님.'],usage:{}};
+  const result={scope:'audio_only',demo:false,claims:[{id:randomUUID(),text:'테스트 자료의 주장',contextText:'전사 원문 <img src=x onerror=window.contextInjected=true> 끝',startSeconds:12,endSeconds:18,subject:null,period:null,metric:null,value:null,unit:null,eligibility:'checkable',verdict:'INSUFFICIENT',evidence:[{url:'javascript:alert(1)',title:'테스트 자료',quote:'<img src=x onerror="window.injected=true">',position:0,publisher:null,publishedAt:null,relation:'INSUFFICIENT',usable:false,reasons:['QUOTE_NOT_VERIFIED'],lineage:'test'}]}],limitations:['테스트 전용 고정 출력. 실제 AI 추론 아님.'],usage:{}};
   await pool.query("INSERT INTO jobs(id,media_id,consent,status,result) VALUES($1,$2,true,'completed',$3)",[id,mediaId,JSON.stringify(result)]);
   await page.goto('/');
   await page.locator('.history-item').first().click();
@@ -52,6 +52,9 @@ test('persisted report links claim time to player and renders evidence as text',
   await page.getByRole('button',{name:/테스트 자료의 주장/}).click();
   await expect.poll(()=>player.evaluate((v:HTMLVideoElement)=>Math.round(v.currentTime))).toBe(12);
   await expect(page.getByText('<img src=x onerror="window.injected=true">',{exact:true})).toBeVisible();
+  await page.getByText('전사 원문 맥락',{exact:true}).click();
+  await expect(page.getByText('전사 원문 <img src=x onerror=window.contextInjected=true> 끝',{exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>Object.hasOwn(window,'contextInjected'))).toBe(false);
   expect(await page.evaluate(()=>Object.hasOwn(window,'injected'))).toBe(false);
   expect(await page.locator('a[href^="javascript:"]').count()).toBe(0);
  }finally{

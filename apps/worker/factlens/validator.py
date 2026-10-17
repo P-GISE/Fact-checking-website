@@ -4,6 +4,32 @@ import re
 from urllib.parse import urlsplit
 from factlens.contracts import Claim, EvidenceCheck
 
+RULE_VERSION = 'audio-numeric-canonical-v2'
+SUPPORTED_SUBJECTS = {'한국','대한민국'}
+METRIC_UNITS = {'고용률':'%','실업률':'%','인구':'명'}
+
+def supported_record(subject,period,metric,value,unit)->bool:
+    # Finite equality-record vocabulary: free-form units/metrics can hide
+    # negation or >= comparisons even when a canonical string matches.
+    if subject not in SUPPORTED_SUBJECTS or metric not in METRIC_UNITS or unit!=METRIC_UNITS[metric]:return False
+    if not re.fullmatch(r'(?:19|20)\d{2}년',period or '') or not re.fullmatch(r'(?:0|[1-9]\d*)(?:\.\d+)?',value or ''):return False
+    number=Decimal(value)
+    return number<=100 if unit=='%' else number==number.to_integral_value()
+
+def claim_issues(claim:Claim)->list[str]:
+    fields=(claim.period,claim.subject,claim.metric,claim.value,claim.unit)
+    if not all(value and value.strip() for value in fields):return ['CLAIM_FIELDS_INCOMPLETE']
+    canonical=f'{claim.period} {claim.subject} {claim.metric} {claim.value}{claim.unit}'
+    reasons=[]
+    if not supported_record(claim.subject,claim.period,claim.metric,claim.value,claim.unit):reasons.append('CLAIM_STRUCTURE_REVIEW_REQUIRED')
+    if not claim.contextText or not claim.contextText.strip():reasons.append('CLAIM_CONTEXT_MISSING')
+    if claim.text.strip()!=canonical or (claim.contextText and claim.contextText.strip()!=canonical):
+        reasons.append('CLAIM_CONTEXT_REVIEW_REQUIRED')
+    try:
+        if not Decimal(claim.value).is_finite():raise InvalidOperation
+    except InvalidOperation:reasons.append('CLAIM_VALUE_INVALID')
+    return reasons
+
 @dataclass
 class Fact:
     subject:str
@@ -25,7 +51,8 @@ class EvidenceDocument:
     lineage:str|None=None
 
 def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
-    d=document;f=d.fact;reasons=[]
+    d=document;f=d.fact;reasons=claim_issues(claim)
+    if not supported_record(f.subject,f.period,f.metric,f.value,f.unit):reasons.append('FACT_STRUCTURE_REVIEW_REQUIRED')
     if not d.quote or d.position<0 or d.text[d.position:d.position+len(d.quote)]!=d.quote:reasons.append('QUOTE_NOT_VERIFIED')
     if not d.publisher or not d.publishedAt:reasons.append('PUBLICATION_METADATA_MISSING')
     for attr in ('subject','period','metric','unit'):

@@ -6,3 +6,13 @@ describe('claim boundary',()=>{
  it('rejects unknown verdicts',()=>expect(claimSchema.safeParse({...claim,verdict:'TRUE'}).success).toBe(false));
  it('accepts an explicit insufficient claim',()=>expect(claimSchema.parse(claim).verdict).toBe('INSUFFICIENT'));
 });
+
+it('preserves new source context and rule versions without inventing legacy provenance',async()=>{
+ const {resultSchema}=await import('../src/contracts.js');
+ const source='원문 <img src=x onerror=alert(1)> 맥락';
+ const current=resultSchema.parse({claims:[{...claim,contextText:source}],limitations:[],scope:'audio_only',versions:{ruleVersion:'audio-numeric-canonical-v2'}});
+ expect(current.claims[0].contextText).toBe(source);
+ expect(current.versions.ruleVersion).toBe('audio-numeric-canonical-v2');
+ const legacy=resultSchema.parse({claims:[claim],limitations:[],scope:'audio_only'});
+ expect(legacy.versions).toEqual({});expect(legacy.claims[0].contextText).toBeNull();
+});

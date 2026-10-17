@@ -152,7 +152,7 @@ class LiveProviders:
                     if not candidate.value or not re.search(r'(?<![\d.,+−-])'+re.escape(candidate.value)+r'(?![\d.,])',candidate.quote):raise ValueError()
                 chosen=[segments[i] for i in ids]
                 if candidate.quote not in ' '.join(s['text'] for s in chosen):raise ValueError()
-                output.append(Claim(id=str(uuid4()),text=candidate.quote,startSeconds=min(s['start'] for s in chosen),endSeconds=max(s['end'] for s in chosen),subject=candidate.subject,period=candidate.period,metric=candidate.metric,value=candidate.value,unit=candidate.unit,eligibility=candidate.eligibility))
+                output.append(Claim(id=str(uuid4()),text=candidate.quote,contextText=' '.join(s['text'] for s in segments),startSeconds=min(s['start'] for s in chosen),endSeconds=max(s['end'] for s in chosen),subject=candidate.subject,period=candidate.period,metric=candidate.metric,value=candidate.value,unit=candidate.unit,eligibility=candidate.eligibility))
             return output
         except (ValueError,IndexError,KeyError,TypeError) as exc:raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID') from exc
 

@@ -124,3 +124,15 @@ def test_structured_claim_attributes_must_match_quote(field,value):
     p,_=make(SDK(completion=response({'claims':[candidate]})))
     with pytest.raises(ProviderUnavailable,match='PROVIDER_RESPONSE_INVALID'):
         p.extract([{'id':0,'start':0,'end':1,'text':'2025년 한국 고용률 50%'}])
+
+
+def test_extract_preserves_entire_transcript_including_adjacent_correction():
+    candidate={'quote':'2025년 한국 고용률 50%','segment_ids':[0],'subject':'한국','period':'2025년','metric':'고용률','value':'50','unit':'%','eligibility':'checkable'}
+    p,_=make(SDK(completion=response({'claims':[candidate]})))
+    segments=[{'id':0,'start':0,'end':1,'text':'2025년 한국 고용률 50%'},{'id':1,'start':1,'end':2,'text':'이 주장은 틀렸다. 실제 수치는 5%다.'}]
+    c=p.extract(segments)[0]
+    assert c.contextText=='2025년 한국 고용률 50% 이 주장은 틀렸다. 실제 수치는 5%다.'
+    from factlens.validator import validate_evidence
+    from factlens.decision import decide
+    from test_validator import document
+    assert decide(c,[validate_evidence(c,document('50'))])=='REVIEW_REQUIRED'
