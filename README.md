@@ -63,3 +63,5 @@ OpenAI whisper-1/gpt-4.1-mini + Brave 어댑터와 월 $20·건당 $0.20 예산 
 기본 `FACTLENS_AI_MODE=disabled`입니다. 안전한 로컬 `.env`에 `FACTLENS_AI_MODE=openai_brave`, `OPENAI_API_KEY`, `BRAVE_SEARCH_API_KEY`를 설정하고 동일한 Compose 파일 조합으로 Worker를 재생성하세요. 예산 변수 기본값은 `FACTLENS_JOB_BUDGET_MICROS=200000`, `FACTLENS_MONTH_BUDGET_MICROS=20000000`이며 승인 상한을 높일 수 없습니다. 키는 Worker에만 전달합니다.
 
 현재 환경에는 키와 `api.openai.com`/`api.search.brave.com` 아웃바운드 허용이 없어 실제 유료 호출은 검증하지 않았습니다. 근거 원문 접근 정책도 필요합니다. 프록시/CA는 유지합니다. [운영 설정과 실자료 검증 절차](docs/08_운영_배포.md)를 따르세요. 정형 원문만 인정하는 현재 Validator 때문에 일반 웹문서는 검증 불충분이 될 수 있습니다.
+
+2026-10-17: 미디어 읽기/삭제 경계에 UUID·정해진 source 파일명·realpath 검사를 추가했습니다. 최신 검증과 운영 잔여 조건은 [프로젝트 가이드](docs/10_파일_점검_현황.md#27-미디어-경로-보호와-전체-가이드-갱신-2026-10-17), 정적 지적별 근거는 [수동 검토표](docs/reports/2026-10-17-security-review.md)에 있습니다.

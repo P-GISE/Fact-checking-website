@@ -1,12 +1,12 @@
 import {beforeAll,afterAll,beforeEach,it,expect} from 'vitest';
 import request from 'supertest';
-import {mkdtemp,readFile,rm} from 'node:fs/promises';
+import {mkdtemp,readFile,rm,symlink,rename,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import { createApp } from '../src/app.js';
 import {pool,migrate} from '../src/db.js';
-import { cleanup } from '../src/cleanup.js';
+import { cleanup,eraseFiles } from '../src/cleanup.js';
 let root:string, app:ReturnType<typeof createApp>, audio:Buffer;
 beforeAll(async()=>{
  root=await mkdtemp(join(tmpdir(),'factlens-'));
@@ -59,4 +59,29 @@ it('retains queued job when enqueue fails so recovery can find it',async()=>{
 });
 it('blocks cross-site requests to an unauthenticated local API',async()=>{
  expect((await request(app).post('/api/analyses').set('Origin','https://evil.example').send({})).status).toBe(403);
+});
+
+it('does not serve a DB path outside its media directory',async()=>{
+ const u=await upload();
+ await pool.query('UPDATE media SET path=$1 WHERE id=$2',[join(root,'sample.wav'),u.body.mediaId]);
+ const r=await request(app).get(`/api/media/${u.body.mediaId}`);
+ expect(r.status).toBe(404);
+});
+it('does not serve a symlinked source file',async()=>{
+ const u=await upload();const target=join(root,u.body.mediaId,'source.wav');
+ await rm(target);await symlink(join(root,'sample.wav'),target);
+ expect((await request(app).get(`/api/media/${u.body.mediaId}`)).status).toBe(404);
+});
+it('does not serve a symlinked media directory',async()=>{
+ const u=await upload();const folder=join(root,u.body.mediaId),outside=join(root,'outside');
+ await rename(folder,outside);await symlink(outside,folder);
+ expect((await request(app).get(`/api/media/${u.body.mediaId}`)).status).toBe(404);
+});
+it('rejects deletion traversal and preserves external files',async()=>{
+ const outside=await mkdtemp(join(tmpdir(),'factlens-outside-'));
+ try{
+  await writeFile(join(outside,'sentinel'),'keep');
+  await expect(eraseFiles(root,'../'+outside.split('/').at(-1))).rejects.toThrow();
+  expect(await readFile(join(outside,'sentinel'),'utf8')).toBe('keep');
+ }finally{await rm(outside,{recursive:true,force:true});}
 });

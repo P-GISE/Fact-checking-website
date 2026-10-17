@@ -1,11 +1,14 @@
 # 04. API 명세
 
-> **최신 연결 상태 · 2026-10-16:** 승인된 OpenAI/Brave SDK와 예산 경계 구현. 기본 비활성화. 키·네트워크·실자료 검증은 대기. 상세는 문서 마지막의 최신 기록 참조.
+> **현재 작업 기준 · 2026-10-17:** GET /api/media/:id는 정상 Range(206)를 유지한다. DB 경로가 해당 UUID 디렉터리의 source 파일과 다르거나 realpath 경계를 벗어나면 404 NOT_FOUND로 거부한다. DELETE 분석의 실제 파일 삭제 경로도 UUID 검증을 통과해야 한다. API 주소/응답 구조 변경은 없다.
 
 
-- 현재 상태 갱신: 2026-10-16 (Asia/Seoul)
+
+
+
+- 현재 상태 갱신: 2026-10-17 (Asia/Seoul)
 - 문서 상태: 검토 중 — 개발용 API 구현, 운영 인증/공통 계약 후속
-- 제품 구현: 개발용 업로드·작업·조회·삭제 API 구현; 실제 AI 제공자 미연결
+- 제품 구현: 개발용 업로드·작업·조회·삭제 API 구현; 실제 AI SDK 구현·실호출 미검증
 - 관련: [기능](02_기능_설계.md), [DB](03_데이터베이스_설계.md), [프런트엔드](06_프런트엔드_구조.md), [백엔드](07_백엔드_구조.md)
 
 > **현재 기준 · 2026-10-16:** 8개 핵심 API와 목록/미디어/health를 개발용으로 구현. Origin 제한은 사용자 인증을 대체하지 않으며 운영 공개 금지다. 과거 작업 기록은 당시 이력으로 보존한다.
@@ -111,3 +114,9 @@
 ## 승인된 실제 제공자 연결 후속 (2026-10-16)
 
 작업 실패 errorCode에 BUDGET_EXCEEDED, BILLING_REVIEW_REQUIRED, PROVIDER_AUTH_FAILED, PROVIDER_RATE_LIMITED, PROVIDER_MODEL_UNAVAILABLE, PROVIDER_INPUT_LIMIT, PROVIDER_RESPONSE_INVALID, PROVIDER_REQUEST_FAILED, PROVIDER_SEARCH_LIMIT를 연결했다. 작업 조회의 failed 상태이며 업로드 HTTP 응답과 구분한다. SDK 예외 원문·인증 키는 응답에 포함하지 않는다. health의 providerConfigured=false는 아직 준비 상태를 동적으로 확인하지 않는 보수적인 표시다.
+
+## 2026-10-17 후속 구현 상태
+
+GET /api/media/:id는 정상 Range(206)를 유지한다. DB 경로가 해당 UUID 디렉터리의 source 파일과 다르거나 realpath 경계를 벗어나면 404 NOT_FOUND로 거부한다. DELETE 분석의 실제 파일 삭제 경로도 UUID 검증을 통과해야 한다. API 주소/응답 구조 변경은 없다.
+
+검증 근거: [10 최신 기록](10_파일_점검_현황.md#27-미디어-경로-보호와-전체-가이드-갱신-2026-10-17), [보안 지적 수동 검토](reports/2026-10-17-security-review.md).

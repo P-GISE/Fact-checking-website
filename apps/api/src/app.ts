@@ -6,6 +6,7 @@ import path from 'node:path';
 import {z} from 'zod';
 import {pool} from './db.js';
 import {eraseFiles} from './cleanup.js';
+import {mediaDirectory,incomingFile,readableMedia} from './storage.js';
 import {resultSchema} from './contracts.js';
 export type Options={mediaRoot:string;enqueue:(id:string)=>Promise<void>;maxBytes?:number};
 class ApiError extends Error{constructor(public status:number,public code:string, message=code){super(message);}}
@@ -30,11 +31,11 @@ export function createApp(options:Options){
  });
  app.use(express.json({limit:'32kb'}));
  app.get('/api/health',async(_req,res)=>{await pool.query('SELECT 1');res.json({status:'ready',scope:'audio_only',providerConfigured:false});});
- const incoming=path.join(options.mediaRoot,'.incoming');
+ const incoming=path.join(path.resolve(options.mediaRoot),'.incoming');
  const upload=multer({storage:multer.diskStorage({destination:async(_req,_file,cb)=>{try{await mkdir(incoming,{recursive:true,mode:0o700});cb(null,incoming);}catch(e){cb(e as Error,incoming);}},filename:(_req,_f,cb)=>cb(null,randomUUID())}),limits:{fileSize:options.maxBytes??104857600,files:1,fields:0},fileFilter:(_req,file,cb)=>{if(!['.mp4','.mp3','.wav'].includes(path.extname(file.originalname).toLowerCase()))cb(new ApiError(415,'UNSUPPORTED_FORMAT'));else cb(null,true);}});
  app.post('/api/media/upload',upload.single('file'),async(req,res)=>{
   if(!req.file)throw new ApiError(400,'FILE_REQUIRED');
-  const mediaId=randomUUID(),folder=path.join(options.mediaRoot,mediaId);
+  const mediaId=randomUUID(),folder=mediaDirectory(options.mediaRoot,mediaId);
   try{
    if(req.file.size===0)throw new ApiError(400,'EMPTY_FILE');
    await mkdir(folder,{mode:0o700});
@@ -43,7 +44,7 @@ export function createApp(options:Options){
    const type=target.endsWith('.mp4')?'video/mp4':target.endsWith('.mp3')?'audio/mpeg':'audio/wav';
    await pool.query('INSERT INTO media(id,path,original_name,bytes,mime) VALUES($1,$2,$3,$4,$5)',[mediaId,target,path.basename(req.file.originalname),req.file.size,type]);
    res.status(201).json({mediaId});
-  }catch(e){await rm(req.file.path,{force:true});await eraseFiles(options.mediaRoot,mediaId);throw e;}
+  }catch(e){await rm(incomingFile(options.mediaRoot,req.file.filename),{force:true});await eraseFiles(options.mediaRoot,mediaId);throw e;}
  });
  app.post('/api/analyses',async(req,res)=>{
   const b=z.object({mediaId:uuid,externalProcessingConsent:z.literal(true)}).parse(req.body);
@@ -81,7 +82,9 @@ export function createApp(options:Options){
  app.get('/api/media/:id',async(req,res)=>{
   const r=await pool.query("SELECT * FROM media m WHERE id=$1 AND expires_at>now() AND NOT EXISTS(SELECT 1 FROM jobs j WHERE j.media_id=m.id AND j.status='deleted')",[id(req.params.id)]);
   const m=r.rows[0];if(!m)throw new ApiError(404,'NOT_FOUND');
-  res.type(m.mime);res.sendFile(m.path,{dotfiles:'deny'},err=>{if(err&&!res.headersSent)res.status(404).end();});
+  let source:string;
+  try{source=await readableMedia(options.mediaRoot,m.id,m.path);}catch{throw new ApiError(404,'NOT_FOUND');}
+  res.type(m.mime);res.sendFile(source,{dotfiles:'deny'},err=>{if(err&&!res.headersSent)res.status(404).end();});
  });
  app.use((_req,_res,next)=>next(new ApiError(404,'NOT_FOUND')));
  app.use((err:any,_req:Request,res:Response,_next:NextFunction)=>{
