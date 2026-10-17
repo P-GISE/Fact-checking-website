@@ -19,7 +19,7 @@ PYTHONPATH=apps/worker .venv/bin/python -m factlens.evaluation score evaluation/
 
 - Dataset: datasetId/version/kind(synthetic 또는 annotated)/annotationVersion/claims. 각 claim은 id/originId/split(dev 또는 test)/label. 추가 필드·빈 식별자·중복 id를 거부한다.
 - 원본/변형/재인용 영상은 동일 originId로 사람이 묶는다. 같은 originId가 dev/test 양쪽에 있으면 전체 manifest를 거부한다. 다른 ID로 잘못 붙인 동일 원본을 자동 탐지하지는 못한다.
-- Run: runId/system(A/B/C)/datasetDigest/modelVersion/promptVersion/ruleVersion/predictions. 각 prediction은 claimId/status(completed 또는 failed)/verdict. completed는 5종 라벨이 필수이고 failed는 null이어야 한다.
+- Run: runId/system(A/B/C 또는 RULES)/datasetDigest/modelVersion/promptVersion/ruleVersion/predictions. 각 prediction은 claimId/status(completed 또는 failed)/verdict. completed는 5종 라벨이 필수이고 failed는 null이어야 한다.
 - 중복 예측 ID·manifest 밖 ID·정규화한 전체 manifest SHA-256 불일치를 거부한다. manifest를 바꾸면 fingerprint를 다시 산출하고 예측 run의 대상 데이터도 재확인한다. 결과 파일의 해시만 바꿔 과거 실행을 새 실행처럼 사용하면 안 된다.
 - 선택 split의 모든 gold 주장을 분모로 쓴다. 해당하지 않는 다른 split의 알려진 예측은 점수에서 제외한다. 선택 split이 비어 있으면 오류다.
 - 버전·system·kind·원본 계열은 호출자가 선언한 메타데이터이며 검증된 학습/실행 이력으로 인증하지 않는다.
@@ -46,3 +46,21 @@ Claim Recall, Evidence Precision@K, Evidence Validity, Cross-modal F1, 시간/�
 3. 같은 gold/split에서 A(텍스트), B(A+검색), C(최종 전체 시스템)를 비교하되 각 모델/프롬프트/규칙·검색 조건·실행 이력을 별도로 보존한다. 현재 C 전체 멀티모달 시스템은 미완료다.
 4. 개발에 test 정답을 사용하지 않고, 실행 전에 목표 지표/분모·K·합격 기준·실패 처리와 비교/절제 실험 조건을 고정한다.
 5. 원본/정답 대응 품질과 별도 누락 주장·근거·시각·시간/비용을 평가해 최종 연구 결과를 만든다. 이 실행기의 점수만으로 TASK-014를 완료하지 않는다.
+
+## 실제 생산 규칙 회귀 — RULES
+
+```bash
+PYTHONPATH=apps/worker .venv/bin/python -m factlens.rule_regression evaluation/rules-fixture.json --split test > /tmp/factlens-rules-report.json
+```
+
+이 명령은 입력 Claim과 EvidenceDocument에 **생산 validate_evidence/decide를 실제 호출**해 예측을 만든다. 기존 score는 제공된 라벨을 채점하는 도구이고, 이 실행은 규칙 실행 자체를 검증한다. RULES 식별자는 연구 A/B/C와 별개이며 모델/STT/검색은 호출하지 않는다.
+
+fixture는 synthetic만 허용한다. manifest의 모든 gold ID와 입력 case가 1:1이어야 하며 duplicate/extra/missing case는 거부한다. 기존 label manifest SHA-256 외에 전체 주장·전체 전사 context·원문/인용/발행 메타데이터를 포함한 fixture SHA-256, 실제 RULE_VERSION, validator/decision/contracts/evaluation/runner 소스 파일 SHA-256을 기록한다. 소스 해시는 파일 추적용이며 실행 환경/호출자가 변조할 수 없다는 인증은 아니다.
+
+종료코드 0은 선택 split의 회귀 기대값 전부 일치, 1은 판정 불일치 또는 실행 실패가 포함된 JSON 보고서, 2는 잘못된 입력이다. 런타임 실패도 failed와 FN/전체 분모에 남기고 예외 원문은 출력하지 않는다. 잘못된 파일 내용도 고정 RULE_REGRESSION_INPUT_INVALID로 처리한다.
+
+동봉 fixture 9개는 지지·반박·충돌·부족·제외·부정·인접 정정·부정 단위·하한 표현의 **직접 작성한 회귀 사례**다. 테스트에서 말하는 split=test는 회귀 자료 구분이며, 보지 않은 실자료 연구 평가나 모델 성능을 뜻하지 않는다. 정답과 기대값은 테스트 개발자가 지정했다.
+
+v2 확정 비교는 한국/대한민국, 1900~2099년, 고용률%·실업률%·인구명의 제한된 등식 기록만 지원한다. 표시 주장과 전체 입력 전사, 근거 전체 텍스트가 이 정형 계약을 만족해야 한다. 지원 밖 발언은 검토/유보하며 일반 언어 이해가 아니다.
+
+회귀의 발행 주체/날짜는 out-of-band 합성 입력이다. 정상 웹문서의 발행 메타데이터·인용 맥락/출처 진위를 검증했다고 주장하지 않는다. 현재 근거 전체 문맥 gate 때문에 일반 문서와 metadata를 포함한 실제 페이지는 대부분 확정되지 않는다. 이는 TASK-023의 지원 문서/맥락/provenance 계약 후속이다. Claim Recall·근거 품질/독립성·시각·STT/시간/비용은 계속 미측정이다.

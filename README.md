@@ -73,3 +73,11 @@ OpenAI whisper-1/gpt-4.1-mini + Brave 어댑터와 월 $20·건당 $0.20 예산 
 ```bash
 PYTHONPATH=apps/worker .venv/bin/python -m factlens.evaluation score evaluation/example-dataset.json evaluation/example-run.json --split test
 ```
+
+## 실제 규칙 회귀
+
+```bash
+PYTHONPATH=apps/worker .venv/bin/python -m factlens.rule_regression evaluation/rules-fixture.json --split test
+```
+
+생산 Validator/Decision을 합성9개 사례에서 실행하며 전체 입력/규칙/소스 해시를 기록합니다. RULES 결과는 모델·실자료 연구 성능이 아닙니다. 현재 v2의 확정 비교는 한국/대한민국의 연 단위 고용률%·실업률%·인구명 등 제한된 정형 기록뿐이며, 표시 주장·전체 전사·근거 전체 맥락을 확인합니다. 일반 발언과 문서의 지원 확장은 [통합 실행 순서](docs/00_문서_가이드.md#통합-실행-순서)를 따릅니다.

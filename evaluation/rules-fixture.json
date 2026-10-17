@@ -1,0 +1,373 @@
+{
+  "fixtureId": "synthetic-production-rules-v2",
+  "version": "1",
+  "dataset": {
+    "datasetId": "rule-labels",
+    "version": "1",
+    "kind": "synthetic",
+    "annotationVersion": "manual-fixture-v1",
+    "claims": [
+      {
+        "id": "support",
+        "originId": "support",
+        "split": "test",
+        "label": "CONFIRMED"
+      },
+      {
+        "id": "refute",
+        "originId": "refute",
+        "split": "test",
+        "label": "REFUTED"
+      },
+      {
+        "id": "conflict",
+        "originId": "conflict",
+        "split": "test",
+        "label": "REVIEW_REQUIRED"
+      },
+      {
+        "id": "absent",
+        "originId": "absent",
+        "split": "test",
+        "label": "INSUFFICIENT"
+      },
+      {
+        "id": "negative",
+        "originId": "negative",
+        "split": "test",
+        "label": "REVIEW_REQUIRED"
+      },
+      {
+        "id": "excluded",
+        "originId": "excluded",
+        "split": "test",
+        "label": "EXCLUDED"
+      },
+      {
+        "id": "cropped",
+        "originId": "cropped",
+        "split": "test",
+        "label": "REVIEW_REQUIRED"
+      },
+      {
+        "id": "negated-unit",
+        "originId": "negated-unit",
+        "split": "test",
+        "label": "REVIEW_REQUIRED"
+      },
+      {
+        "id": "lower-bound",
+        "originId": "lower-bound",
+        "split": "test",
+        "label": "REVIEW_REQUIRED"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "claim": {
+        "id": "support",
+        "text": "2025년 한국 고용률 50%",
+        "contextText": "2025년 한국 고용률 50%",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률",
+        "value": "50",
+        "unit": "%",
+        "eligibility": "checkable",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": [
+        {
+          "url": "https://example.org/report",
+          "title": "통계",
+          "text": "2025년 한국 고용률 50%",
+          "quote": "2025년 한국 고용률 50%",
+          "position": 0,
+          "publisher": "통계 기관",
+          "publishedAt": "2026-01-01",
+          "fact": {
+            "subject": "한국",
+            "period": "2025년",
+            "metric": "고용률",
+            "value": "50",
+            "unit": "%"
+          },
+          "lineage": null
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "refute",
+        "text": "2025년 한국 고용률 50%",
+        "contextText": "2025년 한국 고용률 50%",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률",
+        "value": "50",
+        "unit": "%",
+        "eligibility": "checkable",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": [
+        {
+          "url": "https://example.org/report",
+          "title": "통계",
+          "text": "2025년 한국 고용률 5%",
+          "quote": "2025년 한국 고용률 5%",
+          "position": 0,
+          "publisher": "통계 기관",
+          "publishedAt": "2026-01-01",
+          "fact": {
+            "subject": "한국",
+            "period": "2025년",
+            "metric": "고용률",
+            "value": "5",
+            "unit": "%"
+          },
+          "lineage": null
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "conflict",
+        "text": "2025년 한국 고용률 50%",
+        "contextText": "2025년 한국 고용률 50%",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률",
+        "value": "50",
+        "unit": "%",
+        "eligibility": "checkable",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": [
+        {
+          "url": "https://example.org/report",
+          "title": "통계",
+          "text": "2025년 한국 고용률 50%",
+          "quote": "2025년 한국 고용률 50%",
+          "position": 0,
+          "publisher": "통계 기관",
+          "publishedAt": "2026-01-01",
+          "fact": {
+            "subject": "한국",
+            "period": "2025년",
+            "metric": "고용률",
+            "value": "50",
+            "unit": "%"
+          },
+          "lineage": null
+        },
+        {
+          "url": "https://example.org/report",
+          "title": "통계",
+          "text": "2025년 한국 고용률 5%",
+          "quote": "2025년 한국 고용률 5%",
+          "position": 0,
+          "publisher": "통계 기관",
+          "publishedAt": "2026-01-01",
+          "fact": {
+            "subject": "한국",
+            "period": "2025년",
+            "metric": "고용률",
+            "value": "5",
+            "unit": "%"
+          },
+          "lineage": null
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "absent",
+        "text": "2025년 한국 고용률 50%",
+        "contextText": "2025년 한국 고용률 50%",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률",
+        "value": "50",
+        "unit": "%",
+        "eligibility": "checkable",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": []
+    },
+    {
+      "claim": {
+        "id": "negative",
+        "text": "2025년 한국 고용률 50%가 아니다.",
+        "contextText": "2025년 한국 고용률 50%가 아니다.",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률",
+        "value": "50",
+        "unit": "%",
+        "eligibility": "checkable",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": [
+        {
+          "url": "https://example.org/report",
+          "title": "통계",
+          "text": "2025년 한국 고용률 50%",
+          "quote": "2025년 한국 고용률 50%",
+          "position": 0,
+          "publisher": "통계 기관",
+          "publishedAt": "2026-01-01",
+          "fact": {
+            "subject": "한국",
+            "period": "2025년",
+            "metric": "고용률",
+            "value": "50",
+            "unit": "%"
+          },
+          "lineage": null
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "excluded",
+        "text": "2025년 한국 고용률 50%",
+        "contextText": "2025년 한국 고용률 50%",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률",
+        "value": "50",
+        "unit": "%",
+        "eligibility": "excluded",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": []
+    },
+    {
+      "claim": {
+        "id": "cropped",
+        "text": "2025년 한국 고용률 50%",
+        "contextText": "2025년 한국 고용률 50% 앞선 주장은 틀렸다. 실제 수치는 5%다.",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률",
+        "value": "50",
+        "unit": "%",
+        "eligibility": "checkable",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": [
+        {
+          "url": "https://example.org/report",
+          "title": "통계",
+          "text": "2025년 한국 고용률 50%",
+          "quote": "2025년 한국 고용률 50%",
+          "position": 0,
+          "publisher": "통계 기관",
+          "publishedAt": "2026-01-01",
+          "fact": {
+            "subject": "한국",
+            "period": "2025년",
+            "metric": "고용률",
+            "value": "50",
+            "unit": "%"
+          },
+          "lineage": null
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "negated-unit",
+        "text": "2025년 한국 고용률 50%가 아니다.",
+        "contextText": "2025년 한국 고용률 50%가 아니다.",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률",
+        "value": "50",
+        "unit": "%가 아니다.",
+        "eligibility": "checkable",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": [
+        {
+          "url": "https://example.org/report",
+          "title": "통계",
+          "text": "2025년 한국 고용률 5%가 아니다.",
+          "quote": "2025년 한국 고용률 5%가 아니다.",
+          "position": 0,
+          "publisher": "통계 기관",
+          "publishedAt": "2026-01-01",
+          "fact": {
+            "subject": "한국",
+            "period": "2025년",
+            "metric": "고용률",
+            "value": "5",
+            "unit": "%가 아니다."
+          },
+          "lineage": null
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "lower-bound",
+        "text": "2025년 한국 고용률은 적어도 50%",
+        "contextText": "2025년 한국 고용률은 적어도 50%",
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "subject": "한국",
+        "period": "2025년",
+        "metric": "고용률은 적어도",
+        "value": "50",
+        "unit": "%",
+        "eligibility": "checkable",
+        "verdict": "INSUFFICIENT",
+        "evidence": []
+      },
+      "documents": [
+        {
+          "url": "https://example.org/report",
+          "title": "통계",
+          "text": "2025년 한국 고용률은 적어도 5%",
+          "quote": "2025년 한국 고용률은 적어도 5%",
+          "position": 0,
+          "publisher": "통계 기관",
+          "publishedAt": "2026-01-01",
+          "fact": {
+            "subject": "한국",
+            "period": "2025년",
+            "metric": "고용률은 적어도",
+            "value": "5",
+            "unit": "%"
+          },
+          "lineage": null
+        }
+      ]
+    }
+  ]
+}

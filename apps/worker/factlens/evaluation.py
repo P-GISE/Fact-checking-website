@@ -52,7 +52,7 @@ class Prediction(Strict):
 
 class Run(Strict):
     runId:Name
-    system:Literal['A','B','C']
+    system:Literal['A','B','C','RULES']
     datasetDigest:Annotated[str,StringConstraints(pattern=r'^[0-9a-f]{64}$')]
     modelVersion:Name
     promptVersion:Name
@@ -118,7 +118,7 @@ def score(dataset:Dataset,run:Run,split:Split)->dict:
         'notMeasured':['ClaimRecall','EvidencePrecisionAtK','EvidenceValidity','CrossModalF1','Latency','Cost'],
     }
 
-def _load(path:str,schema:type[BaseModel]):
+def load_input(path:str,schema:type[BaseModel]):
     with Path(path).open('rb') as stream:data=stream.read(2097153)
     if len(data)>2097152:raise ValueError('INPUT_TOO_LARGE')
     return schema.model_validate_json(data)
@@ -131,8 +131,8 @@ def main(argv=None)->int:
     evaluate.add_argument('--split',choices=('dev','test'),required=True)
     args=parser.parse_args(argv)
     try:
-        dataset=_load(args.dataset,Dataset)
-        result=fingerprint(dataset) if args.command=='fingerprint' else score(dataset,_load(args.run,Run),args.split)
+        dataset=load_input(args.dataset,Dataset)
+        result=fingerprint(dataset) if args.command=='fingerprint' else score(dataset,load_input(args.run,Run),args.split)
     except (OSError,ValueError):
         print('EVALUATION_INPUT_INVALID',file=sys.stderr)
         return 2
