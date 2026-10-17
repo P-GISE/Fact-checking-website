@@ -1,0 +1,38 @@
+{
+  "datasetId": "synthetic-scoring-demo",
+  "version": "1",
+  "kind": "synthetic",
+  "annotationVersion": "handwritten-fixture-v1",
+  "claims": [
+    {
+      "id": "example-0",
+      "originId": "synthetic-origin-0",
+      "split": "test",
+      "label": "CONFIRMED"
+    },
+    {
+      "id": "example-1",
+      "originId": "synthetic-origin-1",
+      "split": "test",
+      "label": "REFUTED"
+    },
+    {
+      "id": "example-2",
+      "originId": "synthetic-origin-2",
+      "split": "test",
+      "label": "INSUFFICIENT"
+    },
+    {
+      "id": "example-3",
+      "originId": "synthetic-origin-3",
+      "split": "test",
+      "label": "REVIEW_REQUIRED"
+    },
+    {
+      "id": "example-4",
+      "originId": "synthetic-origin-4",
+      "split": "test",
+      "label": "EXCLUDED"
+    }
+  ]
+}

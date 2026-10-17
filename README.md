@@ -65,3 +65,11 @@ OpenAI whisper-1/gpt-4.1-mini + Brave 어댑터와 월 $20·건당 $0.20 예산 
 현재 환경에는 키와 `api.openai.com`/`api.search.brave.com` 아웃바운드 허용이 없어 실제 유료 호출은 검증하지 않았습니다. 근거 원문 접근 정책도 필요합니다. 프록시/CA는 유지합니다. [운영 설정과 실자료 검증 절차](docs/08_운영_배포.md)를 따르세요. 정형 원문만 인정하는 현재 Validator 때문에 일반 웹문서는 검증 불충분이 될 수 있습니다.
 
 2026-10-17: 미디어 읽기/삭제 경계에 UUID·정해진 source 파일명·realpath 검사를 추가했습니다. 최신 검증과 운영 잔여 조건은 [프로젝트 가이드](docs/10_파일_점검_현황.md#27-미디어-경로-보호와-전체-가이드-갱신-2026-10-17), 정적 지적별 근거는 [수동 검토표](docs/reports/2026-10-17-security-review.md)에 있습니다.
+
+## 오프라인 판정 평가 준비
+
+실제 모델 호출 없이 수동 대응한 정답/예측 라벨을 채점하는 도구를 추가했습니다. 원본 계열의 dev/test 혼입·manifest 해시·누락/실패 분모를 검사합니다. [평가 실행 안내](evaluation/README.md)의 예시는 합성 자료이며 실제 제품/연구 성능이 아닙니다. 생산 Validator는 변경하지 않았습니다.
+
+```bash
+PYTHONPATH=apps/worker .venv/bin/python -m factlens.evaluation score evaluation/example-dataset.json evaluation/example-run.json --split test
+```

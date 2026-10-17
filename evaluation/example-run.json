@@ -1,0 +1,30 @@
+{
+  "runId": "synthetic-demo-not-model-output",
+  "system": "B",
+  "datasetDigest": "8ee273106a4c27dfdb72d6b3040a3b7a699213a56b9cb4a867c098e578a0b9fd",
+  "modelVersion": "fixture-only-no-model-call",
+  "promptVersion": "fixture-v1",
+  "ruleVersion": "fixture-v1",
+  "predictions": [
+    {
+      "claimId": "example-0",
+      "status": "completed",
+      "verdict": "REFUTED"
+    },
+    {
+      "claimId": "example-2",
+      "status": "completed",
+      "verdict": "INSUFFICIENT"
+    },
+    {
+      "claimId": "example-3",
+      "status": "failed",
+      "verdict": null
+    },
+    {
+      "claimId": "example-4",
+      "status": "completed",
+      "verdict": "EXCLUDED"
+    }
+  ]
+}
