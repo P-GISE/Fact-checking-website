@@ -116,3 +116,9 @@
 GET /api/media/:id는 정상 Range(206)를 유지한다. DB 경로가 해당 UUID 디렉터리의 source 파일과 다르거나 realpath 경계를 벗어나면 404 NOT_FOUND로 거부한다. DELETE 분석의 실제 파일 삭제 경로도 UUID 검증을 통과해야 한다. API 주소/응답 구조 변경은 없다.
 
 검증 근거: [10 최신 기록](10_파일_점검_현황.md#27-미디어-경로-보호와-전체-가이드-갱신-2026-10-17), [보안 지적 수동 검토](reports/2026-10-17-security-review.md).
+
+## 파일 descriptor 보호 후속 (2026-10-17)
+
+미디어 GET은 저장 경로를 검사한 뒤 다시 여는 대신 openMedia가 연 파일을 응답 종료/오류/중단 callback까지 유지한다. Linux /proc/self/fd로 Express의 기존 full/Range 처리를 사용하며 finally에서 닫는다. 주소·응답 구조·404 정책은 유지한다.
+
+검증: [10 §29](10_파일_점검_현황.md#29-파일-descriptor-보호-후속-2026-10-17).

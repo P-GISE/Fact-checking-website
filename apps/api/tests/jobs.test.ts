@@ -1,6 +1,6 @@
 import {beforeAll,afterAll,beforeEach,it,expect} from 'vitest';
 import request from 'supertest';
-import {mkdtemp,readFile,rm,symlink,rename,writeFile} from 'node:fs/promises';
+import {mkdtemp,readFile,rm,symlink,rename,writeFile,access} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -31,7 +31,9 @@ it('requires consent, creates idempotent job, deletes immediately',async()=>{
  const again=await request(app).post('/api/analyses').set('Idempotency-Key','one').send(body);
  expect(again.body.id).toBe(a.body.id);
  expect((await request(app).get(`/api/analyses/${a.body.id}`)).body.scope).toBe('audio_only');
+ await writeFile(join(root,u.body.mediaId,'audio.wav'),'derived audio');
  expect((await request(app).delete(`/api/analyses/${a.body.id}`)).status).toBe(204);
+ await expect(access(join(root,u.body.mediaId))).rejects.toMatchObject({code:'ENOENT'});
  expect((await request(app).get(`/api/analyses/${a.body.id}`)).status).toBe(404);
  expect((await request(app).get(`/api/media/${u.body.mediaId}`)).status).toBe(404);
 });
@@ -82,6 +84,15 @@ it('rejects deletion traversal and preserves external files',async()=>{
  try{
   await writeFile(join(outside,'sentinel'),'keep');
   await expect(eraseFiles(root,'../'+outside.split('/').at(-1))).rejects.toThrow();
+  expect(await readFile(join(outside,'sentinel'),'utf8')).toBe('keep');
+ }finally{await rm(outside,{recursive:true,force:true});}
+});
+
+it('rejects absolute deletion IDs without deleting their targets',async()=>{
+ const outside=await mkdtemp(join(tmpdir(),'factlens-absolute-'));
+ try{
+  await writeFile(join(outside,'sentinel'),'keep');
+  await expect(eraseFiles(root,outside)).rejects.toThrow();
   expect(await readFile(join(outside,'sentinel'),'utf8')).toBe('keep');
  }finally{await rm(outside,{recursive:true,force:true});}
 });

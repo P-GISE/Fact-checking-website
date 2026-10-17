@@ -6,7 +6,7 @@ import path from 'node:path';
 import {z} from 'zod';
 import {pool} from './db.js';
 import {eraseFiles} from './cleanup.js';
-import {mediaDirectory,incomingFile,readableMedia} from './storage.js';
+import {mediaDirectory,incomingFile,openMedia} from './storage.js';
 import {resultSchema} from './contracts.js';
 export type Options={mediaRoot:string;enqueue:(id:string)=>Promise<void>;maxBytes?:number};
 class ApiError extends Error{constructor(public status:number,public code:string, message=code){super(message);}}
@@ -82,9 +82,16 @@ export function createApp(options:Options){
  app.get('/api/media/:id',async(req,res)=>{
   const r=await pool.query("SELECT * FROM media m WHERE id=$1 AND expires_at>now() AND NOT EXISTS(SELECT 1 FROM jobs j WHERE j.media_id=m.id AND j.status='deleted')",[id(req.params.id)]);
   const m=r.rows[0];if(!m)throw new ApiError(404,'NOT_FOUND');
-  let source:string;
-  try{source=await readableMedia(options.mediaRoot,m.id,m.path);}catch{throw new ApiError(404,'NOT_FOUND');}
-  res.type(m.mime);res.sendFile(source,{dotfiles:'deny'},err=>{if(err&&!res.headersSent)res.status(404).end();});
+  let source;
+  try{source=await openMedia(options.mediaRoot,m.id,m.path);}catch{throw new ApiError(404,'NOT_FOUND');}
+  try{
+   await new Promise<void>((resolve)=>{
+    res.type(m.mime);res.sendFile(`/proc/self/fd/${source.fd}`,{dotfiles:'deny'},err=>{
+     if(err&&!res.headersSent)res.status(404).end();
+     resolve();
+    });
+   });
+  }finally{await source.close();}
  });
  app.use((_req,_res,next)=>next(new ApiError(404,'NOT_FOUND')));
  app.use((err:any,_req:Request,res:Response,_next:NextFunction)=>{
