@@ -1,7 +1,9 @@
 import {beforeAll,afterAll,beforeEach,it,expect} from 'vitest';
 import request from 'supertest';
-import {mkdtemp,readFile,rm,symlink,rename,writeFile,access} from 'node:fs/promises';
+import {mkdtemp,readFile,rm,symlink,rename,writeFile,access,readdir,readlink,truncate} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
+import {createServer,get as httpGet} from 'node:http';
+import {once} from 'node:events';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import { createApp } from '../src/app.js';
@@ -95,4 +97,57 @@ it('rejects absolute deletion IDs without deleting their targets',async()=>{
   await expect(eraseFiles(root,outside)).rejects.toThrow();
   expect(await readFile(join(outside,'sentinel'),'utf8')).toBe('keep');
  }finally{await rm(outside,{recursive:true,force:true});}
+});
+
+async function mediaDescriptors(source:string){
+ const descriptors=await readdir('/proc/self/fd');
+ const targets=await Promise.all(descriptors.map(async fd=>{
+  try{return await readlink(`/proc/self/fd/${fd}`);}catch(error){
+   if((error as NodeJS.ErrnoException).code==='ENOENT')return '';
+   throw error;
+  }
+ }));
+ return targets.filter(target=>target===source||target===source+' (deleted)').length;
+}
+async function waitForMediaClose(source:string){
+ const deadline=Date.now()+2000;
+ while(await mediaDescriptors(source)){
+  if(Date.now()>=deadline)throw new Error('Media descriptor retained after response ended');
+  await new Promise(resolve=>setTimeout(resolve,10));
+ }
+}
+it('closes source descriptors after an actual client abort',async()=>{
+ const u=await upload(),source=join(root,u.body.mediaId,'source.wav');
+ await truncate(source,64*1024*1024);
+ const server=createServer(app);server.listen(0,'127.0.0.1');await once(server,'listening');
+ const address=server.address();if(!address||typeof address==='string')throw new Error('Missing server port');
+ let client:ReturnType<typeof httpGet>|undefined;
+ const warnings:Error[]=[];
+ const warning=(value:Error)=>{if(value.message.includes('Closing file descriptor')||('code' in value&&value.code==='DEP0137'))warnings.push(value);};
+ process.on('warning',warning);
+ try{
+  const response=await new Promise<import('node:http').IncomingMessage>((resolve,reject)=>{
+   client=httpGet(`http://127.0.0.1:${address.port}/api/media/${u.body.mediaId}`,resolve);
+   client.on('error',reject);
+  });
+  expect(response.statusCode).toBe(200);
+  await once(response,'data');response.pause();
+  expect(await mediaDescriptors(source)).toBeGreaterThan(0);
+  response.destroy();client.destroy();
+  await waitForMediaClose(source);
+  await new Promise(resolve=>setImmediate(resolve));
+  expect(await mediaDescriptors(source)).toBe(0);
+  expect(warnings).toEqual([]);
+ }finally{
+  process.off('warning',warning);
+  client?.destroy();server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));
+ }
+});
+it('closes source descriptors after full and rejected Range responses',async()=>{
+ const u=await upload(),source=join(root,u.body.mediaId,'source.wav');
+ expect((await request(app).get(`/api/media/${u.body.mediaId}`)).status).toBe(200);
+ await waitForMediaClose(source);
+ expect((await request(app).get(`/api/media/${u.body.mediaId}`).set('Range','bytes=999999999-')).status).toBe(416);
+ await waitForMediaClose(source);
+ expect(await mediaDescriptors(source)).toBe(0);
 });

@@ -87,7 +87,7 @@ export function createApp(options:Options){
   try{
    await new Promise<void>((resolve)=>{
     res.type(m.mime);res.sendFile(`/proc/self/fd/${source.fd}`,{dotfiles:'deny'},err=>{
-     if(err&&!res.headersSent)res.status(404).end();
+     if(err&&!res.headersSent)res.status('status' in err&&err.status===416?416:404).end();
      resolve();
     });
    });
