@@ -146,3 +146,13 @@ TASK-020 추가 필드: 주장 contextText는 서버가 보존한 전체 입력 
 sourceTrace.parserVersion은 static-text-v1/v2를 수용한다. sourceLinks(kind/url/locator) 최대32개·sourceLinksComplete를 추가했고 과거 누락은 []/false다. sourceReview는 nullable이며 version/registryVersion, identity(status/publisherId/registeredName), independence=unverified, groupId/groupSize(1~5)/relatedUrls(최대4)/signals를 보존한다. 인증 완료/독립 출처라고 쓰는 enum은 없다. Registry는 repository의 trusted 파일이며 API/모델 입력으로 교체하지 않는다.
 
 결과 versions에 sourceReviewVersion/sourceRegistryVersion을 추가하고 제공자 반환값이 실제 버전을 덮어쓰지 못하게 한다. RULES execution은 검토 모듈/등록 JSON의 해시를 포함한다. 신규 API 경로는 없고 기존 운영 인증/인가 제약은 유지한다.
+
+
+## API 브라우저 보호 보완 (2026-10-19)
+
+모든 API 응답은 Origin 검사 이전 공통 미들웨어에서 X-Frame-Options DENY, Content-Security-Policy(default-src/frame-ancestors/base-uri/form-action none), Cross-Origin-Resource-Policy same-origin, Referrer-Policy no-referrer를 설정한다. 기존 nosniff/no-store와 비허용 Origin403을 유지한다. JSON 필드/상태 계약은 바꾸지 않는다. 정상206 미디어·400/403/404 오류 경계를 검증했고 기존 브라우저 재생/업로드/삭제 회귀를 유지한다. 인증·개별 데이터 소유권 대체가 아니며 운영 공개는 미완료다.
+
+
+## TASK-027 읽기 전용 관리자 화면 (2026-10-19)
+
+GET `/api/admin/overview`만 추가했다. 서버의 별도 `FACTLENS_ADMIN_TOKEN`은 32~256자 `[A-Za-z0-9._~-]` 토큰이며 무작위 32바이트 이상에서 생성한다. Authorization Bearer의 SHA-256 digest를 timingSafeEqual로 비교한다. 환경 미설정/형식 미달은 503 ADMIN_NOT_CONFIGURED, 인증 실패는 401 ADMIN_UNAUTHORIZED, 비허용 Origin은 403이다. 성공 응답은 version(admin-overview-v1), observedAt/windowStart, statusCounts, recentJobs[{id,status,createdAt,errorCode}], usage{month,settledMicros,reservedMicros,effectiveMicros,pendingReservations}다. 비용은 USD micros decimal 문자열이다. recentJobs는 최근 24시간 최대 20개이며 errorCode는 허용 코드 또는 UNCLASSIFIED_ERROR/null이다. 원시 오류·본문·토큰·미디어 ID는 반환하지 않는다. 관리자 변경 엔드포인트는 없으며 이 인증은 기존 제품 API 전체의 사용자 인증을 대신하지 않는다.

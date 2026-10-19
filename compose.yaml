@@ -40,6 +40,7 @@ services:
       DATABASE_URL: postgresql://factlens:development@postgres:5432/factlens
       REDIS_URL: redis://redis:6379
       NODE_EXTRA_CA_CERTS: /run/secrets/proxy_ca
+      FACTLENS_ADMIN_TOKEN: ${FACTLENS_ADMIN_TOKEN:-}
     volumes: [media:/data]
     secrets: [proxy_ca]
     depends_on:

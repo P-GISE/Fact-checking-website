@@ -5,10 +5,11 @@ import { mkdir,rename,rm,chmod } from 'node:fs/promises';
 import path from 'node:path';
 import {z} from 'zod';
 import {pool} from './db.js';
+import {adminRouter} from './admin.js';
 import {eraseFiles} from './cleanup.js';
 import {mediaDirectory,incomingFile,openMedia} from './storage.js';
 import {resultSchema} from './contracts.js';
-export type Options={mediaRoot:string;enqueue:(id:string)=>Promise<void>;maxBytes?:number};
+export type Options={mediaRoot:string;enqueue:(id:string)=>Promise<void>;maxBytes?:number;adminToken?:string};
 class ApiError extends Error{constructor(public status:number,public code:string, message=code){super(message);}}
 const uuid=z.string().uuid();
 function id(value:unknown){return uuid.parse(value);}
@@ -24,12 +25,17 @@ export function createApp(options:Options){
  const app=express();app.disable('x-powered-by');
  app.use((req,res,next)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','no-store');
+  res.setHeader('X-Frame-Options','DENY');
+  res.setHeader('Content-Security-Policy',"default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
+  res.setHeader('Cross-Origin-Resource-Policy','same-origin');
+  res.setHeader('Referrer-Policy','no-referrer');
   const origin=req.get('Origin');
   const allowed=(process.env.ALLOWED_ORIGINS??'http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:8080,http://localhost:8080').split(',');
   if(req.get('Sec-Fetch-Site')==='cross-site'||(origin&&!allowed.includes(origin)))return next(new ApiError(403,'ORIGIN_DENIED'));
   next();
  });
  app.use(express.json({limit:'32kb'}));
+ app.use('/api/admin',adminRouter(options.adminToken??process.env.FACTLENS_ADMIN_TOKEN));
  app.get('/api/health',async(_req,res)=>{await pool.query('SELECT 1');res.json({status:'ready',scope:'audio_only',providerConfigured:false});});
  const incoming=path.join(path.resolve(options.mediaRoot),'.incoming');
  const upload=multer({storage:multer.diskStorage({destination:async(_req,_file,cb)=>{try{await mkdir(incoming,{recursive:true,mode:0o700});cb(null,incoming);}catch(e){cb(e as Error,incoming);}},filename:(_req,_f,cb)=>cb(null,randomUUID())}),limits:{fileSize:options.maxBytes??104857600,files:1,fields:0},fileFilter:(_req,file,cb)=>{if(!['.mp4','.mp3','.wav'].includes(path.extname(file.originalname).toLowerCase()))cb(new ApiError(415,'UNSUPPORTED_FORMAT'));else cb(null,true);}});

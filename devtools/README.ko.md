@@ -1,6 +1,6 @@
 # 개발 도구 설정
 
-`Fact-checking-website` 개발을 위한 도구 모음입니다. 웹사이트 코드는 아직 없습니다.
+`Fact-checking-website` 개발을 위한 도구 모음입니다. Vue 웹·Node API·Python Worker가 구현돼 있으며 최신 상태는 프로젝트 가이드와 실행 기록을 따릅니다.
 
 ```bash
 cd /workspace/Fact-checking-website
@@ -17,7 +17,7 @@ python3 devtools/start-services.py
 | [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | CLI/서비스 3.8.51 | 포트 20128, `/api/health` 정상. 모델 API는 인증 필요 |
 | [PM Skills](https://github.com/phuryn/pm-skills) | 스킬 69개 | PRD·기획·전략 요청에 사용. Claude 전용 슬래시 명령은 Codex 명령으로 변환하지 않음 |
 | [Ponytail](https://github.com/DietrichGebert/ponytail) | 스킬 6개 | 간결성 및 리뷰. 네이티브 플러그인과 lifecycle hook은 미활성화 |
-| [CodeGraph](https://github.com/colbymchenry/codegraph) | CLI/MCP 1.6.2 | `codegraph init --yes .`, `codegraph query NAME --path .`. 앱 소스가 없으므로 현재 인덱스는 비어 있음 |
+| [CodeGraph](https://github.com/colbymchenry/codegraph) | CLI/MCP 1.6.2 | `codegraph init --yes .`, `codegraph query NAME --path .`. 소스 변경 후 인덱스를 갱신해야 하며 이 기록은 현재 인덱스의 최신성을 보증하지 않음 |
 | [LazyCodex](https://github.com/code-yeongyu/lazycodex) | CLI 5.1.33 + 스킬 27개 | 전체 harness·역할·hook 자동 설치는 미적용. 현재 npm installer dry-run은 autonomous 플래그를 추가하므로 실행하지 않음 |
 | [Superpowers](https://github.com/obra/superpowers) | 스킬 15개, 현재 세션 플러그인도 제공됨 | 개발 워크플로. 동일 작업에 플러그인/로컬 스킬을 중복 실행하지 않음 |
 | [Headroom](https://github.com/headroomlabs-ai/headroom) | CLI/MCP/프록시 0.41.0 | 포트 8787, OmniRoute 로컬 upstream. 구조 기반 lossless 모드, ML Kompress 비활성화 |
@@ -46,3 +46,12 @@ Strix는 앱 코드와 선택한 모델이 준비된 뒤 허가된 대상에 실
 - OmniRoute 대시보드 HTTP 200 및 상태 API 정상; 인증 없는 모델 목록 요청은 HTTP 401.
 - Headroom `ready: true`; Kompress는 명시적으로 비활성화. 외부 모델 호출은 미검증.
 - 클라우드 설치·시작 지침의 저장은 환경 게시나 GitHub push와 별개입니다.
+
+
+## 웹 보안·운영 점검 (2026-10-19)
+
+현재 API를 실행한 뒤 `python3 devtools/check-web-security.py`로 점검한다. Compose 웹 경유는 `--base-url http://127.0.0.1:8080`을 사용한다. 이번 실행 검증은 직접 실행한 API3000에 한정되며 Compose 웹 경유는 미검증이다. 도구는 loopback IP의 HTTP origin만 허용하고 redirect/proxy를 사용하지 않으며 읽기 전용 GET4개/각 timeout5초로 상태·보안 헤더·Origin 거부를 확인한다. 응답 본문/Secret/쿠키를 출력하지 않는다. 종료0은 이 한정 범위 통과, 종료1은 요청/검사 실패, 종료2는 잘못된 대상 설정이다. 외부 URL·인증/인가·XSS/SSRF 전체 평가를 수행하지 않는다.
+
+GitHub의 Strix web-app-penetration-testing 스킬을 적용해 대상/실데이터/재현/수정·재검증을 구분했다. CLI1.7.0은 확인됐지만 STRIX_LLM/LLM_API_KEY 구성은 없고 유료 자동스캔은 실행하지 않았다. 자동스캔을 실행할 때는 별도 승인된 모델/예산과 격리한 합성데이터 대상을 지정하고 API 키를 인자/문서에 넣지 않는다. 적용 스킬·운영 절차·공개 전 잔여 조건은08/09/10을 따른다.
+
+관리자 조회는 `/admin`에서 수행한다. API 전용 Secret `FACTLENS_ADMIN_TOKEN`이 없거나32~256자 허용 형식이 아니면 닫힌다. 별도의 무작위32바이트 이상 토큰을 환경 Secret으로 관리하고 셸 인자/리포트/스크린샷에 남기지 않는다. 자동 Strix 스캔 인증과 관리자 접근 토큰은 서로 다른 설정이다.

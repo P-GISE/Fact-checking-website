@@ -1,0 +1,34 @@
+{
+  "scope": "local_api_headers_and_origin_only",
+  "passed": true,
+  "checks": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "expectedStatus": 200,
+      "failedHeaders": [],
+      "passed": true
+    },
+    {
+      "path": "/api/not-found",
+      "status": 404,
+      "expectedStatus": 404,
+      "failedHeaders": [],
+      "passed": true
+    },
+    {
+      "path": "/api/media/not-an-id",
+      "status": 400,
+      "expectedStatus": 400,
+      "failedHeaders": [],
+      "passed": true
+    },
+    {
+      "path": "/api/analyses",
+      "status": 403,
+      "expectedStatus": 403,
+      "failedHeaders": [],
+      "passed": true
+    }
+  ]
+}

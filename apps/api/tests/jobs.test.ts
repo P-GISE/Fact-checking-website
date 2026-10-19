@@ -23,6 +23,8 @@ it('streams uploaded media and preserves range responses',async()=>{
  const u=await upload();expect(u.status).toBe(201);
  const r=await request(app).get(`/api/media/${u.body.mediaId}`).set('Range','bytes=0-15');
  expect(r.status).toBe(206);expect(r.headers['content-range']).toMatch(/^bytes 0-15\//);
+ expect(r.headers['cross-origin-resource-policy']).toBe('same-origin');
+ expect(r.headers['cache-control']).toBe('no-store');
 });
 it('requires consent, creates idempotent job, deletes immediately',async()=>{
  const u=await upload();
@@ -150,4 +152,37 @@ it('closes source descriptors after full and rejected Range responses',async()=>
  expect((await request(app).get(`/api/media/${u.body.mediaId}`).set('Range','bytes=999999999-')).status).toBe(416);
  await waitForMediaClose(source);
  expect(await mediaDescriptors(source)).toBe(0);
+});
+
+it('keeps admin overview closed when no separate admin token is configured',async()=>{
+ const unavailable=createApp({mediaRoot:root,enqueue:async()=>{},adminToken:''});
+ expect((await request(unavailable).get('/api/admin/overview')).status).toBe(503);
+});
+it('requires the exact admin bearer token and retains origin protection',async()=>{
+ const {randomBytes}=await import('node:crypto');const token=randomBytes(32).toString('hex');
+ const admin=createApp({mediaRoot:root,enqueue:async()=>{},adminToken:token});
+ expect((await request(admin).get('/api/admin/overview')).status).toBe(401);
+ expect((await request(admin).get('/api/admin/overview').set('Authorization','Bearer wrong')).status).toBe(401);
+ expect((await request(admin).get('/api/admin/overview').set('Authorization',`Bearer ${token}`).set('Origin','https://untrusted.example')).status).toBe(403);
+ expect((await request(admin).post('/api/admin/overview').set('Authorization',`Bearer ${token}`)).status).toBe(404);
+});
+it('shows bounded admin job metadata and separates settled costs from reservations',async()=>{
+ const {randomBytes,randomUUID}=await import('node:crypto');const token=randomBytes(32).toString('hex');
+ const u=await upload();const job=await request(app).post('/api/analyses').send({mediaId:u.body.mediaId,externalProcessingConsent:true});
+ await pool.query("UPDATE jobs SET status='failed',error=$2 WHERE id=$1",[job.body.id,{code:'PROVIDER_RATE_LIMITED',message:'private transcript must stay hidden'}]);
+ const month=(await pool.query("SELECT to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS month")).rows[0].month;
+ for(const [reserved,actual] of [[100,30],[200,null]])await pool.query('INSERT INTO usage_reservations(id,job_id,month,reserved_micros,actual_micros) VALUES($1,$2,$3,$4,$5)',[randomUUID(),job.body.id,month,reserved,actual]);
+ const admin=createApp({mediaRoot:root,enqueue:async()=>{},adminToken:token});
+ const response=await request(admin).get('/api/admin/overview').set('Authorization',`Bearer ${token}`);
+ expect(response.status).toBe(200);expect(response.body.statusCounts.failed).toBe(1);
+ expect(response.body.usage).toEqual({month,settledMicros:'30',reservedMicros:'200',effectiveMicros:'230',pendingReservations:'1'});
+ expect(response.body.recentJobs).toHaveLength(1);
+ expect(response.body.recentJobs[0]).toMatchObject({id:job.body.id,status:'failed',errorCode:'PROVIDER_RATE_LIMITED'});
+ expect(Object.keys(response.body.recentJobs[0]).sort()).toEqual(['createdAt','errorCode','id','status']);
+ expect(JSON.stringify(response.body)).not.toContain('private transcript');
+ expect(JSON.stringify(response.body)).not.toContain(token);
+ expect(response.headers['cache-control']).toBe('no-store');
+ await pool.query('UPDATE jobs SET error=$2 WHERE id=$1',[job.body.id,{code:'private exception content',message:'secret'}]);
+ const masked=await request(admin).get('/api/admin/overview').set('Authorization',`Bearer ${token}`);
+ expect(masked.body.recentJobs[0].errorCode).toBe('UNCLASSIFIED_ERROR');
 });
