@@ -200,3 +200,24 @@ it('orders upload reservation and closure locks consistently',async()=>{
   expect((await closing).body.error.code).toBe('ACCOUNT_BUSY');
  }finally{await uploadClient.query('ROLLBACK');uploadClient.release();if(closing)await closing;}
 });
+it.skipIf(process.getuid?.()===0)('keeps closed accounts inaccessible while failed file cleanup is retried',async()=>{
+ const {chmod,access}=await import('node:fs/promises');const {cleanup}=await import('../src/cleanup.js');
+ const c=await login('alice');
+ const u=await request(app).post('/api/media/upload').set('Cookie',c).attach('file',Buffer.from('audio'),'private.wav');
+ const mid=u.body.mediaId,folder=join(root,mid);
+ const source=(await pool.query('SELECT path FROM media WHERE id=$1',[mid])).rows[0].path;
+ // Removing a file requires write access to its parent. The service runs unprivileged.
+ await chmod(folder,0o500);
+ try{
+  const response=await request(app).delete('/api/auth/account').set('Cookie',c).send({currentPassword:credentials('alice').password,confirmation:'DELETE'});
+  expect(response.status).toBe(202);expect(response.body).toEqual({cleanupPending:true});
+  expect((await request(app).get('/api/media/'+mid).set('Cookie',c)).status).toBe(401);
+  expect((await request(app).post('/api/auth/login').send(credentials('alice'))).status).toBe(401);
+  await access(source);
+  const media=(await pool.query('SELECT original_name,expires_at<now() AS expired FROM media WHERE id=$1',[mid])).rows[0];
+  expect(media).toEqual({original_name:'',expired:true});
+ }finally{await chmod(folder,0o700);}
+ await cleanup(root);
+ await expect(access(source)).rejects.toThrow();
+ await cleanup(root); // Retry stays idempotent after a previous successful removal.
+});
