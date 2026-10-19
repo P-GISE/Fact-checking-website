@@ -1,8 +1,8 @@
 # 프로젝트 가이드 — 공통 지침 (AGENTS.md)
 
-> **현재 작업 기준 · 2026-10-17:** 전체 가이드 정리 후 TASK020 주장 맥락/정형v2→021 복수 후보→022 생산 RULES 회귀를 순차 완료했다. 다음023 일반 원문 계약이며 실AI·시각/연구/운영 전체는 미완료다. 근거10 §36.
+> **현재 작업 기준 · 2026-10-19:** TASK-023 출처 등록 대조·중복/명시 인용 관계 검토를 결과/API/화면에 연결했다. 실제 등록 출처 목록은 비어 있으며 출처 인증/독립성·일반 문서 확정은 미완료다. 규칙v3는 유지한다. 재시작 후 환경 readiness는 unknown이며 개발 DB 복구 후 Python157/API24개가 통과했다. 최신 기록10 §40.
 
-- 현재 상태 갱신: 2026-10-17 (Asia/Seoul)
+- 현재 상태 갱신: 2026-10-19 (Asia/Seoul)
 > **이전 기준 · 2026-10-16 (이력):** 개발용 PoC 기반 구현. 실제 AI·시각/연구·운영은 미완료. 현재 작업은 TASK-016의 키/네트워크/실자료 검증과 전송 정책 확인이다. 과거 작업 기록은 당시 이력으로 보존한다.
 
 순차 실행 기준: [00 통합 실행 순서](00_문서_가이드.md#통합-실행-순서). 현재 구현과 과거 이력을 구분하며 이번 결과는 10의 최신 기록을 따른다.
@@ -45,7 +45,7 @@
 - 입력: 최종 MVP의 필수 입력은 MP4 및 MP3/WAV 직접 업로드다. 초기 평가 대상은 1~3분 한국어 뉴스형 영상이다. 개발용 구현의 제한은 100 MiB·180초다. 운영 제한과 연구 데이터 범위는 별도 검토한다.
 - 지원 영상 URL·기사 URL·YouTube 등은 확장 범위다. 초기 업로드 경로보다 먼저 만들지 않으며 플랫폼 정책·접근 권한을 확인한다. 다국어·실시간 방송·일괄 처리·팀 검토·API 상품화·C2PA도 후속 제안이다.
 - 기획 단계: 음성 팩트체크 PoC → 자막/화면 PoC → 근거 Validator·교차검증·판정 규칙 PoC → 웹 MVP와 비교 평가. 최종 MVP의 필수 항목을 단계 축소 과정에서 조용히 제외하지 않는다.
-- 우선 기준 문서: [01 시스템 개요](01_시스템_개요.md), [02 기능 설계](02_기능_설계.md), [05 업무 플로우](05_업무_플로우.md). 다음 작업은 `99_해야할일..md`의 TASK-023 일반 원문 계약이며, TASK-016 실제 AI 연결은 키/정책 조건 충족 시 승인된 개발 예산으로 진행한다. 이미 제공된 프로젝트 목적을 다시 처음부터 묻지 않는다.
+- 우선 기준 문서: [01 시스템 개요](01_시스템_개요.md), [02 기능 설계](02_기능_설계.md), [05 업무 플로우](05_업무_플로우.md). 다음 작업은 `99_해야할일..md`의 TASK-023 출처 신원/계보·일반 문서 의미 검증이다. 계약·유보 회귀·수집/구조/발행정보 관측 추적은 구현했다. TASK-016은 환경/SDK 연결 확인 후 Brave 계정 권한·사용/전송 권한 있는 미디어·근거 원문 접근 조건을 확인해 승인된 개발 예산으로 실제 분석을 검증한다. 이미 제공된 프로젝트 목적을 다시 처음부터 묻지 않는다.
 
 ### 분석과 판정의 필수 원칙
 
@@ -90,7 +90,7 @@
 
 ## 현재 개발 환경
 
-The repository now has a private audio web PoC foundation in apps/. Live STT/search/LLM providers remain disabled; do not treat demo reports or passing fixture tests as real AI analysis or research validation.
+The repository now has a private audio web PoC foundation in apps/. Live adapters are implemented and SDK model-list access was checked; the live worker is not running and media inference remains unverified; do not treat demo reports or passing fixture tests as real AI analysis or research validation.
 
 Read `devtools/README.ko.md` for the installed tools and limitations. Run `bash devtools/install.sh` to refresh development tools, then `source devtools/activate.sh`. Tools and upstream source caches are retained under `/workspace/.devtools`, outside this checkout. Each cloud task is already isolated; use this checkout and do not create Git worktrees unless the user requests one.
 
@@ -280,3 +280,19 @@ Start each project task by reading [00_문서_가이드.md](00_문서_가이드.
 ### 순차 실행 3/3 — TASK-022와 인계 (2026-10-17)
 
 합성 입력에서 실제 생산 규칙을 실행하는 RULES 회귀·전체 입력/소스 해시와 실패 분모를 연결했다. Python111/API22/브라우저5·타입/빌드 및 별도 리뷰를 확인했고 컨테이너 RULES9개 일치까지10 §36에 기록했다. 사용자 요청대로 전체 가이드→020→021→022 순차 진행했고 다음은023 일반 원문 계약이다. 실AI/시각/연구/운영 전체 완료로 표시하지 않는다.
+
+### 재개 환경·TASK-023 계약 점검 (2026-10-18)
+
+원격 work 게시 직후388050d 복구, 최신 Secret ready/정책 enforced·Worker SDK 모델 목록 연결 확인. 로컬 승인 설정에는 비밀값을 기록하지 않았다. TASK023 일반 원문 계약1차/합성 유보8개를 고정했으며 생산 규칙은 유지했다. Python112/API22/브라우저5=139개, RULES9+8개·타입/빌드 통과. 정적49파일/51건(종료1)은 유지한다. 실미디어 분석·잔액/한도·Brave 계정 저장 권한·provenance/시각/연구/운영 전체는 미완료이며 상세는10 §37이다. 새 작업 공간/서브에이전트/원격 게시/배포를 만들지 않았다.
+
+### 프로젝트 가이드 13개 동기화 (2026-10-18, TASK-010)
+
+사용자 요청에 따라 13개 문서의 현재 요약·재개 순서·작업 표를 직전 실행 근거(10 §37)에 맞췄다. TASK-023의 계약/유보 회귀와 검증 구현 잔여, TASK-016의 환경/SDK 확인과 실제 분석 잔여를 구분했다. 과거 이력과 앞선 미커밋 구현/회귀 변경은 보존한다. 이번은 문서 갱신이며 제품 테스트/유료 API/정적 보안 스캔/배포는 재실행하지 않았다. 문서 검증은 10 §38에 기록한다.
+
+### TASK-023 원문 관측 추적 구현 (2026-10-18)
+
+기존 가이드/사용자 진행 지시에 따라 직접 구현했다. 수집/정규화 구조/발행정보 관측의 sourceTrace를 Validator·API·Vue 근거 화면까지 연결하고 legacy null을 유지한다. 새 규칙v3는 기존 숫자 문법/전체 맥락을 유지하며 인증되지 않은 traced source를 유보한다. 파서/경계·API·화면 실패를 재현한 뒤 구현했고 독립 코드 리뷰의 P1 중첩 HTML 성능 문제를 실패 테스트/단일 순회/한도로 수정했다. 최종Python133/API23/브라우저5=161개, 타입/빌드·RULES9+8 통과. 정적55건(종료1)은09/10에 분류했다. 실제 AI/일반 문서 신원·의미/계보·시각/연구/운영은 미완료다. 이전 미커밋 변경을 보존했으며 이번 원격 푸시/배포는 하지 않았다. 상세10 §39.
+
+### 출처 등록 대조·관계 후보 및 가이드 브리핑 (2026-10-19)
+
+사용자 진행 지시에 따라 TASK-023 source-review-v1/static-text-v2의 등록 대조/중복·명시 인용 관계 후보를 구현했다. 빈 trusted 등록 정책·legacy null/v1 호환·인증 미확인 유보를 유지했다. 독립 리뷰의 URL/포트/그룹 문제는 실패 테스트 후 수정했다. 이후 환경 재시작으로 DB 연결 거부를 확인해 개발 DB를 복구했고, 현재 Secret/network 상태unknown을 과거 ready와 구분해 가이드13개에 반영했다. 최신 검증/브리핑은10 §40이다. 실제 유료 호출·운영 배포/새 원격 반영은 하지 않았고 기존 미커밋 변경은 보존한다.

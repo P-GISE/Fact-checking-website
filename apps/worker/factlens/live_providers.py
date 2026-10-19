@@ -15,6 +15,7 @@ from factlens.metered import BudgetedCall, ChargedResult
 from factlens.pipeline import Providers, ProviderUnavailable
 from factlens.retrieval import fetch_evidence
 from factlens.validator import EvidenceDocument, Fact
+from factlens.source_document import SourceTrace, PARSER_VERSION
 
 MODEL = 'gpt-4.1-mini'
 MAX_OUTPUT = 2048
@@ -190,13 +191,21 @@ class LiveProviders:
             if not fact.quote or fact.quote not in original:
                 self.limitations.append('검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다.')
                 continue
-            documents.append(EvidenceDocument(url=final_url,title=document['title'],text=original,quote=fact.quote,position=original.index(fact.quote),publisher=fact.publisher if fact.publisher and fact.publisher in original else None,publishedAt=fact.publishedAt if fact.publishedAt and fact.publishedAt in original else None,fact=Fact(subject=fact.subject or '',period=fact.period or '',metric=fact.metric or '',value=fact.value or '',unit=fact.unit or ''),lineage=document['lineage']))
+            trace=SourceTrace.model_validate(document['sourceTrace']) if document.get('sourceTrace') is not None else None
+            if trace is not None:
+                trace.extractionTruncated=excerpt!=original
+                publisher=trace.publication.publisher.value
+                published_at=trace.publication.publishedAt.value
+            else:
+                publisher=fact.publisher if fact.publisher and fact.publisher in original else None
+                published_at=fact.publishedAt if fact.publishedAt and fact.publishedAt in original else None
+            documents.append(EvidenceDocument(url=final_url,title=document['title'],text=original,quote=fact.quote,position=original.index(fact.quote),publisher=publisher,publishedAt=published_at,fact=Fact(subject=fact.subject or '',period=fact.period or '',metric=fact.metric or '',value=fact.value or '',unit=fact.unit or ''),lineage=document['lineage'],sourceTrace=trace))
         return documents
 
     def versions(self):
         return {'providerProfile':'openai_brave','speechModel':'whisper-1','languageModel':MODEL,
                 'claimPromptVersion':'claim-structured-v1','evidencePromptVersion':'evidence-structured-v1',
-                'retrievalVersion':'brave-candidates-v2'}
+                'retrievalVersion':'brave-source-trace-v3','sourceParserVersion':PARSER_VERSION}
 
     def usage(self):
         return {**self.billing.usage(),'currency':'USD','costBasis':'published_tariff_not_invoice','providerProfile':'openai_brave','model':MODEL,'priceDate':'2026-10-16'}

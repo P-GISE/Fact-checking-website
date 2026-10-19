@@ -3,6 +3,7 @@ from uuid import UUID
 from factlens.contracts import Claim, AnalysisResult
 from factlens.validator import validate_evidence, RULE_VERSION
 from factlens.decision import decide
+from factlens.source_review import review_sources, REVIEW_VERSION, DEFAULT_REGISTRY
 
 class ProviderUnavailable(RuntimeError):pass
 
@@ -38,9 +39,11 @@ def run_analysis(job:dict,providers,stage=lambda name:True)->AnalysisResult:
             documents=[];limitations.append(f'{c.id}: 근거 검색에 실패했습니다.')
         advance('validating_evidence')
         c.evidence=[validate_evidence(c,d) for d in documents[:5]]
+        for check,review in zip(c.evidence,review_sources(c.evidence)):
+            check.sourceReview=review
         c.verdict=decide(c,c.evidence)
     limitations.extend(getattr(providers, 'limitations', []))
     limitations = list(dict.fromkeys(limitations))
     usage = providers.usage() if callable(getattr(providers, 'usage', None)) else {'billing':'not_configured'}
     provider_versions=providers.versions() if callable(getattr(providers,'versions',None)) else {}
-    return AnalysisResult(claims=claims,limitations=limitations,usage=usage,versions={**provider_versions,'ruleVersion':RULE_VERSION})
+    return AnalysisResult(claims=claims,limitations=limitations,usage=usage,versions={**provider_versions,'ruleVersion':RULE_VERSION,'sourceReviewVersion':REVIEW_VERSION,'sourceRegistryVersion':DEFAULT_REGISTRY.version})

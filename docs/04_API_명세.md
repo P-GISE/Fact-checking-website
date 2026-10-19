@@ -1,10 +1,10 @@
 # 04. API 명세
 
-> **현재 작업 기준 · 2026-10-17:** 새 주장contextText/결과versions를 보존하고 legacy는 null/{}로 읽는다. 미디어full/Range206·범위416·부재404 유지. 운영 인증과 시각/종합 API 계약은 후속이다.
+> **현재 작업 기준 · 2026-10-19:** 근거에 sourceReview|null, sourceTrace에 bounded sourceLinks/sourceLinksComplete를 추가했다. parser v1/v2와 과거 결과 null을 수용한다. identity는 등록 대조 상태이며 independence는 unverified만 허용한다. 기존 경로/인가 한계는 유지한다.
 
-- 현재 상태 갱신: 2026-10-17 (Asia/Seoul)
+- 현재 상태 갱신: 2026-10-19 (Asia/Seoul)
 - 문서 상태: 검토 중 — 개발용 API 구현, 운영 인증/공통 계약 후속
-- 제품 구현: 개발용 업로드·작업·조회·삭제 API 구현; 실제 AI SDK 구현·실호출 미검증
+- 제품 구현: 개발용 업로드·작업·조회·삭제 API 구현; 실제 AI SDK 구현·모델 목록 연결 확인·실분석 미검증
 - 관련: [기능](02_기능_설계.md), [DB](03_데이터베이스_설계.md), [프런트엔드](06_프런트엔드_구조.md), [백엔드](07_백엔드_구조.md)
 
 > **이전 기준 · 2026-10-16 (이력):** 8개 핵심 API와 목록/미디어/health를 개발용으로 구현. Origin 제한은 사용자 인증을 대체하지 않으며 운영 공개 금지다. 과거 작업 기록은 당시 이력으로 보존한다.
@@ -132,3 +132,17 @@ GET /api/media/:id의 유효하지 않은 Range는 416을 보존하도록 수정
 검증 근거: [10 §30](10_파일_점검_현황.md#30-응답-중단-파일-정리와-range-오류-검증-2026-10-17).
 
 TASK-020 추가 필드: 주장 contextText는 서버가 보존한 전체 입력 전사(nullable legacy), 결과 versions는 문자열 record이며 신규 결과 ruleVersion=audio-numeric-canonical-v2다. 기존 결과에 버전/context를 소급 생성하지 않고 각각 {} / null로 읽는다.
+
+## 2026-10-18 원문 추적 구현 전 계약 대조 (이력)
+
+이번 갱신은 API 경로·응답 스키마를 바꾸지 않는다. TASK-023의 신규 원문/발행정보/출처 추적 필드는 아직 API에 없다. 직전 API 22개 통과와 Worker SDK 모델 목록 연결 근거는 [10 §37](10_파일_점검_현황.md#37-현재-환경-복구sdk-연결일반-원문-계약-2026-10-18)을 따르며 실제 분석 결과 생성 성공과 구분한다.
+
+## TASK-023 sourceTrace 응답 계약
+
+근거에 `sourceTrace: object | null`을 추가했다. 누락된 과거 필드는 null이다. parserVersion/static-text-v1, requestedUrl/finalUrl/retrievedAt/contentType, bodySha256/textSha256/textLength, blocks(kind/position/length), structureComplete, publication(publisher/publishedAt/modifiedAt의 state/value/candidates), quoteOccurrences/quoteBlockIndexes/extractionTruncated를 전달한다. hash64·블록2048·후보32/값500자 및 문서 범위 내 위치를 검증한다. 위치는 정규화 텍스트의 Python Unicode 문자 offset이며 HTML 바이트/JS UTF-16 offset이 아니다. 신규 버전은 audio-numeric-canonical-v3이며 저장된 v2 결과를 재라벨하지 않는다. 관측 metadata를 인증 완료로 표시하는 필드는 없다.
+
+## 출처 검토 API 호환 계약 (2026-10-19)
+
+sourceTrace.parserVersion은 static-text-v1/v2를 수용한다. sourceLinks(kind/url/locator) 최대32개·sourceLinksComplete를 추가했고 과거 누락은 []/false다. sourceReview는 nullable이며 version/registryVersion, identity(status/publisherId/registeredName), independence=unverified, groupId/groupSize(1~5)/relatedUrls(최대4)/signals를 보존한다. 인증 완료/독립 출처라고 쓰는 enum은 없다. Registry는 repository의 trusted 파일이며 API/모델 입력으로 교체하지 않는다.
+
+결과 versions에 sourceReviewVersion/sourceRegistryVersion을 추가하고 제공자 반환값이 실제 버전을 덮어쓰지 못하게 한다. RULES execution은 검토 모듈/등록 JSON의 해시를 포함한다. 신규 API 경로는 없고 기존 운영 인증/인가 제약은 유지한다.

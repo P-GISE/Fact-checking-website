@@ -4,7 +4,8 @@ import os
 import socket
 from urllib.parse import urlsplit, urljoin, urlunsplit
 import httpx
-from bs4 import BeautifulSoup
+from datetime import datetime, timezone
+from factlens.source_document import parse_document, SourceTrace, fingerprint, normalize_source_url
 
 MAX_BYTES=2_000_000
 
@@ -13,9 +14,9 @@ def resolve(host:str)->list[str]:
 
 def public_target(url:str,resolver=resolve)->tuple[str,str,int]:
     p=urlsplit(url)
-    if p.scheme not in ('http','https') or not p.hostname or p.username or p.password or p.fragment:
+    if p.scheme not in ('http','https') or not p.hostname or p.username is not None or p.password is not None or p.fragment:
         raise ValueError('UNSAFE_URL')
-    port=p.port or (443 if p.scheme=='https' else 80)
+    port=p.port if p.port is not None else (443 if p.scheme=='https' else 80)
     if port not in (80,443):raise ValueError('UNSAFE_PORT')
     host=p.hostname.encode('idna').decode('ascii')
     try:addresses=[str(ipaddress.ip_address(host))]
@@ -40,6 +41,7 @@ def request_pinned(url,host,ip,port):
             return r.status_code,dict(r.headers),b''.join(chunks)
 
 def fetch_evidence(url:str,*,resolver=resolve,transport=request_pinned)->dict:
+    requested_url=url
     for _ in range(4):
         host,ip,port=public_target(url,resolver)
         status,headers,body=transport(url,host,ip,port)
@@ -49,9 +51,20 @@ def fetch_evidence(url:str,*,resolver=resolve,transport=request_pinned)->dict:
             url=target;continue
         if status!=200:raise ValueError('DOCUMENT_UNAVAILABLE')
         if len(body)>MAX_BYTES:raise ValueError('DOCUMENT_TOO_LARGE')
-        if not any(t in headers.get('content-type','') for t in ('text/html','text/plain','application/xhtml+xml')):raise ValueError('UNSUPPORTED_DOCUMENT')
-        soup=BeautifulSoup(body,'html.parser')
-        title=soup.title.get_text(' ',strip=True) if soup.title else host
-        for tag in soup(['script','style','noscript']):tag.decompose()
-        return {'url':url,'title':title,'text':soup.get_text(' ',strip=True),'lineage':host}
+        parsed=parse_document(body,headers.get('content-type',''))
+        source_links=[]
+        links_complete=parsed['sourceLinksComplete']
+        for reference in parsed['sourceLinksRaw']:
+            try:
+                if parsed['hasBase'] and not urlsplit(reference['value']).scheme:raise ValueError('UNSUPPORTED_DOCUMENT_BASE')
+                target=normalize_source_url(reference['value'],url)
+            except (ValueError,UnicodeError):
+                links_complete=False
+                continue
+            source_links.append({'kind':reference['kind'],'url':target,'locator':reference['locator']})
+        trace=SourceTrace(requestedUrl=requested_url,finalUrl=url,retrievedAt=datetime.now(timezone.utc).isoformat(),
+                          contentType=parsed['contentType'],bodySha256=fingerprint(body),
+                          textSha256=fingerprint(parsed['text'].encode()),textLength=len(parsed['text']),
+                          blocks=parsed['blocks'],structureComplete=parsed['structureComplete'],publication=parsed['publication'],sourceLinks=source_links,sourceLinksComplete=links_complete)
+        return {'url':url,'title':parsed['title'] or host,'text':parsed['text'],'lineage':host,'sourceTrace':trace.model_dump()}
     raise ValueError('REDIRECT_LIMIT')

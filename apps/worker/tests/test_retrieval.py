@@ -18,3 +18,14 @@ def test_redirect_rechecks_target():
 def test_size_and_nontext_rejected():
     for headers,body in [({'content-type':'image/png'},b'PNG'),({'content-type':'text/plain'},b'x'*2000001)]:
         with pytest.raises(ValueError):fetch_evidence('https://example.org',resolver=lambda h:['93.184.216.34'],transport=lambda *a:(200,headers,body))
+
+
+@pytest.mark.parametrize('url',['https://example.org:0/','http://example.org:0/'])
+def test_explicit_port_zero_is_rejected_before_any_request(url):
+    with pytest.raises(ValueError,match='UNSAFE_PORT'):
+        public_target(url,resolver=lambda h:['93.184.216.34'])
+
+
+@pytest.mark.parametrize('url',['https://@example.org/','https://:@example.org/'])
+def test_even_empty_userinfo_is_not_an_unauthenticated_source_url(url):
+    with pytest.raises(ValueError):public_target(url,resolver=lambda h:['93.184.216.34'])

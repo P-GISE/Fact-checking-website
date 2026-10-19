@@ -1,3 +1,5 @@
+from factlens.source_document import SourceTrace
+from factlens.source_review import SourceReview
 from typing import Literal
 from pydantic import BaseModel, Field, model_validator
 
@@ -13,6 +15,8 @@ class EvidenceCheck(BaseModel):
     usable: bool = False
     reasons: list[str] = Field(default_factory=list)
     lineage: str
+    sourceTrace: SourceTrace | None = None
+    sourceReview: SourceReview | None = None
 
 class Claim(BaseModel):
     id: str

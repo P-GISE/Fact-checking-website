@@ -10,7 +10,7 @@
 
 ## 개발용 웹 PoC 실행
 
-현재 업로드·작업·삭제·시간축 보고서 UI와 검증 규칙이 구현돼 있습니다. **실제 STT/검색/LLM 제공자는 미설정**이며 정상 파일의 분석은 `PROVIDER_NOT_CONFIGURED`로 종료됩니다. ‘예시 보고서’는 가상 자료이며 실제 분석의 대체 결과가 아닙니다. 인증이 없는 로컬 개발용이므로 공개 배포하지 않습니다.
+현재 업로드·작업·삭제·시간축 보고서 UI와 검증 규칙이 구현돼 있습니다. 기본 AI 모드는 disabled이며 이 모드에서 정상 파일의 분석은 `PROVIDER_NOT_CONFIGURED`로 종료됩니다. 승인된 OpenAI/Brave 어댑터는 구현됐고 실제 미디어 분석은 아직 검증하지 않았습니다. ‘예시 보고서’는 가상 자료이며 실제 분석의 대체 결과가 아닙니다. 인증이 없는 로컬 개발용이므로 공개 배포하지 않습니다.
 
 ```bash
 # Docker와 Compose v2 필요
@@ -60,9 +60,9 @@ OpenAI whisper-1/gpt-4.1-mini + Brave 어댑터와 월 $20·건당 $0.20 예산 
 
 ## 승인 프로필 설정
 
-기본 `FACTLENS_AI_MODE=disabled`입니다. 안전한 로컬 `.env`에 `FACTLENS_AI_MODE=openai_brave`, `OPENAI_API_KEY`, `BRAVE_SEARCH_API_KEY`를 설정하고 동일한 Compose 파일 조합으로 Worker를 재생성하세요. 예산 변수 기본값은 `FACTLENS_JOB_BUDGET_MICROS=200000`, `FACTLENS_MONTH_BUDGET_MICROS=20000000`이며 승인 상한을 높일 수 없습니다. 키는 Worker에만 전달합니다.
+기본 `FACTLENS_AI_MODE=disabled`입니다. 로컬 `.env`에는 `FACTLENS_AI_MODE=openai_brave`와 예산만 설정하고, `OPENAI_API_KEY`, `BRAVE_SEARCH_API_KEY`는 관리 환경의 Secret으로 주입해 동일한 Compose 파일 조합으로 Worker를 재생성하세요. 예산 변수 기본값은 `FACTLENS_JOB_BUDGET_MICROS=200000`, `FACTLENS_MONTH_BUDGET_MICROS=20000000`이며 승인 상한을 높일 수 없습니다. 키는 Worker에만 전달합니다.
 
-현재 환경에는 키와 `api.openai.com`/`api.search.brave.com` 아웃바운드 허용이 없어 실제 유료 호출은 검증하지 않았습니다. 근거 원문 접근 정책도 필요합니다. 프록시/CA는 유지합니다. [운영 설정과 실자료 검증 절차](docs/08_운영_배포.md)를 따르세요. 정형 원문만 인정하는 현재 Validator 때문에 일반 웹문서는 검증 불충분이 될 수 있습니다.
+2026-10-18 현재 두 Secret ready·API 도메인 정책 enforced 및 실제 Worker SDK 모델 목록 연결을 확인했습니다. 실제 전사/생성·잔액/한도는 미검증이며 Brave 계정 저장/추론 권한과 사용권 있는 한국어 미디어 확인이 남아 있습니다. 라이브 Worker는 상시 실행하지 않습니다. 근거 원문 접근 정책도 필요합니다. 프록시/CA는 유지합니다. [운영 설정과 실자료 검증 절차](docs/08_운영_배포.md)를 따르세요. 정형 원문만 인정하는 현재 Validator 때문에 일반 웹문서는 검증 불충분이 될 수 있습니다.
 
 2026-10-17: 미디어 읽기/삭제 경계에 UUID·정해진 source 파일명·realpath 검사를 추가했습니다. 최신 검증과 운영 잔여 조건은 [프로젝트 가이드](docs/10_파일_점검_현황.md#27-미디어-경로-보호와-전체-가이드-갱신-2026-10-17), 정적 지적별 근거는 [수동 검토표](docs/reports/2026-10-17-security-review.md)에 있습니다.
 

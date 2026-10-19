@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from pydantic import ConfigDict, Field, field_validator, model_validator
 from typing import Self
-from factlens import contracts, decision, evaluation, validator
+from factlens import contracts, decision, evaluation, validator, source_document, source_review
 from factlens.contracts import Claim
 from factlens.evaluation import Dataset, Run, Strict, Name, Split, fingerprint, score, load_input
 
@@ -31,6 +31,7 @@ class InputDocument(Strict):
     publishedAt:str|None
     fact:InputFact
     lineage:Name|None=None
+    sourceTrace:source_document.SourceTrace|None=None
 
     @field_validator('url')
     @classmethod
@@ -68,8 +69,10 @@ def execute(fixture:RulesFixture,split:Split)->dict:
     for case in fixture.cases:
         if case.claim.id not in selected:continue
         try:
-            documents=[validator.EvidenceDocument(**{**doc.model_dump(),'fact':validator.Fact(**doc.fact.model_dump())}) for doc in case.documents]
+            documents=[validator.EvidenceDocument(**{**doc.model_dump(),'fact':validator.Fact(**doc.fact.model_dump()),'sourceTrace':doc.sourceTrace}) for doc in case.documents]
             checks=[validator.validate_evidence(case.claim,document) for document in documents]
+            for check,review in zip(checks,source_review.review_sources(checks)):
+                check.sourceReview=review
             verdict=decision.decide(case.claim,checks)
             predictions.append({'claimId':case.claim.id,'status':'completed','verdict':verdict})
             diagnostics.append({'claimId':case.claim.id,'status':'completed','verdict':verdict,
@@ -85,11 +88,11 @@ def execute(fixture:RulesFixture,split:Split)->dict:
             predictions=predictions)
     report=score(fixture.dataset,run,split)
     modules={'validator':validator.__file__,'decision':decision.__file__,'contracts':contracts.__file__,
-             'evaluation':evaluation.__file__,'rule_regression':__file__}
+             'evaluation':evaluation.__file__,'source_document':source_document.__file__,'source_review':source_review.__file__,'source_registry':str(Path(source_review.__file__).with_name('source_registry.json')),'rule_regression':__file__}
     report['execution']={'kind':'production_rules','fixtureId':fixture.fixtureId,'fixtureVersion':fixture.version,
                          'fixtureDigest':fixture_fingerprint(fixture),
                          'sourceDigests':{name:hashlib.sha256(Path(path).read_bytes()).hexdigest() for name,path in modules.items()},
-                         'modelsInvoked':False}
+                         'modelsInvoked':False,'sourceReviewVersion':source_review.REVIEW_VERSION,'sourceRegistryVersion':source_review.DEFAULT_REGISTRY.version}
     report['scope']='synthetic_numeric_rule_regression_only'
     report['metadataProvenance']='local_rule_execution_and_caller_supplied_fixture'
     report['notMeasured']+=['STTQuality','SourceAuthenticity']

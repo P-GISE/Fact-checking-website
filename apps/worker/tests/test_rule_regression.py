@@ -84,3 +84,33 @@ def test_valid_max_length_fixture_identifier_is_accepted_by_execution():
     report=execute(RulesFixture.model_validate(raw),'test')
     assert report['regressionPassed'] is True
     assert report['run']['runId']=='f'*120
+
+
+def test_general_document_contract_keeps_uncertain_sources_non_decisive():
+    from pathlib import Path
+    path=Path(__file__).resolve().parents[3]/'evaluation/general-document-boundaries.json'
+    f=RulesFixture.model_validate_json(path.read_text())
+    report=execute(f,'test')
+    assert report['regressionPassed'] is True
+    assert report['counts']['cases']==8 and report['counts']['decisive']==0
+    assert report['researchValidation'] is False
+    cases={case['claimId']:case for case in report['cases']}
+    for name in ('article-with-publication','adjacent-correction','two-periods','body-instruction','repeated-quote'):
+        assert 'CONTEXT_REVIEW_REQUIRED' in cases[name]['checks'][0]['reasons']
+    assert 'PUBLICATION_METADATA_MISSING' in cases['metadata-missing']['checks'][0]['reasons']
+    assert 'QUOTE_NOT_VERIFIED' in cases['quote-not-present']['checks'][0]['reasons']
+    assert cases['cropped-transcript']['verdict']=='REVIEW_REQUIRED'
+
+
+def test_rule_runner_preserves_nested_source_trace_and_hashes_parser_code():
+    from factlens.retrieval import fetch_evidence
+    raw=fixture().model_dump()
+    source=fetch_evidence('https://example.org/report',resolver=lambda h:['93.184.216.34'],transport=lambda *a:(200,{'content-type':'text/plain'},b'2025\xeb\x85\x84 \xed\x95\x9c\xea\xb5\xad \xea\xb3\xa0\xec\x9a\xa9\xeb\xa5\xa0 50%'))
+    raw['cases'][0]['documents'][0]['sourceTrace']=source['sourceTrace']
+    raw['dataset']['claims'][0]['label']='INSUFFICIENT'
+    report=execute(RulesFixture.model_validate(raw),'test')
+    checked=report['cases'][0]['checks'][0]
+    assert report['regressionPassed'] is True
+    assert checked['sourceTrace']['quoteOccurrences']==1
+    assert 'SOURCE_AUTHENTICITY_UNVERIFIED' in checked['reasons']
+    assert len(report['execution']['sourceDigests']['source_document'])==64

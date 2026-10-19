@@ -64,3 +64,16 @@ fixture는 synthetic만 허용한다. manifest의 모든 gold ID와 입력 case�
 v2 확정 비교는 한국/대한민국, 1900~2099년, 고용률%·실업률%·인구명의 제한된 등식 기록만 지원한다. 표시 주장과 전체 입력 전사, 근거 전체 텍스트가 이 정형 계약을 만족해야 한다. 지원 밖 발언은 검토/유보하며 일반 언어 이해가 아니다.
 
 회귀의 발행 주체/날짜는 out-of-band 합성 입력이다. 정상 웹문서의 발행 메타데이터·인용 맥락/출처 진위를 검증했다고 주장하지 않는다. 현재 근거 전체 문맥 gate 때문에 일반 문서와 metadata를 포함한 실제 페이지는 대부분 확정되지 않는다. 이는 TASK-023의 지원 문서/맥락/provenance 계약 후속이다. Claim Recall·근거 품질/독립성·시각·STT/시간/비용은 계속 미측정이다.
+
+
+## 일반 원문 안전 경계 (TASK-023, 2026-10-18)
+
+```bash
+PYTHONPATH=apps/worker .venv/bin/python -m factlens.rule_regression evaluation/general-document-boundaries.json --split test
+```
+
+별도 합성8개 입력으로 metadata 포함 기사·인접 정정·여러 기간·발행정보 누락·인용 부재·원문 지시·중복 인용·잘린 전사의 유보를 고정한다. 기존9개와 별도 fixture/digest로 관리한다. 현재 생산 v2를 실행하며 일반 문서를 새로 지지/반박하도록 규칙을 바꾸지 않는다. `test_general_document_contract_keeps_uncertain_sources_non_decisive`가 기대 판정과 구체적인 검증 사유를 검사한다. 일반 원문 파서/발행정보 진위·독립성·실제 검색/AI 정확도는 검증 범위가 아니다. 입력은 직접 작성한 자료이며 Brave 응답이나 외부 기사 사본이 아니다.
+
+## 원문 관측 추적과 규칙 v3 (2026-10-18)
+
+신규 규칙은 audio-numeric-canonical-v3다. 정형v2 문법/전체 맥락 조건은 유지하며 sourceTrace의 원문/해시·인용/구조/발행정보 관측을 재대조한다. typed sourceTrace는 fixture에 선택적으로 포함할 수 있고 parser 소스도 sourceDigests에 기록한다. 관측만 있는 실제 수집 원문은 SOURCE_AUTHENTICITY_UNVERIFIED로 유보하며 일반 문서 확정 범위를 늘리지 않는다. 기존 합성9개·별도 유보8개의 기대값은 유지한다. sourceTrace가 없는 합성 fixture metadata는 외부에서 주어진 입력으로서 여전히 실제 출처 인증을 증명하지 않는다.

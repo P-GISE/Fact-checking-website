@@ -42,7 +42,10 @@ test('persisted report links claim time to player and renders evidence as text',
   const u=await request.post('/api/media/upload',{multipart:{file:{name:'report.wav',mimeType:'audio/wav',buffer:readFileSync(file)}}});
   const mediaId=(await u.json()).mediaId;
   const {randomUUID}=await import('node:crypto');id=randomUUID();
-  const result={scope:'audio_only',demo:false,claims:[{id:randomUUID(),text:'테스트 자료의 주장',contextText:'전사 원문 <img src=x onerror=window.contextInjected=true> 끝',startSeconds:12,endSeconds:18,subject:null,period:null,metric:null,value:null,unit:null,eligibility:'checkable',verdict:'INSUFFICIENT',evidence:[{url:'javascript:alert(1)',title:'테스트 자료',quote:'<img src=x onerror="window.injected=true">',position:0,publisher:null,publishedAt:null,relation:'INSUFFICIENT',usable:false,reasons:['QUOTE_NOT_VERIFIED'],lineage:'test'}]}],limitations:['테스트 전용 고정 출력. 실제 AI 추론 아님.'],usage:{}};
+  const missing={state:'missing',value:null,candidates:[]};
+  const sourceTrace={parserVersion:'static-text-v1',requestedUrl:'https://example.org/start',finalUrl:'https://example.org/report',retrievedAt:'2026-10-18T00:00:00+00:00',contentType:'text/html',bodySha256:'a'.repeat(64),textSha256:'b'.repeat(64),textLength:30,blocks:[{kind:'paragraph',position:0,length:30}],structureComplete:true,publication:{publisher:{state:'observed',value:'<img src=x onerror=window.traceInjected=true>',candidates:[{value:'<img src=x onerror=window.traceInjected=true>',locator:'meta[0]@content'}]},publishedAt:missing,modifiedAt:missing},quoteOccurrences:2,quoteBlockIndexes:[],extractionTruncated:false};
+  const sourceReview={version:'source-review-v1',registryVersion:'browser-fixture-v1',identity:{status:'publisher_conflict',publisherId:'fixture-publisher',registeredName:'<img src=x onerror=window.registryInjected=true>'},independence:'unverified',groupId:'c'.repeat(64),groupSize:2,relatedUrls:['https://other.example/original'],signals:['DECLARED_SOURCE_LINK']};
+  const result={scope:'audio_only',demo:false,claims:[{id:randomUUID(),text:'테스트 자료의 주장',contextText:'전사 원문 <img src=x onerror=window.contextInjected=true> 끝',startSeconds:12,endSeconds:18,subject:null,period:null,metric:null,value:null,unit:null,eligibility:'checkable',verdict:'INSUFFICIENT',evidence:[{url:'javascript:alert(1)',title:'테스트 자료',quote:'<img src=x onerror="window.injected=true">',position:0,publisher:null,publishedAt:null,relation:'INSUFFICIENT',usable:false,reasons:['QUOTE_NOT_VERIFIED'],lineage:'test',sourceTrace,sourceReview}]}],limitations:['테스트 전용 고정 출력. 실제 AI 추론 아님.'],usage:{}};
   await pool.query("INSERT INTO jobs(id,media_id,consent,status,result) VALUES($1,$2,true,'completed',$3)",[id,mediaId,JSON.stringify(result)]);
   await page.goto('/');
   await page.locator('.history-item').first().click();
@@ -56,6 +59,18 @@ test('persisted report links claim time to player and renders evidence as text',
   await expect(page.getByText('전사 원문 <img src=x onerror=window.contextInjected=true> 끝',{exact:true})).toBeVisible();
   expect(await page.evaluate(()=>Object.hasOwn(window,'contextInjected'))).toBe(false);
   expect(await page.evaluate(()=>Object.hasOwn(window,'injected'))).toBe(false);
+  await expect(page.getByText('원문 수집·발행 정보',{exact:true})).toBeVisible();
+  await page.getByText('원문 수집·발행 정보',{exact:true}).click();
+  await expect(page.getByText('페이지에서 관측한 정보이며 출처 인증이나 독립성 확인을 뜻하지 않습니다.')).toBeVisible();
+  await expect(page.getByText('<img src=x onerror=window.traceInjected=true>',{exact:true})).toBeVisible();
+  await expect(page.getByText('인용 위치 미확정 · 동일 인용 2곳',{exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>Object.hasOwn(window,'traceInjected'))).toBe(false);
+  await expect(page.getByText('출처 등록·재인용 검토',{exact:true})).toBeVisible();
+  await page.getByText('출처 등록·재인용 검토',{exact:true}).click();
+  await expect(page.getByText('출처 독립성은 확인되지 않았습니다.',{exact:true})).toBeVisible();
+  await expect(page.getByText('가능한 공통 출처 그룹 · 2개 근거',{exact:true})).toBeVisible();
+  await expect(page.getByText('<img src=x onerror=window.registryInjected=true>',{exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>Object.hasOwn(window,'registryInjected'))).toBe(false);
   expect(await page.locator('a[href^="javascript:"]').count()).toBe(0);
  }finally{
   if(id)await request.delete(`/api/analyses/${id}`);

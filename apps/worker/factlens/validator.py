@@ -3,8 +3,9 @@ from decimal import Decimal, InvalidOperation
 import re
 from urllib.parse import urlsplit
 from factlens.contracts import Claim, EvidenceCheck
+from factlens.source_document import SourceTrace, fingerprint
 
-RULE_VERSION = 'audio-numeric-canonical-v2'
+RULE_VERSION = 'audio-numeric-canonical-v3'
 SUPPORTED_SUBJECTS = {'한국','대한민국'}
 METRIC_UNITS = {'고용률':'%','실업률':'%','인구':'명'}
 
@@ -49,6 +50,7 @@ class EvidenceDocument:
     publishedAt:str|None
     fact:Fact
     lineage:str|None=None
+    sourceTrace:SourceTrace|None=None
 
 def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
     d=document;f=d.fact;reasons=claim_issues(claim)
@@ -64,6 +66,26 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
     # Natural-language interpretation/negation needs a reviewed extraction contract.
     canonical=f'{f.period} {f.subject} {f.metric} {f.value}{f.unit}'
     if d.quote.strip()!=canonical or d.text.strip()!=canonical:reasons.append('CONTEXT_REVIEW_REQUIRED')
+    trace=d.sourceTrace.model_copy(deep=True) if d.sourceTrace else None
+    if trace is not None:
+        # A page's metadata is a statement, not an authenticated issuer identity.
+        reasons.append('SOURCE_AUTHENTICITY_UNVERIFIED')
+        if trace.textSha256!=fingerprint(d.text.encode()) or trace.textLength!=len(d.text) or trace.finalUrl!=d.url:
+            reasons.append('SOURCE_TRACE_MISMATCH')
+        if not trace.structureComplete:reasons.append('SOURCE_STRUCTURE_INCOMPLETE')
+        if trace.extractionTruncated:reasons.append('SOURCE_EXTRACTION_TRUNCATED')
+        publication=trace.publication
+        if any(field.state in ('conflicting','invalid') for field in (publication.publisher,publication.publishedAt,publication.modifiedAt)):
+            reasons.append('PUBLICATION_METADATA_CONFLICT')
+        if (publication.publisher.state!='observed' or publication.publishedAt.state!='observed'
+                or d.publisher!=publication.publisher.value or d.publishedAt!=publication.publishedAt.value):
+            reasons.append('PUBLICATION_METADATA_UNVERIFIED')
+        trace.quoteOccurrences=sum(1 for _ in re.finditer('(?='+re.escape(d.quote)+')',d.text)) if d.quote else 0
+        trace.quoteBlockIndexes=[]
+        if trace.quoteOccurrences>1:reasons.append('QUOTE_AMBIGUOUS')
+        elif trace.quoteOccurrences==1:
+            trace.quoteBlockIndexes=[i for i,b in enumerate(trace.blocks) if b.position<=d.position and b.position+b.length>=d.position+len(d.quote)]
+            if not trace.quoteBlockIndexes:reasons.append('QUOTE_CONTEXT_REVIEW_REQUIRED')
     relation='INSUFFICIENT'
     try:
         a,b=Decimal(claim.value or ''),Decimal(f.value)
@@ -73,4 +95,4 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
             elif '.' in (claim.value or '') or '.' in f.value:reasons.append('PRECISION_REVIEW_REQUIRED')
             else:relation='REFUTED'
     except InvalidOperation:reasons.append('INVALID_NUMERIC_VALUE')
-    return EvidenceCheck(url=d.url,title=d.title,quote=d.quote,position=max(0,d.position),publisher=d.publisher,publishedAt=d.publishedAt,relation=relation,usable=not reasons,reasons=reasons,lineage=d.lineage or urlsplit(d.url).hostname or d.url)
+    return EvidenceCheck(url=d.url,title=d.title,quote=d.quote,position=max(0,d.position),publisher=d.publisher,publishedAt=d.publishedAt,relation=relation,usable=not reasons,reasons=reasons,lineage=d.lineage or urlsplit(d.url).hostname or d.url,sourceTrace=trace)
