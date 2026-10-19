@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from pydantic import ConfigDict, Field, field_validator, model_validator
 from typing import Self
-from factlens import contracts, decision, evaluation, validator, source_document, source_review
+from factlens import contracts, decision, evaluation, validator, source_document, source_review, table_context
 from factlens.contracts import Claim
 from factlens.evaluation import Dataset, Run, Strict, Name, Split, fingerprint, score, load_input
 
@@ -88,11 +88,11 @@ def execute(fixture:RulesFixture,split:Split)->dict:
             predictions=predictions)
     report=score(fixture.dataset,run,split)
     modules={'validator':validator.__file__,'decision':decision.__file__,'contracts':contracts.__file__,
-             'evaluation':evaluation.__file__,'source_document':source_document.__file__,'source_review':source_review.__file__,'source_registry':str(Path(source_review.__file__).with_name('source_registry.json')),'rule_regression':__file__}
+             'evaluation':evaluation.__file__,'table_context':table_context.__file__,'source_document':source_document.__file__,'source_review':source_review.__file__,'source_registry':str(Path(source_review.__file__).with_name('source_registry.json')),'rule_regression':__file__}
     report['execution']={'kind':'production_rules','fixtureId':fixture.fixtureId,'fixtureVersion':fixture.version,
                          'fixtureDigest':fixture_fingerprint(fixture),
                          'sourceDigests':{name:hashlib.sha256(Path(path).read_bytes()).hexdigest() for name,path in modules.items()},
-                         'modelsInvoked':False,'sourceReviewVersion':source_review.REVIEW_VERSION,'sourceRegistryVersion':source_review.DEFAULT_REGISTRY.version}
+                         'modelsInvoked':False,'tableContextVersion':table_context.CONTEXT_VERSION,'sourceReviewVersion':source_review.REVIEW_VERSION,'sourceRegistryVersion':source_review.DEFAULT_REGISTRY.version}
     report['scope']='synthetic_numeric_rule_regression_only'
     report['metadataProvenance']='local_rule_execution_and_caller_supplied_fixture'
     report['notMeasured']+=['STTQuality','SourceAuthenticity']

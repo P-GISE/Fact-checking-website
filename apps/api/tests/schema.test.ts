@@ -47,3 +47,23 @@ it('preserves physical table locations in v3 and accepts legacy blocks without t
  expect(sourceTraceSchema.safeParse({...trace,blocks:[{...trace.blocks[0],tableLocation:{...location,columnSpan:0}}]}).success).toBe(false);
  expect(sourceTraceSchema.safeParse({...trace,blocks:[{...trace.blocks[0],tableLocation:{...location,tableIndex:-1}}]}).success).toBe(false);
 });
+
+it('keeps same-table context candidates bounded and rejects false semantic verification',async()=>{
+ const {sourceTraceSchema}=await import('../src/contracts.js');const missing={state:'missing',value:null,candidates:[]};
+ const location={tableIndex:0,rowIndex:0,cellIndex:0,rowSpan:1,columnSpan:1};
+ const fragment={blockIndex:0,kind:'table_header',text:'분모 <img src=x onerror=alert(1)>',truncated:false};
+ const context={version:'table-context-v1',tableIndex:0,association:'same_table_only',meaningVerified:false,complete:true,fragments:[fragment]};
+ const trace={parserVersion:'static-text-v3',requestedUrl:'https://example.org/',finalUrl:'https://example.org/',retrievedAt:'2026-10-19T00:00:00Z',contentType:'text/html',bodySha256:'a'.repeat(64),textSha256:'b'.repeat(64),textLength:50,blocks:[{kind:'table_header',position:0,length:50,tableLocation:location}],structureComplete:true,publication:{publisher:missing,publishedAt:missing,modifiedAt:missing},quoteOccurrences:1,quoteBlockIndexes:[0],extractionTruncated:false,tableContext:context};
+ expect(sourceTraceSchema.parse(trace)).toHaveProperty('tableContext',context);
+ const differentQuote={...trace,textLength:51,blocks:[...trace.blocks,{kind:'table_cell',position:50,length:1,tableLocation:{...location,tableIndex:1}}],quoteBlockIndexes:[1]};
+ expect(sourceTraceSchema.safeParse(differentQuote).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,quoteOccurrences:2}).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,quoteBlockIndexes:[]}).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,meaningVerified:true}}).success).toBe(false);
+ const unicodeTrace={...trace,textLength:500,blocks:[{...trace.blocks[0],length:500}],tableContext:{...context,fragments:[{...fragment,text:'😀'.repeat(500)}]}};
+ expect(sourceTraceSchema.safeParse(unicodeTrace).success).toBe(true);
+ expect(sourceTraceSchema.safeParse({...unicodeTrace,tableContext:{...context,fragments:[{...fragment,text:'😀'.repeat(501)}]}}).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,fragments:[{...fragment,blockIndex:1}]}}).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,fragments:Array(17).fill(fragment)}}).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,fragments:[{...fragment,truncated:true}]}}).success).toBe(false);
+});

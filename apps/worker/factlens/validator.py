@@ -4,6 +4,7 @@ import re
 from urllib.parse import urlsplit
 from factlens.contracts import Claim, EvidenceCheck
 from factlens.source_document import SourceTrace, fingerprint
+from factlens.table_context import build_table_context
 
 RULE_VERSION = 'audio-numeric-canonical-v4'
 SUPPORTED_SUBJECTS = {'한국','대한민국'}
@@ -68,6 +69,7 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
     if d.quote.strip()!=canonical or d.text.strip()!=canonical:reasons.append('CONTEXT_REVIEW_REQUIRED')
     trace=d.sourceTrace.model_copy(deep=True) if d.sourceTrace else None
     if trace is not None:
+        trace.tableContext=None
         # A page's metadata is a statement, not an authenticated issuer identity.
         reasons.append('SOURCE_AUTHENTICITY_UNVERIFIED')
         if trace.textSha256!=fingerprint(d.text.encode()) or trace.textLength!=len(d.text) or trace.finalUrl!=d.url:
@@ -94,6 +96,8 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
         elif trace.quoteOccurrences==1:
             trace.quoteBlockIndexes=[i for i,b in enumerate(trace.blocks) if b.position<=d.position and b.position+b.length>=d.position+len(d.quote)]
             if not trace.quoteBlockIndexes:reasons.append('QUOTE_CONTEXT_REVIEW_REQUIRED')
+        if 'SOURCE_TRACE_MISMATCH' not in reasons:
+            trace.tableContext=build_table_context(d.text,trace,d.position,d.quote)
     relation='INSUFFICIENT'
     try:
         a,b=Decimal(claim.value or ''),Decimal(f.value)

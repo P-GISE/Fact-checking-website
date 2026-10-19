@@ -85,6 +85,22 @@ class SourceLink(Strict):
     locator: str = Field(min_length=1,max_length=128)
 
 
+class TableContextFragment(Strict):
+    blockIndex: int = Field(ge=0, lt=MAX_BLOCKS)
+    kind: Literal['table_header','caption','note']
+    text: str = Field(min_length=1, max_length=500)
+    truncated: bool = False
+
+
+class TableContext(Strict):
+    version: Literal['table-context-v1'] = 'table-context-v1'
+    tableIndex: int = Field(ge=0, lt=MAX_NODES)
+    association: Literal['same_table_only'] = 'same_table_only'
+    meaningVerified: Literal[False] = False
+    complete: bool
+    fragments: list[TableContextFragment] = Field(max_length=16)
+
+
 class SourceTrace(Strict):
     parserVersion: Literal['static-text-v1','static-text-v2','static-text-v3'] = PARSER_VERSION
     requestedUrl: str
@@ -102,6 +118,7 @@ class SourceTrace(Strict):
     extractionTruncated: bool = False
     sourceLinks: list[SourceLink] = Field(default_factory=list,max_length=32)
     sourceLinksComplete: bool = False
+    tableContext: TableContext | None = None
 
     @model_validator(mode='after')
     def valid_locations(self):
@@ -112,6 +129,19 @@ class SourceTrace(Strict):
             end = block.position + block.length
         if any(index < 0 or index >= len(self.blocks) for index in self.quoteBlockIndexes):
             raise ValueError('INVALID_QUOTE_BLOCK')
+        if self.tableContext is not None:
+            if (self.quoteOccurrences!=1 or not self.quoteBlockIndexes or any(
+                    self.blocks[index].tableLocation is None or
+                    self.blocks[index].tableLocation.tableIndex!=self.tableContext.tableIndex
+                    for index in self.quoteBlockIndexes)):
+                raise ValueError('INVALID_TABLE_CONTEXT')
+            for fragment in self.tableContext.fragments:
+                if fragment.blockIndex>=len(self.blocks):raise ValueError('INVALID_TABLE_CONTEXT')
+                block=self.blocks[fragment.blockIndex]
+                if block.kind!=fragment.kind or block.tableLocation is None or block.tableLocation.tableIndex!=self.tableContext.tableIndex:
+                    raise ValueError('INVALID_TABLE_CONTEXT')
+            if self.tableContext.complete and (not self.structureComplete or self.extractionTruncated or any(f.truncated for f in self.tableContext.fragments)):
+                raise ValueError('INVALID_TABLE_CONTEXT')
         return self
 
 

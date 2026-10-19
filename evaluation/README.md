@@ -87,3 +87,8 @@ PYTHONPATH=apps/worker .venv/bin/python -m factlens.rule_regression evaluation/g
 ## 표 위치 관측 확장 (2026-10-19)
 
 parser static-text-v3는 tableLocation을 보존하며 RULES runner의 source_document 소스 해시로 실행 변경을 추적한다. 판정은 audio-numeric-canonical-v4를 유지한다. 구조 연결은 표 의미 검증/실제 AI 정확도 향상이 아니며 TABLE_CONTEXT_UNVERIFIED를 제거하지 않는다. 기존9개/유보8개 기대값은 유지된다.
+
+
+## 표 설명 후보 검토 버전 (2026-10-19)
+
+tableContextVersion=table-context-v1과 table_context 모듈 SHA-256을 생산 RULES 실행 기록에 추가했다. pipeline도 제공자의 같은 이름 버전을 신뢰하지 않고 서버 값으로 덮어쓴다. 기존 숫자 판정v4와9개/유보8개 기대값은 그대로이며 설명 후보를 표시하는 것이 실제 AI 정확도 측정은 아니다.

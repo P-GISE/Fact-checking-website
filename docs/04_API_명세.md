@@ -161,3 +161,8 @@ GET `/api/admin/overview`만 추가했다. 서버의 별도 `FACTLENS_ADMIN_TOKE
 ## TASK-023 표 구조 연결 (2026-10-19)
 
 sourceTrace.parserVersion은 static-text-v3를 추가로 수용한다. blocks[].tableLocation은 nullable/default null이며 내부 객체는 strict다. tableIndex는0..99999, rowIndex/cellIndex는 같은 범위 또는null, rowSpan은0..1000 또는null, columnSpan은1..1000 또는null이다. 이전 v1/v2 블록은 자동으로 null을 받는다. 범위 밖/음수/columnSpan0은 거부한다. 구조 위치는 의미 검증 결과나 판정 등급이 아니다.
+
+
+## TASK-023 표 설명 후보 연결 (2026-10-19)
+
+sourceTrace.tableContext는 nullable/default null이다. version=table-context-v1, association=same_table_only, meaningVerified=false로 고정한다. fragments는최대16개, blockIndex0..2047, kind는table_header/caption/note, text는Unicode codepoint1..500, truncated는boolean이다. complete=true는 구조/추출이 완전하고 fragment가 절단되지 않은 경우만 허용한다. fragment의 kind/표 번호/블록 범위와 유일 인용의 표 번호가 일치해야 하며 quoteOccurrences!=1 또는 quoteBlockIndexes가 없으면 거부한다. UTF-16 길이 차이 때문에500개의 보조 평면 문자도 수용한다. 판정/독립성 인증을 뜻하지 않는다.
