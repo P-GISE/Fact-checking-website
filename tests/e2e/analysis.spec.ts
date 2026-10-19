@@ -121,3 +121,23 @@ test('admin access is explicit, read-only and forgotten on logout',async({page})
  await expect(page.getByLabel('관리자 접근 토큰')).toHaveValue('');
  expect(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length}))).toEqual({local:0,session:0});
 });
+
+test('table quote displays physical source location without claiming verified meaning',async({page,request})=>{
+ const {default:pg}=await import('pg');const pool=new pg.Pool({connectionString:process.env.DATABASE_URL});
+ const dir=mkdtempSync(path.join(tmpdir(),'factlens-table-')),file=path.join(dir,'table.wav');
+ execFileSync('ffmpeg',['-v','error','-f','lavfi','-i','sine=duration=1',file]);let id='';
+ try{
+  const {readFileSync}=await import('node:fs');const {randomUUID}=await import('node:crypto');
+  const uploaded=await request.post('/api/media/upload',{multipart:{file:{name:'table.wav',mimeType:'audio/wav',buffer:readFileSync(file)}}});
+  const mediaId=(await uploaded.json()).mediaId;id=randomUUID();const quote='2025년 한국 고용률 50%';
+  const missing={state:'missing',value:null,candidates:[]};
+  const sourceTrace={parserVersion:'static-text-v3',requestedUrl:'https://example.org/table',finalUrl:'https://example.org/table',retrievedAt:'2026-10-19T00:00:00Z',contentType:'text/html',bodySha256:'a'.repeat(64),textSha256:'b'.repeat(64),textLength:quote.length,blocks:[{kind:'table_cell',position:0,length:quote.length,tableLocation:{tableIndex:0,rowIndex:1,cellIndex:0,rowSpan:1,columnSpan:2}}],structureComplete:true,publication:{publisher:missing,publishedAt:missing,modifiedAt:missing},quoteOccurrences:1,quoteBlockIndexes:[0],extractionTruncated:false};
+  const result={scope:'audio_only',demo:false,claims:[{id:randomUUID(),text:'표 위치 추적 테스트',startSeconds:0,endSeconds:1,verdict:'INSUFFICIENT',evidence:[{url:sourceTrace.finalUrl,title:'합성 표',quote,position:0,publisher:null,publishedAt:null,relation:'INSUFFICIENT',usable:false,reasons:['TABLE_CONTEXT_UNVERIFIED'],lineage:'example.org',sourceTrace}]}],limitations:['합성 고정 출력이며 실제 AI 분석이 아닙니다.'],usage:{}};
+  await pool.query("INSERT INTO jobs(id,media_id,consent,status,result) VALUES($1,$2,true,'completed',$3)",[id,mediaId,JSON.stringify(result)]);
+  await page.goto('/');await page.locator('.history-item').first().click();
+  await page.getByText('원문 수집·발행 정보',{exact:true}).click();
+  await expect(page.getByText('표 1 · 행 2 · 셀 1 (원문 순서)',{exact:true})).toBeVisible();
+  await expect(page.getByText('행 병합 표기: 1 · 열 병합 표기: 2',{exact:true})).toBeVisible();
+  await expect(page.getByText('행·셀 번호는 원문 태그 순서입니다. 단위·분모·주석의 의미는 검증되지 않았습니다.',{exact:true})).toBeVisible();
+ }finally{if(id)await request.delete(`/api/analyses/${id}`);await pool.end();rmSync(dir,{recursive:true});}
+});

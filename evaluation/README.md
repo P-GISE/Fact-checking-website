@@ -82,3 +82,8 @@ PYTHONPATH=apps/worker .venv/bin/python -m factlens.rule_regression evaluation/g
 ## TASK-023 표 인용 맥락 유보 보완 (2026-10-19)
 
 현재 규칙은 `audio-numeric-canonical-v4`다. 인용 범위가 table_cell/table_header와 겹치면 `TABLE_CONTEXT_UNVERIFIED`를 기록한다. 셀/헤더의 숫자만으로 행·열·분모·단위·주석의 의미를 확정하지 않는다. 관계없는 표가 있다는 이유만으로 문단 인용에 이 사유를 붙이지 않는다. 기존 전체 원문 맥락/출처 인증 유보는 유지하며 일반 표 의미 해석·실자료 정확도 검증은 미완료다. 신규 API 필드/DB 변경 없이 기존 reasons로 전달한다.
+
+
+## 표 위치 관측 확장 (2026-10-19)
+
+parser static-text-v3는 tableLocation을 보존하며 RULES runner의 source_document 소스 해시로 실행 변경을 추적한다. 판정은 audio-numeric-canonical-v4를 유지한다. 구조 연결은 표 의미 검증/실제 AI 정확도 향상이 아니며 TABLE_CONTEXT_UNVERIFIED를 제거하지 않는다. 기존9개/유보8개 기대값은 유지된다.

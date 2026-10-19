@@ -2,9 +2,9 @@ import { z } from 'zod';
 export const verdictSchema=z.enum(['CONFIRMED','REFUTED','INSUFFICIENT','REVIEW_REQUIRED','EXCLUDED']);
 const observedFieldSchema=z.object({state:z.enum(['missing','observed','conflicting','invalid']),value:z.string().max(500).nullable(),candidates:z.array(z.object({value:z.string().min(1).max(500),locator:z.string().min(1).max(128)}).strict()).max(32)}).strict();
 export const sourceTraceSchema=z.object({
- parserVersion:z.enum(['static-text-v1','static-text-v2']),requestedUrl:z.string().url(),finalUrl:z.string().url(),retrievedAt:z.string().datetime({offset:true}),
+ parserVersion:z.enum(['static-text-v1','static-text-v2','static-text-v3']),requestedUrl:z.string().url(),finalUrl:z.string().url(),retrievedAt:z.string().datetime({offset:true}),
  contentType:z.enum(['text/html','application/xhtml+xml','text/plain']),bodySha256:z.string().regex(/^[0-9a-f]{64}$/),textSha256:z.string().regex(/^[0-9a-f]{64}$/),textLength:z.number().int().nonnegative(),
- blocks:z.array(z.object({kind:z.enum(['title','heading','paragraph','table_header','table_cell','caption','note','text']),position:z.number().int().nonnegative(),length:z.number().int().positive()}).strict()).max(2048),
+ blocks:z.array(z.object({kind:z.enum(['title','heading','paragraph','table_header','table_cell','caption','note','text']),position:z.number().int().nonnegative(),length:z.number().int().positive(),tableLocation:z.object({tableIndex:z.number().int().min(0).max(99999),rowIndex:z.number().int().min(0).max(99999).nullable(),cellIndex:z.number().int().min(0).max(99999).nullable(),rowSpan:z.number().int().min(0).max(1000).nullable(),columnSpan:z.number().int().min(1).max(1000).nullable()}).strict().nullable().default(null)}).strict()).max(2048),
  structureComplete:z.boolean(),publication:z.object({publisher:observedFieldSchema,publishedAt:observedFieldSchema,modifiedAt:observedFieldSchema}).strict(),
  quoteOccurrences:z.number().int().nonnegative().nullable(),quoteBlockIndexes:z.array(z.number().int().nonnegative()).max(2048),extractionTruncated:z.boolean(),
  sourceLinks:z.array(z.object({kind:z.enum(['canonical','citation']),url:z.string().url().max(2000),locator:z.string().min(1).max(128)}).strict()).max(32).default([]),sourceLinksComplete:z.boolean().default(false)

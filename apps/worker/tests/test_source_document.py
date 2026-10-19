@@ -103,7 +103,7 @@ def test_metadata_overflow_is_bounded_and_does_not_select_a_trusted_value():
 def test_explicit_canonical_and_cite_links_resolve_against_server_final_url_only():
     raw=fetched(b'<link rel="canonical" href="/original#section"><blockquote cite="https://source.example/report">quote</blockquote><a rel="cite" href="https://source.example/data">source</a><a href="https://ordinary.example/">navigation</a>')
     trace=raw['sourceTrace']
-    assert trace['parserVersion']=='static-text-v2'
+    assert trace['parserVersion']=='static-text-v3'
     assert [(link['kind'],link['url']) for link in trace['sourceLinks']]==[('canonical','https://example.org/original'),('citation','https://source.example/report'),('citation','https://source.example/data')]
     assert trace['sourceLinksComplete'] is True
 
@@ -131,3 +131,37 @@ def test_source_reference_does_not_default_explicit_port_zero(url):
 def test_empty_userinfo_is_not_removed_to_make_a_reference_look_trusted(url):
     from factlens.source_document import normalize_source_url
     with pytest.raises(ValueError):normalize_source_url(url)
+
+
+def test_table_blocks_link_physical_rows_cells_and_span_observations():
+    raw=fetched('<table><caption>연간 통계</caption><tr><th rowspan="2">대상</th><th colspan="2">기간</th></tr><tr><td><p>2025년</p></td><td>50%</td></tr></table>'.encode())
+    blocks=raw['sourceTrace']['blocks']
+    locations=[b.get('tableLocation') for b in blocks]
+    assert locations==[
+        {'tableIndex':0,'rowIndex':None,'cellIndex':None,'rowSpan':None,'columnSpan':None},
+        {'tableIndex':0,'rowIndex':0,'cellIndex':0,'rowSpan':2,'columnSpan':1},
+        {'tableIndex':0,'rowIndex':0,'cellIndex':1,'rowSpan':1,'columnSpan':2},
+        {'tableIndex':0,'rowIndex':1,'cellIndex':0,'rowSpan':1,'columnSpan':1},
+        {'tableIndex':0,'rowIndex':1,'cellIndex':1,'rowSpan':1,'columnSpan':1},
+    ]
+    assert raw['sourceTrace']['parserVersion']=='static-text-v3'
+
+
+def test_nested_tables_keep_separate_identity_and_restore_outer_cell():
+    raw=fetched(b'<table><tr><td>outer before<table><tr><td>inner</td></tr></table>outer after</td><td>next</td></tr></table><table><tr><td>second</td></tr></table>')
+    blocks=raw['sourceTrace']['blocks']
+    assert [b.get('tableLocation',{}).get('tableIndex') for b in blocks]==[0,1,0,0,2]
+    assert [b['tableLocation']['cellIndex'] for b in blocks]==[0,0,0,1,0]
+
+
+@pytest.mark.parametrize('span',['-1','0','1001','999999999999999999999999','bad'])
+def test_invalid_column_spans_are_unknown_instead_of_inventing_a_grid(span):
+    raw=fetched(f'<table><tr><td colspan="{span}">value</td></tr></table>'.encode())
+    assert raw['sourceTrace']['blocks'][0].get('tableLocation',{}).get('columnSpan') is None
+    assert raw['sourceTrace']['blocks'][0].get('tableLocation',{}).get('rowSpan')==1
+
+
+def test_rowspan_zero_is_retained_and_non_table_text_has_no_table_location():
+    raw=fetched(b'<p>paragraph</p><table><tr><td rowspan="0">cell</td></tr></table>')
+    assert raw['sourceTrace']['blocks'][0].get('tableLocation') is None
+    assert raw['sourceTrace']['blocks'][1].get('tableLocation',{}).get('rowSpan')==0

@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from bs4.element import NavigableString, CData, Tag
 
-PARSER_VERSION = 'static-text-v2'
+PARSER_VERSION = 'static-text-v3'
 MAX_BLOCKS = 2048
 MAX_OBSERVATIONS = 32
 MAX_NODES = 100000
@@ -20,10 +20,20 @@ class Strict(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
 
+class TableLocation(Strict):
+    # DOM order, not a resolved logical grid or authenticated semantic scope.
+    tableIndex: int = Field(ge=0, lt=MAX_NODES)
+    rowIndex: int | None = Field(default=None, ge=0, lt=MAX_NODES)
+    cellIndex: int | None = Field(default=None, ge=0, lt=MAX_NODES)
+    rowSpan: int | None = Field(default=None, ge=0, le=1000)
+    columnSpan: int | None = Field(default=None, ge=1, le=1000)
+
+
 class TextBlock(Strict):
     kind: Literal['title','heading','paragraph','table_header','table_cell','caption','note','text']
     position: int = Field(ge=0)
     length: int = Field(gt=0)
+    tableLocation: TableLocation | None = None
 
 
 class MetadataCandidate(Strict):
@@ -76,7 +86,7 @@ class SourceLink(Strict):
 
 
 class SourceTrace(Strict):
-    parserVersion: Literal['static-text-v1','static-text-v2'] = PARSER_VERSION
+    parserVersion: Literal['static-text-v1','static-text-v2','static-text-v3'] = PARSER_VERSION
     requestedUrl: str
     finalUrl: str
     retrievedAt: str
@@ -146,6 +156,14 @@ def publication_observations(soup: BeautifulSoup) -> Publication:
     return Publication(**result)
 
 
+def observed_span(node: Tag, attribute: str, minimum: int) -> int | None:
+    value=node.get(attribute)
+    if value is None:return 1
+    if not isinstance(value,str) or not 1<=len(value)<=4 or not value.isascii() or not value.isdecimal():return None
+    number=int(value)
+    return number if minimum<=number<=1000 else None
+
+
 def parse_document(body: bytes, content_type: str) -> dict:
     if not content_type.strip():
         raise ValueError('UNSUPPORTED_DOCUMENT')
@@ -175,10 +193,11 @@ def parse_document(body: bytes, content_type: str) -> dict:
     kinds = {'title':'title','h1':'heading','h2':'heading','h3':'heading','h4':'heading','h5':'heading','h6':'heading',
              'p':'paragraph','li':'paragraph','blockquote':'paragraph','th':'table_header','td':'table_cell',
              'caption':'caption','aside':'note','div':'text','pre':'text'}
-    stack = [(iter(soup.children), None, None)]
+    stack = [(iter(soup.children), None, None, None, None)]
+    table_count = 0
     nodes = 0
     while stack:
-        iterator, normal, special = stack[-1]
+        iterator, normal, special, table, row = stack[-1]
         node = next(iterator, None)
         if node is None:
             stack.pop()
@@ -198,25 +217,45 @@ def parse_document(body: bytes, content_type: str) -> dict:
                 if not isinstance(value,str) or not value or len(value)>2000 or len(source_links)>=32:
                     links_complete=False
                 else:source_links.append({'kind':kind,'value':value,'locator':f'{node.name}[{nodes}]@{attribute}'})
-            child_normal = (id(node), kinds[node.name]) if node.name in kinds else normal
-            child_special = (id(node), kinds[node.name]) if node.name in ('th','td','caption','aside') else special
+            child_table, child_row = table, row
+            if node.name=='table':
+                child_table={'index':table_count,'nextRow':0}
+                table_count+=1
+                child_row=None
+                normal=special=None
+            elif node.name=='tr' and table is not None:
+                child_row={'index':table['nextRow'],'nextCell':0}
+                table['nextRow']+=1
+            location=special[2] if special else None
+            if node.name in ('th','td','caption'):
+                location=None
+                if table is not None:
+                    caption=node.name=='caption'
+                    location=TableLocation(tableIndex=table['index'],
+                        rowIndex=row['index'] if row is not None and not caption else None,
+                        cellIndex=row['nextCell'] if row is not None and not caption else None,
+                        rowSpan=observed_span(node,'rowspan',0) if not caption else None,
+                        columnSpan=observed_span(node,'colspan',1) if not caption else None)
+                    if row is not None and not caption:row['nextCell']+=1
+            child_normal = (id(node), kinds[node.name], None) if node.name in kinds else normal
+            child_special = (id(node), kinds[node.name], location) if node.name in ('th','td','caption','aside') else special
             if len(stack) >= MAX_DEPTH:
                 raise ValueError('DOCUMENT_STRUCTURE_LIMIT')
-            stack.append((iter(node.children), child_normal, child_special))
+            stack.append((iter(node.children), child_normal, child_special, child_table, child_row))
             continue
         if type(node) not in (NavigableString, CData):
             continue
         value = ' '.join(str(node).split())
         if not value:
             continue
-        identity, kind = special or normal or (id(node), 'text')
+        identity, kind, location = special or normal or (id(node), 'text', None)
         position = length + (1 if chunks else 0)
         chunks.append(value)
         length = position + len(value)
         if previous == identity and blocks and complete:
             blocks[-1].length = length - blocks[-1].position
         elif len(blocks) < MAX_BLOCKS:
-            blocks.append(TextBlock(kind=kind, position=position, length=len(value)))
+            blocks.append(TextBlock(kind=kind, position=position, length=len(value),tableLocation=location))
         else:
             complete = False
         previous = identity

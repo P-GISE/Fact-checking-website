@@ -37,3 +37,13 @@ it('preserves source registration review without claiming independent evidence',
  expect(evidenceSchema.parse(evidence)).toHaveProperty('sourceReview',null);
  expect(evidenceSchema.safeParse({...evidence,sourceReview:{...sourceReview,independence:'verified'}}).success).toBe(false);
 });
+
+it('preserves physical table locations in v3 and accepts legacy blocks without them',async()=>{
+ const {sourceTraceSchema}=await import('../src/contracts.js');const field={state:'missing',value:null,candidates:[]};
+ const location={tableIndex:0,rowIndex:1,cellIndex:0,rowSpan:0,columnSpan:2};
+ const trace={parserVersion:'static-text-v3',requestedUrl:'https://example.org/',finalUrl:'https://example.org/',retrievedAt:'2026-10-19T00:00:00Z',contentType:'text/html',bodySha256:'a'.repeat(64),textSha256:'b'.repeat(64),textLength:4,blocks:[{kind:'table_cell',position:0,length:4,tableLocation:location}],structureComplete:true,publication:{publisher:field,publishedAt:field,modifiedAt:field},quoteOccurrences:1,quoteBlockIndexes:[0],extractionTruncated:false};
+ expect(sourceTraceSchema.parse(trace).blocks[0]).toHaveProperty('tableLocation',location);
+ expect(sourceTraceSchema.parse({...trace,parserVersion:'static-text-v2',blocks:[{kind:'table_cell',position:0,length:4}]}).blocks[0]).toHaveProperty('tableLocation',null);
+ expect(sourceTraceSchema.safeParse({...trace,blocks:[{...trace.blocks[0],tableLocation:{...location,columnSpan:0}}]}).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,blocks:[{...trace.blocks[0],tableLocation:{...location,tableIndex:-1}}]}).success).toBe(false);
+});

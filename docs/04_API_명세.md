@@ -156,3 +156,8 @@ sourceTrace.parserVersion은 static-text-v1/v2를 수용한다. sourceLinks(kind
 ## TASK-027 읽기 전용 관리자 화면 (2026-10-19)
 
 GET `/api/admin/overview`만 추가했다. 서버의 별도 `FACTLENS_ADMIN_TOKEN`은 32~256자 `[A-Za-z0-9._~-]` 토큰이며 무작위 32바이트 이상에서 생성한다. Authorization Bearer의 SHA-256 digest를 timingSafeEqual로 비교한다. 환경 미설정/형식 미달은 503 ADMIN_NOT_CONFIGURED, 인증 실패는 401 ADMIN_UNAUTHORIZED, 비허용 Origin은 403이다. 성공 응답은 version(admin-overview-v1), observedAt/windowStart, statusCounts, recentJobs[{id,status,createdAt,errorCode}], usage{month,settledMicros,reservedMicros,effectiveMicros,pendingReservations}다. 비용은 USD micros decimal 문자열이다. recentJobs는 최근 24시간 최대 20개이며 errorCode는 허용 코드 또는 UNCLASSIFIED_ERROR/null이다. 원시 오류·본문·토큰·미디어 ID는 반환하지 않는다. 관리자 변경 엔드포인트는 없으며 이 인증은 기존 제품 API 전체의 사용자 인증을 대신하지 않는다.
+
+
+## TASK-023 표 구조 연결 (2026-10-19)
+
+sourceTrace.parserVersion은 static-text-v3를 추가로 수용한다. blocks[].tableLocation은 nullable/default null이며 내부 객체는 strict다. tableIndex는0..99999, rowIndex/cellIndex는 같은 범위 또는null, rowSpan은0..1000 또는null, columnSpan은1..1000 또는null이다. 이전 v1/v2 블록은 자동으로 null을 받는다. 범위 밖/음수/columnSpan0은 거부한다. 구조 위치는 의미 검증 결과나 판정 등급이 아니다.
