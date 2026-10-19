@@ -33,6 +33,7 @@ def test_real_database_recovery_discards_sessions_reports_and_preserves_costs(tm
   assert (bundle/'database.dump').stat().st_mode&0o777==0o600
   m.restore('factlens-postgres-1',target,bundle)
   assert m.sql('factlens-postgres-1',target,f"SELECT count(*) FROM app_users WHERE id='{user}'").strip()==b'1'
+  assert m.sql('factlens-postgres-1',target,"SELECT count(*) FROM app_users WHERE deleted_at IS NULL OR password_hash<>'!'").strip()==b'0'
   assert m.sql('factlens-postgres-1',target,'SELECT count(*) FROM app_sessions').strip()==b'0'
   assert m.sql('factlens-postgres-1',target,f"SELECT status||':'||(result IS NULL)::text FROM jobs WHERE id='{job}'").strip()==b'deleted:true'
   assert m.sql('factlens-postgres-1',target,f"SELECT actual_micros FROM usage_reservations WHERE id='{reservation}'").strip()==b'50'
