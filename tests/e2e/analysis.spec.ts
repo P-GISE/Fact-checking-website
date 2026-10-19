@@ -144,3 +144,19 @@ test('table quote displays physical source location without claiming verified me
   expect(await page.evaluate(()=>Object.hasOwn(window,'tableContextInjected'))).toBe(false);
  }finally{if(id)await request.delete(`/api/analyses/${id}`);await pool.end();rmSync(dir,{recursive:true});}
 });
+
+test('visual observations remain separate from external verdicts and escape OCR text',async({page})=>{
+ const text='<img src=x onerror=window.ocrInjected=true> 화면 40%';
+ const item={id:'visual',status:'completed',stage:'completed',createdAt:'2026-10-19T00:00:00Z',expiresAt:'',scope:'audio_visual',demo:false,error:null,claims:[{id:'claim',text:'음성 50%',startSeconds:0,endSeconds:1,verdict:'INSUFFICIENT',evidence:[]}],limitations:['15초 간격 표본 추출'],usage:{},visual:{version:'visual-sampled-v1',status:'partial',durationSeconds:2,subtitleStatus:'not_present',ocrStatus:'partial',frames:[{frameId:'frame',timeSeconds:0}],records:[{source:'ocr',startSeconds:0,endSeconds:2,text,frameId:'frame'}],limitations:['OCR 오인식 가능']},modalChecks:[{claimId:'claim',source:'ocr',startSeconds:0,endSeconds:2,observedText:text,status:'possible_mismatch',reasons:['OCR_UNCERTAIN'],frameId:'frame'}],summary:{overall:'review_required',counts:{CONFIRMED:0,REFUTED:0,INSUFFICIENT:1,REVIEW_REQUIRED:0,EXCLUDED:0},strength:'not_assessed',independenceVerified:false,crossModalReviewRequired:true}};
+ await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
+ await page.route('**/api/analyses/visual',route=>route.fulfill({json:item}));
+ await page.goto('/');await page.locator('.history-item').first().click();
+ await expect(page.getByRole('heading',{name:'자막·화면 관측'})).toBeVisible();
+ await expect(page.getByText('불일치 후보 · 검토 필요',{exact:true})).toBeVisible();
+ await expect(page.getByText(text,{exact:true}).first()).toBeVisible();
+ await expect(page.getByText('전체 영상의 진실 판정이 아닙니다. 근거 강도와 출처 독립성은 평가하지 않았습니다.',{exact:true})).toBeVisible();
+ await expect(page.locator('.claim-card .verdict')).toHaveText('검증 불충분');
+ expect(await page.evaluate(()=>Object.hasOwn(window,'ocrInjected'))).toBe(false);
+ await page.setViewportSize({width:390,height:844});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

@@ -92,3 +92,8 @@ parser static-text-v3는 tableLocation을 보존하며 RULES runner의 source_do
 ## 표 설명 후보 검토 버전 (2026-10-19)
 
 tableContextVersion=table-context-v1과 table_context 모듈 SHA-256을 생산 RULES 실행 기록에 추가했다. pipeline도 제공자의 같은 이름 버전을 신뢰하지 않고 서버 값으로 덮어쓴다. 기존 숫자 판정v4와9개/유보8개 기대값은 그대로이며 설명 후보를 표시하는 것이 실제 AI 정확도 측정은 아니다.
+
+
+## 실제 연결 smoke와 연구 데이터 구분 (2026-10-19)
+
+smoke/owned-korean-connection.json은 직접 작성한 문장을 espeak-ng ko로 합성한7.953초 입력의 권리/생성기/해시 기록이다. 원본군/개발·평가 분할이나 gold label을 가진 연구 자료가 아니다. 테스트 후 파일은 삭제했다. OpenAI whisper-1 실호출은429로 실패했고 언어 모델/Brave를 포함한 파이프라인 완료를 검증하지 못했다. 별도 Brave 최소 연결은200/검색 후보3개였으며 원문 검증·실제 모델 정확도 측정은 아니다. sanitized 실행 기록은docs/reports/2026-10-19-owned-korean-live-smoke.json 및2026-10-19-brave-connection-smoke.json이다. 실제 청구/잔액과 요율 기반 보수적 비용을 구분한다. A/B/C 실자료 평가는 미실행이다.

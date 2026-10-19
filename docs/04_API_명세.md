@@ -166,3 +166,19 @@ sourceTrace.parserVersion은 static-text-v3를 추가로 수용한다. blocks[].
 ## TASK-023 표 설명 후보 연결 (2026-10-19)
 
 sourceTrace.tableContext는 nullable/default null이다. version=table-context-v1, association=same_table_only, meaningVerified=false로 고정한다. fragments는최대16개, blockIndex0..2047, kind는table_header/caption/note, text는Unicode codepoint1..500, truncated는boolean이다. complete=true는 구조/추출이 완전하고 fragment가 절단되지 않은 경우만 허용한다. fragment의 kind/표 번호/블록 범위와 유일 인용의 표 번호가 일치해야 하며 quoteOccurrences!=1 또는 quoteBlockIndexes가 없으면 거부한다. UTF-16 길이 차이 때문에500개의 보조 평면 문자도 수용한다. 판정/독립성 인증을 뜻하지 않는다.
+
+
+## 계정 API와 소유권 (2026-10-19)
+
+| 경로 | 동작 |
+| --- | --- |
+| GET /api/auth/session | local/accounts 모드와 현재 사용자 또는 null |
+| POST /api/auth/register | username/password로 계정 생성 및 세션 설정 |
+| POST /api/auth/login | 비밀번호 확인·새 세션 설정 |
+| POST /api/auth/logout | 현재 세션 폐기·쿠키 제거 |
+
+공개 모드 쿠키는 __Host-factlens_session, Secure/HttpOnly/SameSite=Strict/Path=/,24시간이다. DB에는 토큰 SHA-256만 저장한다. 비밀번호는 임의16바이트 salt의 Node scrypt64바이트 해시로 보존한다. 인증 실패는401, 입력 오류400, 중복 이름409, 인증 시도/저장량 제한429다.
+
+계정 모드의 모든 업로드/분석 생성·이력·단건·claims·timeline·report·evidence·media·삭제는 서버 세션 소유자를 사용한다. 미인증401, 타 계정/기존 소유자 NULL 자료404다. health와 별도 관리자 Bearer 인증은 예외이며 관리자 토큰은 일반 사용자의 미디어 접근을 허용하지 않는다.
+
+결과 scope는 audio_only/audio_visual, visual/modalChecks/summary는 이전 결과와 호환되는 선택 필드다. visual-sampled-v1의 비공개 frameId/시간/관측/부분 상태, modal-record-review-v1 비교, claim-summary-v1 주장 집계를 검증한다. 원본 프레임 공개 URL이나 진실 확률은 제공하지 않는다.

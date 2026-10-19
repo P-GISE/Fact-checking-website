@@ -67,3 +67,13 @@ it('keeps same-table context candidates bounded and rejects false semantic verif
  expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,fragments:Array(17).fill(fragment)}}).success).toBe(false);
  expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,fragments:[{...fragment,truncated:true}]}}).success).toBe(false);
 });
+
+it('preserves sampled visual observations and a non-probabilistic claim summary',async()=>{
+ const {resultSchema}=await import('../src/contracts.js');
+ const visual={version:'visual-sampled-v1',status:'complete',durationSeconds:3,subtitleStatus:'extracted',ocrStatus:'no_video',frames:[],records:[{source:'subtitle',startSeconds:0,endSeconds:2,text:'2025년 한국 고용률 5%',frameId:null}],limitations:[]};
+ const summary={version:'claim-summary-v1',scope:'claim_summary',overall:'insufficient',counts:{CONFIRMED:0,REFUTED:0,INSUFFICIENT:1,REVIEW_REQUIRED:0,EXCLUDED:0},strength:'not_assessed',independenceVerified:false,crossModalReviewRequired:false};
+ const report={scope:'audio_visual',claims:[claim],limitations:[],visual,modalChecks:[],summary};
+ expect(resultSchema.parse(report)).toMatchObject({visual,summary});
+ expect(resultSchema.safeParse({...report,visual:{...visual,records:[{...visual.records[0],endSeconds:4}]}}).success).toBe(false);
+ expect(resultSchema.safeParse({...report,summary:{...summary,independenceVerified:true}}).success).toBe(false);
+});

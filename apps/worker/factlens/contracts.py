@@ -1,3 +1,6 @@
+from factlens.visual import VisualAnalysis
+from factlens.multimodal import ModalCheck
+from factlens.report import ClaimSummary
 from factlens.source_document import SourceTrace
 from factlens.source_review import SourceReview
 from typing import Literal
@@ -40,9 +43,12 @@ class Claim(BaseModel):
         return self
 
 class AnalysisResult(BaseModel):
-    scope: Literal['audio_only'] = 'audio_only'
+    scope: Literal['audio_only','audio_visual'] = 'audio_only'
     demo: bool = False
     claims: list[Claim] = Field(max_length=5)
     limitations: list[str]
     usage: dict = Field(default_factory=dict)
     versions: dict[str,str] = Field(default_factory=dict)
+    visual: VisualAnalysis | None = None
+    modalChecks: list[ModalCheck] = Field(default_factory=list,max_length=100)
+    summary: ClaimSummary | None = None

@@ -9,3 +9,7 @@ export async function createAnalysis(mediaId:string,consent:boolean){return call
 export const getAnalysis=(id:string)=>call<Analysis>(`/api/analyses/${id}`);
 export const listAnalyses=()=>call<Analysis[]>('/api/analyses');
 export const deleteAnalysis=(id:string)=>call<void>(`/api/analyses/${id}`,{method:'DELETE'});
+export interface Session{mode:'local'|'accounts';user:{id:string;username:string}|null;}
+export const getSession=()=>call<Session>('/api/auth/session');
+export const authenticate=(action:'login'|'register',username:string,password:string)=>call<Session>(`/api/auth/${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+export const logout=()=>call<void>('/api/auth/logout',{method:'POST'});

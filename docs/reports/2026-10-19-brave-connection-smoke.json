@@ -1,0 +1,22 @@
+{
+  "scope": "standalone Brave connection; production BudgetedCall; not full source-validation adapter or accuracy evaluation",
+  "query": "2025년 한국 고용률",
+  "automaticRetry": false,
+  "httpStatus": 200,
+  "status": "completed",
+  "candidateCount": 3,
+  "rawResponseStored": false,
+  "originalSourceAccess": "not_attempted",
+  "accountBalance": "not_verified",
+  "invoice": "not_verified",
+  "usage": {
+    "billing": "metered",
+    "currencyUnit": "configured_currency_micros",
+    "actualMicros": 5000,
+    "unknownUsageCalls": 0,
+    "conservativeMicros": 5000,
+    "calls": 1
+  },
+  "elapsedSeconds": 1.05,
+  "deleted": true
+}

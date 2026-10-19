@@ -1,3 +1,6 @@
+from factlens.visual import extract_visual,VISUAL_VERSION
+from factlens.multimodal import review_modalities,MODAL_VERSION
+from factlens.report import summarize,SUMMARY_VERSION
 from pathlib import Path
 from uuid import UUID
 from factlens.contracts import Claim, AnalysisResult
@@ -23,9 +26,13 @@ def run_analysis(job:dict,providers,stage=lambda name:True)->AnalysisResult:
         if not stage(name):raise ValueError('JOB_CANCELLED')
     advance('transcribing')
     segments=providers.transcribe(Path(job['path']))
+    visual=extract_visual(Path(job['sourcePath']),job['duration']) if job.get('sourcePath') else None
     advance('extracting')
     claims=[Claim.model_validate(c) for c in providers.extract(segments)]
     limitations=['음성만 분석했습니다. 자막·화면 맥락은 검증하지 않았습니다.','정형 수치 발화와 전체 전사 맥락이 일치하는 범위만 확정 비교합니다. 일반 발언은 검토 또는 유보합니다.']
+    if visual is not None and visual.status!='not_applicable':
+        limitations[0]='음성과 자막·화면 표본을 별도로 확인했습니다. 전체 영상의 시각적 의미를 검증하지는 않았습니다.'
+        limitations.extend(visual.limitations)
     if len(claims)>5:limitations.append('최대 5개 주장만 검증했습니다.')
     claims=claims[:5]
     ids=set()
@@ -47,4 +54,5 @@ def run_analysis(job:dict,providers,stage=lambda name:True)->AnalysisResult:
     limitations = list(dict.fromkeys(limitations))
     usage = providers.usage() if callable(getattr(providers, 'usage', None)) else {'billing':'not_configured'}
     provider_versions=providers.versions() if callable(getattr(providers,'versions',None)) else {}
-    return AnalysisResult(claims=claims,limitations=limitations,usage=usage,versions={**provider_versions,'ruleVersion':RULE_VERSION,'sourceReviewVersion':REVIEW_VERSION,'sourceRegistryVersion':DEFAULT_REGISTRY.version,'tableContextVersion':CONTEXT_VERSION})
+    checks=review_modalities(claims,visual)
+    return AnalysisResult(scope='audio_visual' if visual is not None and visual.status!='not_applicable' else 'audio_only',visual=visual,modalChecks=checks,summary=summarize(claims,checks),claims=claims,limitations=limitations,usage=usage,versions={**provider_versions,'ruleVersion':RULE_VERSION,'sourceReviewVersion':REVIEW_VERSION,'sourceRegistryVersion':DEFAULT_REGISTRY.version,'tableContextVersion':CONTEXT_VERSION,'visualVersion':VISUAL_VERSION,'modalVersion':MODAL_VERSION,'summaryVersion':SUMMARY_VERSION})

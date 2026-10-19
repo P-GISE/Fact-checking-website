@@ -1,0 +1,14 @@
+{
+  "version": "connection-fixture-v1",
+  "id": "owned-korean-2026-10-19",
+  "purpose": "connection_smoke_only",
+  "synthetic": true,
+  "rights": "self-authored text rendered locally with espeak-ng; no third-party recording",
+  "text": "이천이십오년 한국 고용률은 오십 퍼센트입니다.",
+  "engine": "espeak-ng 1.51 ko",
+  "durationSeconds": 7.953,
+  "audioSha256": "de45702dbbd19fe31660d423cc54717ca22afb4590b42ce01a081aee21483ab4",
+  "audioRetained": false,
+  "goldLabels": null,
+  "researchSplit": null
+}

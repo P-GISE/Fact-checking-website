@@ -1,0 +1,49 @@
+{
+  "purpose": "synthetic owned Korean audio connection smoke, not accuracy evaluation",
+  "text": "이천이십오년 한국 고용률은 오십 퍼센트입니다.",
+  "engine": "espeak-ng 1.51 ko",
+  "durationSeconds": 7.953,
+  "audioSha256": "de45702dbbd19fe31660d423cc54717ca22afb4590b42ce01a081aee21483ab4",
+  "models": [
+    "whisper-1",
+    "gpt-4.1-mini"
+  ],
+  "jobBudgetMicros": 200000,
+  "monthBudgetMicros": 20000000,
+  "steps": [
+    "transcribing"
+  ],
+  "status": "failed",
+  "error": "PROVIDER_RATE_LIMITED",
+  "elapsedSeconds": 1.62,
+  "usage": {
+    "billing": "metered",
+    "currencyUnit": "configured_currency_micros",
+    "actualMicros": 0,
+    "unknownUsageCalls": 1,
+    "conservativeMicros": 900,
+    "calls": 1,
+    "currency": "USD",
+    "costBasis": "published_tariff_not_invoice",
+    "providerProfile": "openai_brave",
+    "model": "gpt-4.1-mini",
+    "priceDate": "2026-10-16"
+  },
+  "searchRequests": 0,
+  "databaseUsage": {
+    "calls": 1,
+    "reserved": 900,
+    "known_actual": 0,
+    "unknown": 1
+  },
+  "deleted": true,
+  "attemptedModels": [
+    "whisper-1"
+  ],
+  "languageModelGeneration": "not_attempted",
+  "braveSearch": "not_attempted_in_this_pipeline_run",
+  "accountBalance": "not_verified",
+  "rateLimitCause": "not_verified",
+  "actualInvoice": "not_verified",
+  "apiRetry": false
+}

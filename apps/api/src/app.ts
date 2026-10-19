@@ -5,11 +5,13 @@ import { mkdir,rename,rm,chmod } from 'node:fs/promises';
 import path from 'node:path';
 import {z} from 'zod';
 import {pool} from './db.js';
+import {uploadReservation,UploadLimitError} from './upload-limits.js';
+import {authentication,type AuthMode} from './auth.js';
 import {adminRouter} from './admin.js';
 import {eraseFiles} from './cleanup.js';
 import {mediaDirectory,incomingFile,openMedia} from './storage.js';
 import {resultSchema} from './contracts.js';
-export type Options={mediaRoot:string;enqueue:(id:string)=>Promise<void>;maxBytes?:number;adminToken?:string};
+export type Options={mediaRoot:string;enqueue:(id:string)=>Promise<void>;maxBytes?:number;adminToken?:string;authMode?:AuthMode;secureCookies?:boolean;trustProxy?:boolean;uploadQuotaBytes?:number;uploadAccountQuotaBytes?:number};
 class ApiError extends Error{constructor(public status:number,public code:string, message=code){super(message);}}
 const uuid=z.string().uuid();
 function id(value:unknown){return uuid.parse(value);}
@@ -17,12 +19,12 @@ function view(row:any){
  const r=row.result?resultSchema.parse(row.result):{scope:'audio_only',demo:false,claims:[],limitations:['이 버전은 음성만 검증하며 자막·화면 맥락을 분석하지 않습니다.'],usage:{}};
  return {id:row.id,status:row.status,stage:row.status,createdAt:row.created_at,expiresAt:row.expires_at,error:row.error,mediaId:row.media_id,...r};
 }
-async function getJob(jobId:string){
- const r=await pool.query("SELECT * FROM jobs WHERE id=$1 AND status<>'deleted' AND expires_at>now()",[jobId]);
+async function getJob(jobId:string,ownerId:string|null){
+ const r=await pool.query("SELECT * FROM jobs WHERE id=$1 AND owner_id IS NOT DISTINCT FROM $2::uuid AND status<>'deleted' AND expires_at>now()",[jobId,ownerId]);
  if(!r.rows[0])throw new ApiError(404,'NOT_FOUND');return r.rows[0];
 }
 export function createApp(options:Options){
- const app=express();app.disable('x-powered-by');
+ const app=express();app.disable('x-powered-by');if(options.trustProxy)app.set('trust proxy',1);
  app.use((req,res,next)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Frame-Options','DENY');
@@ -37,9 +39,11 @@ export function createApp(options:Options){
  app.use(express.json({limit:'32kb'}));
  app.use('/api/admin',adminRouter(options.adminToken??process.env.FACTLENS_ADMIN_TOKEN));
  app.get('/api/health',async(_req,res)=>{await pool.query('SELECT 1');res.json({status:'ready',scope:'audio_only',providerConfigured:false});});
+ const auth=authentication(options.authMode??'local',options.secureCookies??false);
+ app.use('/api/auth',auth.router);app.use('/api',auth.requireUser);
  const incoming=path.join(path.resolve(options.mediaRoot),'.incoming');
- const upload=multer({storage:multer.diskStorage({destination:async(_req,_file,cb)=>{try{await mkdir(incoming,{recursive:true,mode:0o700});cb(null,incoming);}catch(e){cb(e as Error,incoming);}},filename:(_req,_f,cb)=>cb(null,randomUUID())}),limits:{fileSize:options.maxBytes??104857600,files:1,fields:0},fileFilter:(_req,file,cb)=>{if(!['.mp4','.mp3','.wav'].includes(path.extname(file.originalname).toLowerCase()))cb(new ApiError(415,'UNSUPPORTED_FORMAT'));else cb(null,true);}});
- app.post('/api/media/upload',upload.single('file'),async(req,res)=>{
+ const upload=multer({storage:multer.diskStorage({destination:async(_req,_file,cb)=>{try{await mkdir(incoming,{recursive:true,mode:0o700});cb(null,incoming);}catch(e){cb(e as Error,incoming);}},filename:(_req,_f,cb)=>{const name=randomUUID();(_req.res as Response).locals.incomingName=name;cb(null,name);}}),limits:{fileSize:options.maxBytes??104857600,files:1,fields:0},fileFilter:(_req,file,cb)=>{if(!['.mp4','.mp3','.wav'].includes(path.extname(file.originalname).toLowerCase()))cb(new ApiError(415,'UNSUPPORTED_FORMAT'));else cb(null,true);}});
+ app.post('/api/media/upload',...(options.authMode==='accounts'?[uploadReservation(options)]:[]),upload.single('file'),async(req,res)=>{
   if(!req.file)throw new ApiError(400,'FILE_REQUIRED');
   const mediaId=randomUUID(),folder=mediaDirectory(options.mediaRoot,mediaId);
   try{
@@ -48,8 +52,8 @@ export function createApp(options:Options){
    const target=path.join(folder,'source'+path.extname(req.file.originalname).toLowerCase());
    await rename(req.file.path,target);await chmod(target,0o600);
    const type=target.endsWith('.mp4')?'video/mp4':target.endsWith('.mp3')?'audio/mpeg':'audio/wav';
-   await pool.query('INSERT INTO media(id,path,original_name,bytes,mime) VALUES($1,$2,$3,$4,$5)',[mediaId,target,path.basename(req.file.originalname),req.file.size,type]);
-   res.status(201).json({mediaId});
+   await pool.query('INSERT INTO media(id,path,original_name,bytes,mime,owner_id) VALUES($1,$2,$3,$4,$5,$6)',[mediaId,target,path.basename(req.file.originalname),req.file.size,type,res.locals.ownerId]);
+   await res.locals.releaseUpload?.();res.status(201).json({mediaId});
   }catch(e){await rm(incomingFile(options.mediaRoot,req.file.filename),{force:true});await eraseFiles(options.mediaRoot,mediaId);throw e;}
  });
  app.post('/api/analyses',async(req,res)=>{
@@ -58,35 +62,35 @@ export function createApp(options:Options){
   const client=await pool.connect();let jobId:string;
   try{
    await client.query('BEGIN');
-   const m=await client.query('SELECT id FROM media WHERE id=$1 AND expires_at>now() FOR UPDATE',[b.mediaId]);
+   const m=await client.query('SELECT id FROM media WHERE id=$1 AND owner_id IS NOT DISTINCT FROM $2::uuid AND expires_at>now() FOR UPDATE',[b.mediaId,res.locals.ownerId]);
    if(!m.rows[0])throw new ApiError(404,'MEDIA_NOT_FOUND');
-   const prev=await client.query('SELECT id,media_id,status FROM jobs WHERE media_id=$1 OR ($2::text IS NOT NULL AND idempotency_key=$2)',[b.mediaId,key??null]);
+   const prev=await client.query('SELECT id,media_id,status FROM jobs WHERE owner_id IS NOT DISTINCT FROM $3::uuid AND (media_id=$1 OR ($2::text IS NOT NULL AND idempotency_key=$2))',[b.mediaId,key??null,res.locals.ownerId]);
    if(prev.rows[0]){
     if(prev.rows[0].media_id!==b.mediaId||prev.rows[0].status==='deleted')throw new ApiError(409,'ANALYSIS_CONFLICT');
     jobId=prev.rows[0].id;
    }else{
-    jobId=randomUUID();await client.query('INSERT INTO jobs(id,media_id,consent,idempotency_key) VALUES($1,$2,true,$3)',[jobId,b.mediaId,key??null]);
+    jobId=randomUUID();await client.query('INSERT INTO jobs(id,media_id,consent,idempotency_key,owner_id) VALUES($1,$2,true,$3,$4)',[jobId,b.mediaId,key??null,res.locals.ownerId]);
    }
    await client.query('COMMIT');
   }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
   try{await options.enqueue(jobId!);}catch{/* Durable queued row is recovered by the worker. */}
   res.status(202).json({id:jobId!});
  });
- app.get('/api/analyses',async(_req,res)=>{const r=await pool.query("SELECT * FROM jobs WHERE status<>'deleted' AND expires_at>now() ORDER BY created_at DESC LIMIT 50");res.json(r.rows.map(view));});
- app.get('/api/analyses/:id',async(req,res)=>res.json(view(await getJob(id(req.params.id)))));
- app.get('/api/analyses/:id/claims',async(req,res)=>res.json(view(await getJob(id(req.params.id))).claims));
- app.get('/api/analyses/:id/timeline',async(req,res)=>{const job=view(await getJob(id(req.params.id)));res.json(job.claims.map(c=>({claimId:c.id,startSeconds:c.startSeconds,endSeconds:c.endSeconds,verdict:c.verdict})));});
- app.get('/api/analyses/:id/report',async(req,res)=>res.json(view(await getJob(id(req.params.id)))));
- app.get('/api/claims/:id/evidence',async(req,res)=>{const r=await pool.query("SELECT c.data FROM claims c JOIN jobs j ON j.id=c.job_id WHERE c.id=$1 AND j.status<>'deleted' AND j.expires_at>now()",[id(req.params.id)]);if(!r.rows[0])throw new ApiError(404,'NOT_FOUND');res.json(r.rows[0].data.evidence);});
+ app.get('/api/analyses',async(_req,res)=>{const r=await pool.query("SELECT * FROM jobs WHERE owner_id IS NOT DISTINCT FROM $1::uuid AND status<>'deleted' AND expires_at>now() ORDER BY created_at DESC LIMIT 50",[res.locals.ownerId]);res.json(r.rows.map(view));});
+ app.get('/api/analyses/:id',async(req,res)=>res.json(view(await getJob(id(req.params.id),res.locals.ownerId))));
+ app.get('/api/analyses/:id/claims',async(req,res)=>res.json(view(await getJob(id(req.params.id),res.locals.ownerId)).claims));
+ app.get('/api/analyses/:id/timeline',async(req,res)=>{const job=view(await getJob(id(req.params.id),res.locals.ownerId));res.json(job.claims.map(c=>({claimId:c.id,startSeconds:c.startSeconds,endSeconds:c.endSeconds,verdict:c.verdict})));});
+ app.get('/api/analyses/:id/report',async(req,res)=>res.json(view(await getJob(id(req.params.id),res.locals.ownerId))));
+ app.get('/api/claims/:id/evidence',async(req,res)=>{const r=await pool.query("SELECT c.data FROM claims c JOIN jobs j ON j.id=c.job_id WHERE c.id=$1 AND j.owner_id IS NOT DISTINCT FROM $2::uuid AND j.status<>'deleted' AND j.expires_at>now()",[id(req.params.id),res.locals.ownerId]);if(!r.rows[0])throw new ApiError(404,'NOT_FOUND');res.json(r.rows[0].data.evidence);});
  app.delete('/api/analyses/:id',async(req,res)=>{
   const jobId=id(req.params.id);
-  const r=await pool.query("UPDATE jobs SET status='deleted',deleted_at=now(),version=version+1,result=NULL,error=NULL WHERE id=$1 RETURNING media_id",[jobId]);
+  const r=await pool.query("UPDATE jobs SET status='deleted',deleted_at=now(),version=version+1,result=NULL,error=NULL WHERE id=$1 AND owner_id IS NOT DISTINCT FROM $2::uuid RETURNING media_id",[jobId,res.locals.ownerId]);
   if(!r.rows[0])throw new ApiError(404,'NOT_FOUND');
   await pool.query('DELETE FROM claims WHERE job_id=$1',[jobId]);
   await eraseFiles(options.mediaRoot,r.rows[0].media_id);res.status(204).end();
  });
  app.get('/api/media/:id',async(req,res)=>{
-  const r=await pool.query("SELECT * FROM media m WHERE id=$1 AND expires_at>now() AND NOT EXISTS(SELECT 1 FROM jobs j WHERE j.media_id=m.id AND j.status='deleted')",[id(req.params.id)]);
+  const r=await pool.query("SELECT * FROM media m WHERE id=$1 AND m.owner_id IS NOT DISTINCT FROM $2::uuid AND expires_at>now() AND NOT EXISTS(SELECT 1 FROM jobs j WHERE j.media_id=m.id AND j.status='deleted')",[id(req.params.id),res.locals.ownerId]);
   const m=r.rows[0];if(!m)throw new ApiError(404,'NOT_FOUND');
   let source;
   try{source=await openMedia(options.mediaRoot,m.id,m.path);}catch{throw new ApiError(404,'NOT_FOUND');}
@@ -100,9 +104,10 @@ export function createApp(options:Options){
   }finally{await source.close();}
  });
  app.use((_req,_res,next)=>next(new ApiError(404,'NOT_FOUND')));
- app.use((err:any,_req:Request,res:Response,_next:NextFunction)=>{
+ app.use(async(err:any,_req:Request,res:Response,_next:NextFunction)=>{
+  await res.locals.releaseUpload?.().catch(()=>{});
   const status=err instanceof z.ZodError?400:err.code==='LIMIT_FILE_SIZE'?413:err.code==='23505'?409:err.status??500;
-  const code=err instanceof z.ZodError?'INVALID_INPUT':err.code==='LIMIT_FILE_SIZE'?'SIZE_LIMIT':err.code==='23505'?'ANALYSIS_CONFLICT':err instanceof ApiError?err.code:'INTERNAL_ERROR';
+  const code=err instanceof z.ZodError?'INVALID_INPUT':err.code==='LIMIT_FILE_SIZE'?'SIZE_LIMIT':err.code==='23505'?'ANALYSIS_CONFLICT':(err instanceof ApiError||err instanceof UploadLimitError)?err.code:'INTERNAL_ERROR';
   res.status(status).json({error:{code,message:status===500?'서버 처리 중 오류가 발생했습니다.':code,requestId:randomUUID()}});
  });return app;
 }

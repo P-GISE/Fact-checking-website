@@ -19,7 +19,7 @@ def process_job(job):
         audio=path.parent/'audio.wav'
         extract_audio(path,audio)
         providers=build_providers({**job,'duration':info.duration})
-        result=run_analysis({**job,'path':str(audio),'duration':info.duration},providers,stage=lambda s:set_stage(job_id,version,s))
+        result=run_analysis({**job,'path':str(audio),'sourcePath':str(path),'duration':info.duration},providers,stage=lambda s:set_stage(job_id,version,s))
         complete_job(job_id,version,result)
     except ProviderUnavailable as exc:
         code=str(exc)
