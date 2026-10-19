@@ -58,15 +58,20 @@ test('administration requires a privileged account and never asks for a bearer t
  const status=await page.evaluate(async()=> (await fetch('/api/admin/overview')).status);
  expect(status).toBe(403);
 });
-test('administrator filters and pagination send bounded queries and show empty results',async({page})=>{
+test('administrator filters and pagination send bounded queries and show empty results',async({page},testInfo)=>{
  await page.route('**/api/auth/session',route=>route.fulfill({json:{mode:'accounts',user:{id:'00000000-0000-4000-8000-000000000001',username:'admin_fixture',role:'admin'}}}));
  const queries:URLSearchParams[]=[];
  await page.route('**/api/admin/overview?*',route=>{
   const q=new URL(route.request().url()).searchParams;queries.push(q);
-  return route.fulfill({json:{version:'admin-overview-v2',observedAt:new Date().toISOString(),windowStart:new Date().toISOString(),statusCounts:{failed:21},recentJobs:[],usage:{month:'2026-10',settledMicros:'0',reservedMicros:'0',effectiveMicros:'0',pendingReservations:'0'},pagination:{page:Number(q.get('page')),pageSize:20,total:q.get('q')?0:21,hasNext:!q.get('q')&&q.get('page')==='1'}}});
+  return route.fulfill({json:{version:'admin-overview-v2',observedAt:new Date().toISOString(),windowStart:new Date().toISOString(),statusCounts:{queued:3,transcribing:2,completed:18,failed:21},recentJobs:q.get('q')?[]:[{id:'00000000-0000-4000-8000-000000000021',status:'failed',createdAt:new Date().toISOString(),errorCode:'PROVIDER_RATE_LIMITED'}],usage:{month:'2026-10',settledMicros:'0',reservedMicros:'0',effectiveMicros:'0',pendingReservations:'0'},pagination:{page:Number(q.get('page')),pageSize:20,total:q.get('q')?0:21,hasNext:!q.get('q')&&q.get('page')==='1'}}});
  });
  await page.goto('/admin');
  await expect(page.getByRole('heading',{name:'월 사용량 기록'})).toBeVisible();
+ await expect(page.getByRole('definition').filter({hasText:'44'})).toHaveCount(1);
+ await page.screenshot({path:testInfo.outputPath('admin-desktop.png'),fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+ await page.screenshot({path:testInfo.outputPath('admin-mobile.png'),fullPage:true});
  await page.getByRole('button',{name:'다음 페이지',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('2페이지');
  await expect(page.getByRole('button',{name:'다음 페이지',exact:true})).toBeDisabled();
