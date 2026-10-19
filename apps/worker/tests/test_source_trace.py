@@ -70,3 +70,20 @@ def test_legacy_evidence_does_not_acquire_invented_source_trace():
     assert checked.sourceTrace is None
     legacy=EvidenceCheck.model_validate(checked.model_dump(exclude={'sourceTrace'}))
     assert legacy.sourceTrace is None
+
+
+def test_table_cell_quote_explicitly_requires_row_column_and_note_context():
+    d=traced_document('<table><caption>잠정치, 전체가 아닌 특정 연령</caption><tr><th>전년 대비</th></tr><tr><td>2025년 한국 고용률 50%</td></tr></table>')
+    checked=validate_evidence(claim(),d)
+    assert 'TABLE_CONTEXT_UNVERIFIED' in checked.reasons
+    assert not checked.usable and checked.relation=='INSUFFICIENT'
+
+
+def test_table_header_quote_is_not_treated_as_an_observed_data_record():
+    d=traced_document('<table><tr><th>2025년 한국 고용률 50%</th><td>해당 없음</td></tr></table>')
+    assert 'TABLE_CONTEXT_UNVERIFIED' in validate_evidence(claim(),d).reasons
+
+
+def test_unrelated_table_does_not_relabel_a_paragraph_quote():
+    d=traced_document('<p>2025년 한국 고용률 50%</p><table><tr><td>다른 자료</td></tr></table>')
+    assert 'TABLE_CONTEXT_UNVERIFIED' not in validate_evidence(claim(),d).reasons

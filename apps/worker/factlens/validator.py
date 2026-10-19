@@ -5,7 +5,7 @@ from urllib.parse import urlsplit
 from factlens.contracts import Claim, EvidenceCheck
 from factlens.source_document import SourceTrace, fingerprint
 
-RULE_VERSION = 'audio-numeric-canonical-v3'
+RULE_VERSION = 'audio-numeric-canonical-v4'
 SUPPORTED_SUBJECTS = {'한국','대한민국'}
 METRIC_UNITS = {'고용률':'%','실업률':'%','인구':'명'}
 
@@ -80,6 +80,14 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
         if (publication.publisher.state!='observed' or publication.publishedAt.state!='observed'
                 or d.publisher!=publication.publisher.value or d.publishedAt!=publication.publishedAt.value):
             reasons.append('PUBLICATION_METADATA_UNVERIFIED')
+        # A cell/header alone does not establish row/column scope, units,
+        # denominators or footnotes. Do not infer those semantics from a number.
+        quote_end=d.position+len(d.quote)
+        if d.quote and d.position>=0 and any(
+                block.kind in ('table_header','table_cell')
+                and block.position<quote_end and block.position+block.length>d.position
+                for block in trace.blocks):
+            reasons.append('TABLE_CONTEXT_UNVERIFIED')
         trace.quoteOccurrences=sum(1 for _ in re.finditer('(?='+re.escape(d.quote)+')',d.text)) if d.quote else 0
         trace.quoteBlockIndexes=[]
         if trace.quoteOccurrences>1:reasons.append('QUOTE_AMBIGUOUS')

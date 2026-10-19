@@ -77,3 +77,8 @@ PYTHONPATH=apps/worker .venv/bin/python -m factlens.rule_regression evaluation/g
 ## 원문 관측 추적과 규칙 v3 (2026-10-18)
 
 신규 규칙은 audio-numeric-canonical-v3다. 정형v2 문법/전체 맥락 조건은 유지하며 sourceTrace의 원문/해시·인용/구조/발행정보 관측을 재대조한다. typed sourceTrace는 fixture에 선택적으로 포함할 수 있고 parser 소스도 sourceDigests에 기록한다. 관측만 있는 실제 수집 원문은 SOURCE_AUTHENTICITY_UNVERIFIED로 유보하며 일반 문서 확정 범위를 늘리지 않는다. 기존 합성9개·별도 유보8개의 기대값은 유지한다. sourceTrace가 없는 합성 fixture metadata는 외부에서 주어진 입력으로서 여전히 실제 출처 인증을 증명하지 않는다.
+
+
+## TASK-023 표 인용 맥락 유보 보완 (2026-10-19)
+
+현재 규칙은 `audio-numeric-canonical-v4`다. 인용 범위가 table_cell/table_header와 겹치면 `TABLE_CONTEXT_UNVERIFIED`를 기록한다. 셀/헤더의 숫자만으로 행·열·분모·단위·주석의 의미를 확정하지 않는다. 관계없는 표가 있다는 이유만으로 문단 인용에 이 사유를 붙이지 않는다. 기존 전체 원문 맥락/출처 인증 유보는 유지하며 일반 표 의미 해석·실자료 정확도 검증은 미완료다. 신규 API 필드/DB 변경 없이 기존 reasons로 전달한다.
