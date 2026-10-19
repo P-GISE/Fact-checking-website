@@ -1,5 +1,10 @@
 # 04. API 명세
 
+> **관리자 방식 확정 · 2026-10-19 (10 §54):** 관리자는 관리자 계정으로 로그인하고 서버가 역할을 확인한다. 최초 관리자는 서버 전용 명령으로 생성하며 일반 가입으로 관리자 권한을 부여하지 않는다. TASK-029에 운영 화면 개선·토큰 입력 제거·권한 회귀를 등록했다. 현재 제품은 아직 Bearer 토큰 방식이며 아래 계정 기반 방식은 구현 예정이다.
+
+> **최신 상태 · 2026-10-19 (10 §53):** 사용자 서버 출력으로 Lightsail 전용 서버의 운영 Compose·Cloudflare 공개 HTTPS health200을 확인했고 사용자가 사이트 접속 성공을 확인했다. AI는 비활성화다. 사용자 피드백에 따라 계정 CRUD·가입/로그인 사용성 개선을 TASK-028 최우선 후속으로 등록했다. 아래 과거 미배포 기록은 당시 이력이며 현재는 공개 연결 확인/계정 기능 실운영 검증 미완료를 구분한다.
+
+
 > **현재 작업 기준 · 2026-10-19:** 근거에 sourceReview|null, sourceTrace에 bounded sourceLinks/sourceLinksComplete를 추가했다. parser v1/v2와 과거 결과 null을 수용한다. identity는 등록 대조 상태이며 independence는 unverified만 허용한다. 기존 경로/인가 한계는 유지한다.
 
 - 현재 상태 갱신: 2026-10-19 (Asia/Seoul)
@@ -189,3 +194,13 @@ sourceTrace.tableContext는 nullable/default null이다. version=table-context-v
 SourceTrace.tableReferenceAudit는 version/meaningVerified=false/complete와 최대32개 references(cellBlockIndex,declaredId,status,headerBlockIndex|null)를 전달한다. resolved_same_table_header만 실제 같은 표의 table_header 블록 참조를 허용하고 다른 상태는 target을null로 제한한다. complete=true는 전체 구조가 추적된 경우에만 허용한다. 선언 ID는64유니코드 코드포인트로 Python/API 한도를 맞췄다.
 
 TableContext.cueAudit는 version/meaningVerified=false/complete와최대32개 cues(blockIndex,kind,offset,text)를 전달한다. 종류는period/denominator/correction/unit, offset은 보존된 fragment의 코드포인트 기준이다. 서버/API는 fragment와 literal 일치·범위·완전성 조건을 확인한다. 의미 검증 true나 다른 표/없는 블록/위조 문자열은 거부한다. 기존 클라이언트는 선택 필드를 무시할 수 있고 예전 결과는 audit 없이 읽을 수 있다.
+
+
+## TASK-028 계정 API 확장 상태
+
+현재 제공하는 경로는 `/api/auth/register`, `/login`, `/logout`, `/session`이다(공통 접두사 `/api/auth`). 계정 수정·비밀번호 변경·탈퇴 API는 아직 없다. 후속 계약은 본인 세션·재인증·Origin 방어·횟수 제한·필드 오류·중복/만료 응답·세션 폐기와 함께 고정한다. 이 절의 요구를 이미 제공하는 엔드포인트로 해석하지 않는다.
+
+
+## 관리자 계정·운영 화면 개선 — 확정 요구 (2026-10-19)
+
+관리자 조회 API는 일반 계정 세션과 서버 역할 검사로 전환할 예정이다. 미로그인401/일반 회원403, 관리자200을 검증한다. 검색/필터/페이지 크기·정렬은 서버에서 검증하고 조회량을 제한한다. 현재 Bearer 토큰 계약이 아직 실행 중이며 신규 엔드포인트/응답 계약은 구현 전에 정의한다.
