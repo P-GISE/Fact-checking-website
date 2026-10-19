@@ -9,7 +9,7 @@ import {pool,migrate} from '../src/db.js';
 let root:string,app:ReturnType<typeof createApp>;
 const credentials=(username:string)=>({username,password:'correct-horse-927!'});
 beforeAll(async()=>{root=await mkdtemp(join(tmpdir(),'factlens-auth-'));await migrate();app=createApp({mediaRoot:root,enqueue:async()=>{},authMode:'accounts',secureCookies:true});});
-beforeEach(async()=>{await pool.query('TRUNCATE media,jobs CASCADE');if((await pool.query("SELECT to_regclass('app_users') AS name")).rows[0].name)await pool.query('TRUNCATE app_users CASCADE');});
+beforeEach(async()=>{app=createApp({mediaRoot:root,enqueue:async()=>{},authMode:'accounts',secureCookies:true});await pool.query('TRUNCATE media,jobs CASCADE');if((await pool.query("SELECT to_regclass('app_users') AS name")).rows[0].name)await pool.query('TRUNCATE app_users CASCADE');});
 afterAll(async()=>{await pool.end();await rm(root,{recursive:true,force:true});});
 async function login(name:string){const r=await request(app).post('/api/auth/register').send(credentials(name));expect(r.status).toBe(201);return r.headers['set-cookie'][0].split(';')[0];}
 it('requires authentication before accepting uploads or reading history',async()=>{expect((await request(app).get('/api/analyses')).status).toBe(401);expect((await request(app).post('/api/media/upload').attach('file',Buffer.from('audio'),'a.wav')).status).toBe(401);});
@@ -94,4 +94,109 @@ it('releases upload reservations and partial files on client disconnect',async()
   expect(Number((await pool.query('SELECT count(*) FROM upload_leases')).rows[0].count)).toBe(0);
   expect(await readdir(join(root,'.incoming'))).toEqual([]);
  }finally{outbound.destroy();await new Promise<void>(resolve=>server.close(()=>resolve()));}
+});
+it('authorizes administrators by current database role and rejects bearer bypass',async()=>{
+ const c=await login('operator');
+ expect((await request(app).get('/api/admin/overview')).status).toBe(401);
+ expect((await request(app).get('/api/admin/overview').set('Cookie',c)).status).toBe(403);
+ expect((await request(app).get('/api/auth/session').set('Cookie',c)).body.user.role).toBe('user');
+ expect((await request(app).post('/api/auth/register').send({...credentials('intruder'),role:'admin'})).status).toBe(400);
+ await pool.query("UPDATE app_users SET role='admin' WHERE username='operator'");
+ expect((await request(app).get('/api/admin/overview').set('Cookie',c)).status).toBe(200);
+ await pool.query("UPDATE app_users SET role='user' WHERE username='operator'");
+ expect((await request(app).get('/api/admin/overview').set('Cookie',c)).status).toBe(403);
+ expect((await request(app).get('/api/admin/overview').set('Authorization','Bearer '+ 'a'.repeat(64))).status).toBe(401);
+});
+it('bounds administrator searches and paginates only matching metadata',async()=>{
+ const c=await login('operator');await pool.query("UPDATE app_users SET role='admin' WHERE username='operator'");
+ const ids=[];
+ for(let i=0;i<3;i++){
+  const mid=randomUUID(),jid=randomUUID();ids.push(jid);
+  await pool.query("INSERT INTO media(id,path,original_name,bytes,mime) VALUES($1,$2,'private.wav',1,'audio/wav')",[mid,join(root,mid)]);
+  await pool.query('INSERT INTO jobs(id,media_id,status,consent) VALUES($1,$2,$3,true)',[jid,mid,i<2?'failed':'completed']);
+ }
+ const get=(query:string)=>request(app).get('/api/admin/overview'+query).set('Cookie',c);
+ const first=await get('?status=failed&pageSize=1');expect(first.status).toBe(200);
+ expect(first.body.pagination).toMatchObject({page:1,pageSize:1,total:2,hasNext:true});
+ expect(first.body.recentJobs).toHaveLength(1);
+ const second=await get('?status=failed&pageSize=1&page=2');expect(second.body.recentJobs[0].id).not.toBe(first.body.recentJobs[0].id);
+ expect(second.body.pagination.hasNext).toBe(false);
+ const search=await get('?q='+ids[2]);expect(search.body.recentJobs.map((j:any)=>j.id)).toEqual([ids[2]]);
+ expect((await get('?q=ffffffff')).body.recentJobs).toEqual([]);
+ for(const q of ['?page=0','?pageSize=51','?status=invalid','?q=%25','?page=1001','?page=1&page=2'])expect((await get(q)).status,q).toBe(400);
+ expect(JSON.stringify(first.body)).not.toContain('private.wav');
+});
+it('reauthenticates account changes and revokes every existing session atomically',async()=>{
+ const c=await login('alice');
+ const other=await request(app).post('/api/auth/login').send(credentials('alice'));const second=other.headers['set-cookie'][0].split(';')[0];
+ const change=(body:any)=>request(app).patch('/api/auth/account').set('Cookie',c).send(body);
+ expect((await change({username:'renamed',currentPassword:'wrong-password-123'})).status).toBe(401);
+ expect((await change({username:'renamed',currentPassword:credentials('alice').password,role:'admin'})).status).toBe(400);
+ const result=await change({username:'renamed',currentPassword:credentials('alice').password,newPassword:'new-correct-password-789!'});
+ expect(result.status).toBe(204);
+ for(const cookie of [c,second])expect((await request(app).get('/api/analyses').set('Cookie',cookie)).status).toBe(401);
+ expect((await request(app).post('/api/auth/login').send(credentials('alice'))).status).toBe(401);
+ expect((await request(app).post('/api/auth/login').send({username:'renamed',password:'new-correct-password-789!'})).status).toBe(200);
+ expect((await pool.query("SELECT role FROM app_users WHERE username='renamed'")).rows[0].role).toBe('user');
+});
+it('preserves credentials and sessions when an account rename conflicts',async()=>{
+ const c=await login('alice');await login('bob');
+ const result=await request(app).patch('/api/auth/account').set('Cookie',c).send({username:'bob',currentPassword:credentials('alice').password,newPassword:'new-correct-password-789!'});
+ expect(result.status).toBe(409);
+ expect((await request(app).get('/api/auth/session').set('Cookie',c)).body.user.username).toBe('alice');
+ expect((await request(app).post('/api/auth/login').send(credentials('alice'))).status).toBe(200);
+ expect((await request(app).patch('/api/auth/account').send({username:'other',currentPassword:credentials('alice').password})).status).toBe(401);
+});
+it('permits only one concurrent credential change from a revoked session',async()=>{
+ const c=await login('alice');
+ const changes=['changed_one','changed_two'].map(username=>request(app).patch('/api/auth/account').set('Cookie',c).send({username,currentPassword:credentials('alice').password}));
+ const responses=await Promise.all(changes);expect(responses.map(r=>r.status).sort()).toEqual([204,401]);
+ expect((await pool.query('SELECT count(*)::int AS count FROM app_sessions')).rows[0].count).toBe(0);
+});
+it('closes only the reauthenticated account, erases media and keeps cost records',async()=>{
+ const a=await login('alice'),b=await login('bob');
+ const u=await request(app).post('/api/media/upload').set('Cookie',a).attach('file',Buffer.from('audio'),'private.wav');
+ const j=await request(app).post('/api/analyses').set('Cookie',a).send({mediaId:u.body.mediaId,externalProcessingConsent:true});
+ const mid=u.body.mediaId;const before=await pool.query('SELECT path FROM media WHERE id=$1',[mid]);
+ await pool.query("INSERT INTO usage_reservations(id,job_id,month,reserved_micros) VALUES($1,$2,'2026-10',123)",[randomUUID(),j.body.id]);
+ const close=(body:any)=>request(app).delete('/api/auth/account').set('Cookie',a).send(body);
+ expect((await close({currentPassword:credentials('alice').password})).status).toBe(400);
+ expect((await close({currentPassword:'wrong-password-123',confirmation:'DELETE'})).status).toBe(401);
+ expect((await close({currentPassword:credentials('alice').password,confirmation:'DELETE'})).status).toBe(204);
+ expect((await request(app).get('/api/analyses').set('Cookie',a)).status).toBe(401);
+ expect((await request(app).get('/api/analyses').set('Cookie',b)).status).toBe(200);
+ expect((await request(app).post('/api/auth/login').send(credentials('alice'))).status).toBe(401);
+ expect((await pool.query('SELECT status,result FROM jobs WHERE id=$1',[j.body.id])).rows[0]).toEqual({status:'deleted',result:null});
+ expect((await pool.query('SELECT reserved_micros FROM usage_reservations WHERE job_id=$1',[j.body.id])).rows[0].reserved_micros).toBe('123');
+ const {access}=await import('node:fs/promises');await expect(access(before.rows[0].path)).rejects.toThrow();
+ const row=(await pool.query('SELECT username,password_hash,deleted_at FROM app_users WHERE deleted_at IS NOT NULL')).rows[0];expect(row.username).not.toBe('alice');expect(row.password_hash).toBe('!');
+});
+it('blocks closure during running work and prevents administrator self-deletion',async()=>{
+ const c=await login('alice');
+ const u=await request(app).post('/api/media/upload').set('Cookie',c).attach('file',Buffer.from('audio'),'a.wav');
+ const j=await request(app).post('/api/analyses').set('Cookie',c).send({mediaId:u.body.mediaId,externalProcessingConsent:true});
+ await pool.query("UPDATE jobs SET status='transcribing' WHERE id=$1",[j.body.id]);
+ const body={currentPassword:credentials('alice').password,confirmation:'DELETE'};
+ expect((await request(app).delete('/api/auth/account').set('Cookie',c).send(body)).status).toBe(409);
+ expect((await request(app).get('/api/auth/session').set('Cookie',c)).body.user.username).toBe('alice');
+ await pool.query("UPDATE jobs SET status='completed' WHERE id=$1",[j.body.id]);await pool.query("UPDATE app_users SET role='admin' WHERE username='alice'");
+ expect((await request(app).delete('/api/auth/account').set('Cookie',c).send(body)).body.error.code).toBe('ADMIN_CLOSURE_BLOCKED');
+});
+it('orders upload reservation and closure locks consistently',async()=>{
+ const c=await login('alice');const uid=(await pool.query("SELECT id FROM app_users WHERE username='alice'")).rows[0].id;
+ const uploadClient=await pool.connect();let closing:Promise<any>|undefined;
+ try{
+  await uploadClient.query('BEGIN');await uploadClient.query('SELECT pg_advisory_xact_lock(548871631)');
+  closing=request(app).delete('/api/auth/account').set('Cookie',c).send({currentPassword:credentials('alice').password,confirmation:'DELETE'}).then(r=>r);
+  let waiting=false;
+  for(let attempt=0;attempt<50;attempt++){
+   const r=await pool.query("SELECT 1 FROM pg_locks WHERE locktype='advisory' AND NOT granted AND objid=548871631::oid");
+   if(r.rowCount){waiting=true;break;}await new Promise(resolve=>setTimeout(resolve,10));
+  }
+  expect(waiting).toBe(true);
+  await uploadClient.query("SET LOCAL lock_timeout='500ms'");
+  await uploadClient.query('INSERT INTO upload_leases(id,owner_id,reserved_bytes) VALUES($1,$2,1)',[randomUUID(),uid]);
+  await uploadClient.query('COMMIT');
+  expect((await closing).body.error.code).toBe('ACCOUNT_BUSY');
+ }finally{await uploadClient.query('ROLLBACK');uploadClient.release();if(closing)await closing;}
 });

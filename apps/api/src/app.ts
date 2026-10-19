@@ -11,7 +11,7 @@ import {adminRouter} from './admin.js';
 import {eraseFiles} from './cleanup.js';
 import {mediaDirectory,incomingFile,openMedia} from './storage.js';
 import {resultSchema} from './contracts.js';
-export type Options={mediaRoot:string;enqueue:(id:string)=>Promise<void>;maxBytes?:number;adminToken?:string;authMode?:AuthMode;secureCookies?:boolean;trustProxy?:boolean;uploadQuotaBytes?:number;uploadAccountQuotaBytes?:number};
+export type Options={mediaRoot:string;enqueue:(id:string)=>Promise<void>;maxBytes?:number;authMode?:AuthMode;secureCookies?:boolean;trustProxy?:boolean;uploadQuotaBytes?:number;uploadAccountQuotaBytes?:number};
 class ApiError extends Error{constructor(public status:number,public code:string, message=code){super(message);}}
 const uuid=z.string().uuid();
 function id(value:unknown){return uuid.parse(value);}
@@ -37,9 +37,9 @@ export function createApp(options:Options){
   next();
  });
  app.use(express.json({limit:'32kb'}));
- app.use('/api/admin',adminRouter(options.adminToken??process.env.FACTLENS_ADMIN_TOKEN));
  app.get('/api/health',async(_req,res)=>{await pool.query('SELECT 1');res.json({status:'ready',scope:'audio_only',providerConfigured:false});});
- const auth=authentication(options.authMode??'local',options.secureCookies??false);
+ const auth=authentication(options.authMode??'local',options.secureCookies??false,options.mediaRoot);
+ app.use('/api/admin',auth.requireAdmin,adminRouter());
  app.use('/api/auth',auth.router);app.use('/api',auth.requireUser);
  const incoming=path.join(path.resolve(options.mediaRoot),'.incoming');
  const upload=multer({storage:multer.diskStorage({destination:async(_req,_file,cb)=>{try{await mkdir(incoming,{recursive:true,mode:0o700});cb(null,incoming);}catch(e){cb(e as Error,incoming);}},filename:(_req,_f,cb)=>{const name=randomUUID();(_req.res as Response).locals.incomingName=name;cb(null,name);}}),limits:{fileSize:options.maxBytes??104857600,files:1,fields:0},fileFilter:(_req,file,cb)=>{if(!['.mp4','.mp3','.wav'].includes(path.extname(file.originalname).toLowerCase()))cb(new ApiError(415,'UNSUPPORTED_FORMAT'));else cb(null,true);}});
@@ -62,6 +62,7 @@ export function createApp(options:Options){
   const client=await pool.connect();let jobId:string;
   try{
    await client.query('BEGIN');
+   if(res.locals.ownerId){const owner=await client.query('SELECT id FROM app_users WHERE id=$1 AND deleted_at IS NULL FOR UPDATE',[res.locals.ownerId]);if(!owner.rowCount)throw new ApiError(401,'AUTH_REQUIRED');}
    const m=await client.query('SELECT id FROM media WHERE id=$1 AND owner_id IS NOT DISTINCT FROM $2::uuid AND expires_at>now() FOR UPDATE',[b.mediaId,res.locals.ownerId]);
    if(!m.rows[0])throw new ApiError(404,'MEDIA_NOT_FOUND');
    const prev=await client.query('SELECT id,media_id,status FROM jobs WHERE owner_id IS NOT DISTINCT FROM $3::uuid AND (media_id=$1 OR ($2::text IS NOT NULL AND idempotency_key=$2))',[b.mediaId,key??null,res.locals.ownerId]);

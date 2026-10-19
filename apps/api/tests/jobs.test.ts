@@ -154,17 +154,17 @@ it('closes source descriptors after full and rejected Range responses',async()=>
  expect(await mediaDescriptors(source)).toBe(0);
 });
 
-it('keeps admin overview closed when no separate admin token is configured',async()=>{
- const unavailable=createApp({mediaRoot:root,enqueue:async()=>{},adminToken:''});
- expect((await request(unavailable).get('/api/admin/overview')).status).toBe(503);
+it('keeps admin overview closed without an account session',async()=>{
+ const unavailable=createApp({mediaRoot:root,enqueue:async()=>{}});
+ expect((await request(unavailable).get('/api/admin/overview')).status).toBe(401);
 });
-it('requires the exact admin bearer token and retains origin protection',async()=>{
+it('rejects bearer access and retains origin protection',async()=>{
  const {randomBytes}=await import('node:crypto');const token=randomBytes(32).toString('hex');
- const admin=createApp({mediaRoot:root,enqueue:async()=>{},adminToken:token});
+ const admin=createApp({mediaRoot:root,enqueue:async()=>{}});
  expect((await request(admin).get('/api/admin/overview')).status).toBe(401);
  expect((await request(admin).get('/api/admin/overview').set('Authorization','Bearer wrong')).status).toBe(401);
  expect((await request(admin).get('/api/admin/overview').set('Authorization',`Bearer ${token}`).set('Origin','https://untrusted.example')).status).toBe(403);
- expect((await request(admin).post('/api/admin/overview').set('Authorization',`Bearer ${token}`)).status).toBe(404);
+ expect((await request(admin).post('/api/admin/overview').set('Authorization',`Bearer ${token}`)).status).toBe(401);
 });
 it('shows bounded admin job metadata and separates settled costs from reservations',async()=>{
  const {randomBytes,randomUUID}=await import('node:crypto');const token=randomBytes(32).toString('hex');
@@ -172,8 +172,11 @@ it('shows bounded admin job metadata and separates settled costs from reservatio
  await pool.query("UPDATE jobs SET status='failed',error=$2 WHERE id=$1",[job.body.id,{code:'PROVIDER_RATE_LIMITED',message:'private transcript must stay hidden'}]);
  const month=(await pool.query("SELECT to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS month")).rows[0].month;
  for(const [reserved,actual] of [[100,30],[200,null]])await pool.query('INSERT INTO usage_reservations(id,job_id,month,reserved_micros,actual_micros) VALUES($1,$2,$3,$4,$5)',[randomUUID(),job.body.id,month,reserved,actual]);
- const admin=createApp({mediaRoot:root,enqueue:async()=>{},adminToken:token});
- const response=await request(admin).get('/api/admin/overview').set('Authorization',`Bearer ${token}`);
+ const admin=createApp({mediaRoot:root,enqueue:async()=>{},authMode:'accounts'});
+ const {createHash}=await import('node:crypto');const uid=randomUUID();
+ await pool.query("INSERT INTO app_users(id,username,password_hash,role) VALUES($1,$2,'unusable','admin')",[uid,'admin_'+uid.slice(0,8)]);
+ await pool.query('INSERT INTO app_sessions(token_hash,user_id) VALUES($1,$2)',[createHash('sha256').update(token).digest('hex'),uid]);
+ const response=await request(admin).get('/api/admin/overview').set('Cookie',`factlens_session=${token}`);
  expect(response.status).toBe(200);expect(response.body.statusCounts.failed).toBe(1);
  expect(response.body.usage).toEqual({month,settledMicros:'30',reservedMicros:'200',effectiveMicros:'230',pendingReservations:'1'});
  expect(response.body.recentJobs).toHaveLength(1);
@@ -183,6 +186,6 @@ it('shows bounded admin job metadata and separates settled costs from reservatio
  expect(JSON.stringify(response.body)).not.toContain(token);
  expect(response.headers['cache-control']).toBe('no-store');
  await pool.query('UPDATE jobs SET error=$2 WHERE id=$1',[job.body.id,{code:'private exception content',message:'secret'}]);
- const masked=await request(admin).get('/api/admin/overview').set('Authorization',`Bearer ${token}`);
+ const masked=await request(admin).get('/api/admin/overview').set('Cookie',`factlens_session=${token}`);
  expect(masked.body.recentJobs[0].errorCode).toBe('UNCLASSIFIED_ERROR');
 });

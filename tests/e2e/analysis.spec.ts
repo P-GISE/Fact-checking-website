@@ -101,25 +101,12 @@ test('budget rejection is explained without suggesting successful analysis',asyn
  await expect(page.getByText('이 작업의 실제 AI 분석은 완료되지 않았습니다.')).toBeVisible();
 });
 
-test('admin access is explicit, read-only and forgotten on logout',async({page})=>{
+test('local development does not implicitly grant administrator access',async({page})=>{
  await page.goto('/admin');
  await expect(page.getByRole('heading',{name:'운영 관리'})).toBeVisible();
- await page.getByLabel('관리자 접근 토큰').fill('invalid-token');
- await page.getByRole('button',{name:'관리자 연결',exact:true}).click();
- const token=process.env.FACTLENS_ADMIN_TOKEN;
- if(!token){
-  await expect(page.getByRole('alert')).toContainText('관리자 접근이 설정되지 않았습니다');
-  return;
- }
- await expect(page.getByRole('alert')).toContainText('관리자 인증 정보를 확인');
- await page.getByLabel('관리자 접근 토큰').fill(token);
- await page.getByRole('button',{name:'관리자 연결',exact:true}).click();
- await expect(page.getByRole('heading',{name:'월 사용량 기록'})).toBeVisible();
- await expect(page.getByText('미정산 예약액', {exact:true})).toBeVisible();
- await page.getByRole('button',{name:'연결 종료',exact:true}).click();
+ await expect(page.getByRole('alert')).toContainText('관리자 계정으로 로그인해야');
+ await expect(page.getByLabel('관리자 접근 토큰')).toHaveCount(0);
  await expect(page.getByRole('heading',{name:'월 사용량 기록'})).toHaveCount(0);
- await expect(page.getByLabel('관리자 접근 토큰')).toHaveValue('');
- expect(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length}))).toEqual({local:0,session:0});
 });
 
 test('table quote displays physical source location without claiming verified meaning',async({page,request})=>{

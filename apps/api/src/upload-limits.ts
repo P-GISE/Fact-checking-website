@@ -13,6 +13,8 @@ export function uploadReservation(options:UploadLimits):RequestHandler{
    const client=await pool.connect(),lease=randomUUID();
    try{
     await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(548871631)');
+    const owner=await client.query('SELECT id FROM app_users WHERE id=$1 AND deleted_at IS NULL',[res.locals.ownerId]);
+    if(!owner.rowCount)throw Object.assign(new Error('AUTH_REQUIRED'),{status:401,code:'AUTH_REQUIRED'});
     await client.query('DELETE FROM upload_leases WHERE expires_at<=now()');
     const r=await client.query(`SELECT count(*)::int AS count,COALESCE(sum(bytes),0) AS bytes,
      count(*) FILTER(WHERE owner_id IS NOT DISTINCT FROM $1::uuid)::int AS owner_count,

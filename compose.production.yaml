@@ -52,7 +52,6 @@ services:
       FACTLENS_TRUST_PROXY: 'true'
       ALLOWED_ORIGINS: https://factlens.pigs0516.com
       NODE_EXTRA_CA_CERTS: /run/secrets/proxy_ca
-      FACTLENS_ADMIN_TOKEN: ${FACTLENS_ADMIN_TOKEN:?required}
     secrets: [proxy_ca]
     volumes: [media:/data]
     depends_on:

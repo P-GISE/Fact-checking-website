@@ -60,6 +60,8 @@ def restore(container,target,folder):
  with dump.open('rb') as source:
   command(container,['pg_restore','-U','factlens','-d',target,'--no-owner','--no-acl','--single-transaction'],data=source.read())
  sql(container,target,"""BEGIN;
+ ALTER TABLE app_users ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+ UPDATE app_users SET username='restored_'||id::text,password_hash='!',deleted_at=now();
  DELETE FROM app_sessions;
  DELETE FROM upload_leases;
  UPDATE jobs SET status='deleted',deleted_at=now(),expires_at=now(),version=version+1,result=NULL,error=NULL;
