@@ -45,6 +45,7 @@ def test_ambiguous_or_unverified_quote_cannot_select_table_context():
 
 def test_incomplete_source_structure_never_claims_complete_context():
     doc=traced_document('<table><tr><th>header</th><td>2025년 한국 고용률 50%</td></tr></table>');doc.sourceTrace.structureComplete=False
+    doc.sourceTrace.tableReferenceAudit.complete=False
     context=getattr(validate_evidence(claim(),doc).sourceTrace,'tableContext',None)
     assert context is not None and context.complete is False
 
@@ -102,3 +103,29 @@ def test_serialized_context_must_match_a_single_verified_quote_table():
     with pytest.raises(ValueError,match='INVALID_TABLE_CONTEXT'):SourceTrace.model_validate(wrong)
     for change in ({'quoteOccurrences':2},{'quoteOccurrences':0},{'quoteBlockIndexes':[]}):
         with pytest.raises(ValueError,match='INVALID_TABLE_CONTEXT'):SourceTrace.model_validate({**trace.model_dump(),**change})
+
+
+def test_literal_period_denominator_correction_and_unit_cues_remain_unverified():
+    context=context_for('<table><caption>2025년 / 단위: % / 분모: 15세 이상 / 정정 공지</caption><tr><td>2025년 한국 고용률 50%</td></tr></table>')
+    audit=getattr(context,'cueAudit',None)
+    assert audit is not None and audit.version=='table-cue-audit-v1' and audit.meaningVerified is False
+    assert {cue.kind for cue in audit.cues}=={'period','denominator','correction','unit'}
+    assert audit.complete
+    for cue in audit.cues:
+        assert cue.blockIndex==0 and context.fragments[0].text[cue.offset:cue.offset+len(cue.text)]==cue.text
+
+
+def test_cue_audit_is_bounded_and_cannot_claim_complete_after_truncation():
+    context=context_for('<table><tr>'+('<th>2025년 분모 정정 단위</th>'*16)+'<td>2025년 한국 고용률 50%</td></tr></table>')
+    audit=getattr(context,'cueAudit',None)
+    assert audit is not None and len(audit.cues)==32 and audit.complete is False
+
+
+def test_serialized_cue_must_match_the_bounded_fragment():
+    import pytest
+    from factlens.source_document import SourceTrace
+    doc=traced_document('<table><caption>정정 공지</caption><tr><td>2025년 한국 고용률 50%</td></tr></table>')
+    trace=validate_evidence(claim(),doc).sourceTrace
+    assert getattr(trace.tableContext,'cueAudit',None) is not None
+    raw=trace.model_dump();raw['tableContext']['cueAudit']['cues'][0]['text']='forged'
+    with pytest.raises(ValueError):SourceTrace.model_validate(raw)

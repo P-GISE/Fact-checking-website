@@ -182,3 +182,10 @@ sourceTrace.tableContext는 nullable/default null이다. version=table-context-v
 계정 모드의 모든 업로드/분석 생성·이력·단건·claims·timeline·report·evidence·media·삭제는 서버 세션 소유자를 사용한다. 미인증401, 타 계정/기존 소유자 NULL 자료404다. health와 별도 관리자 Bearer 인증은 예외이며 관리자 토큰은 일반 사용자의 미디어 접근을 허용하지 않는다.
 
 결과 scope는 audio_only/audio_visual, visual/modalChecks/summary는 이전 결과와 호환되는 선택 필드다. visual-sampled-v1의 비공개 frameId/시간/관측/부분 상태, modal-record-review-v1 비교, claim-summary-v1 주장 집계를 검증한다. 원본 프레임 공개 URL이나 진실 확률은 제공하지 않는다.
+
+
+### 선택 표 감사 DTO (2026-10-19)
+
+SourceTrace.tableReferenceAudit는 version/meaningVerified=false/complete와 최대32개 references(cellBlockIndex,declaredId,status,headerBlockIndex|null)를 전달한다. resolved_same_table_header만 실제 같은 표의 table_header 블록 참조를 허용하고 다른 상태는 target을null로 제한한다. complete=true는 전체 구조가 추적된 경우에만 허용한다. 선언 ID는64유니코드 코드포인트로 Python/API 한도를 맞췄다.
+
+TableContext.cueAudit는 version/meaningVerified=false/complete와최대32개 cues(blockIndex,kind,offset,text)를 전달한다. 종류는period/denominator/correction/unit, offset은 보존된 fragment의 코드포인트 기준이다. 서버/API는 fragment와 literal 일치·범위·완전성 조건을 확인한다. 의미 검증 true나 다른 표/없는 블록/위조 문자열은 거부한다. 기존 클라이언트는 선택 필드를 무시할 수 있고 예전 결과는 audit 없이 읽을 수 있다.

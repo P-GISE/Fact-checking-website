@@ -1,3 +1,4 @@
+from factlens.table_references import REFERENCE_VERSION
 from factlens.visual import extract_visual,VISUAL_VERSION
 from factlens.multimodal import review_modalities,MODAL_VERSION
 from factlens.report import summarize,SUMMARY_VERSION
@@ -7,7 +8,7 @@ from factlens.contracts import Claim, AnalysisResult
 from factlens.validator import validate_evidence, RULE_VERSION
 from factlens.decision import decide
 from factlens.source_review import review_sources, REVIEW_VERSION, DEFAULT_REGISTRY
-from factlens.table_context import CONTEXT_VERSION
+from factlens.table_context import CONTEXT_VERSION,CUE_VERSION
 
 class ProviderUnavailable(RuntimeError):pass
 
@@ -55,4 +56,4 @@ def run_analysis(job:dict,providers,stage=lambda name:True)->AnalysisResult:
     usage = providers.usage() if callable(getattr(providers, 'usage', None)) else {'billing':'not_configured'}
     provider_versions=providers.versions() if callable(getattr(providers,'versions',None)) else {}
     checks=review_modalities(claims,visual)
-    return AnalysisResult(scope='audio_visual' if visual is not None and visual.status!='not_applicable' else 'audio_only',visual=visual,modalChecks=checks,summary=summarize(claims,checks),claims=claims,limitations=limitations,usage=usage,versions={**provider_versions,'ruleVersion':RULE_VERSION,'sourceReviewVersion':REVIEW_VERSION,'sourceRegistryVersion':DEFAULT_REGISTRY.version,'tableContextVersion':CONTEXT_VERSION,'visualVersion':VISUAL_VERSION,'modalVersion':MODAL_VERSION,'summaryVersion':SUMMARY_VERSION})
+    return AnalysisResult(scope='audio_visual' if visual is not None and visual.status!='not_applicable' else 'audio_only',visual=visual,modalChecks=checks,summary=summarize(claims,checks),claims=claims,limitations=limitations,usage=usage,versions={**provider_versions,'ruleVersion':RULE_VERSION,'sourceReviewVersion':REVIEW_VERSION,'sourceRegistryVersion':DEFAULT_REGISTRY.version,'tableContextVersion':CONTEXT_VERSION,'tableCueVersion':CUE_VERSION,'tableReferenceVersion':REFERENCE_VERSION,'visualVersion':VISUAL_VERSION,'modalVersion':MODAL_VERSION,'summaryVersion':SUMMARY_VERSION})

@@ -65,6 +65,6 @@ def fetch_evidence(url:str,*,resolver=resolve,transport=request_pinned)->dict:
         trace=SourceTrace(requestedUrl=requested_url,finalUrl=url,retrievedAt=datetime.now(timezone.utc).isoformat(),
                           contentType=parsed['contentType'],bodySha256=fingerprint(body),
                           textSha256=fingerprint(parsed['text'].encode()),textLength=len(parsed['text']),
-                          blocks=parsed['blocks'],structureComplete=parsed['structureComplete'],publication=parsed['publication'],sourceLinks=source_links,sourceLinksComplete=links_complete)
+                          blocks=parsed['blocks'],structureComplete=parsed['structureComplete'],publication=parsed['publication'],tableReferenceAudit=parsed.get('tableReferenceAudit'),sourceLinks=source_links,sourceLinksComplete=links_complete)
         return {'url':url,'title':parsed['title'] or host,'text':parsed['text'],'lineage':host,'sourceTrace':trace.model_dump()}
     raise ValueError('REDIRECT_LIMIT')

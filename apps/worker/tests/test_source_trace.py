@@ -52,6 +52,7 @@ def test_changed_original_cannot_reuse_an_earlier_source_hash():
 def test_incomplete_structure_and_extraction_are_explicitly_non_decisive():
     d=traced_document('<p>2025년 한국 고용률 50%</p>')
     d.sourceTrace.structureComplete=False;d.sourceTrace.extractionTruncated=True
+    d.sourceTrace.tableReferenceAudit.complete=False
     checked=validate_evidence(claim(),d)
     assert 'SOURCE_STRUCTURE_INCOMPLETE' in checked.reasons
     assert 'SOURCE_EXTRACTION_TRUNCATED' in checked.reasons

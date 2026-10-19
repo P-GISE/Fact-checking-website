@@ -47,9 +47,9 @@ Interface: secure server sessions with hashed opaque cookie token, scrypt passwo
 ## Task 4: remaining source/meaning audit (TASK023)
 Files: source parser/table context/validator and bounded regression fixtures.
 Interface: explicit header/scope/reference observations and conservative meaning review diagnostics; never treat candidate context as verified semantics.
-- [ ] RED for duplicate/missing/cross-table header references and correction/period/denominator cues.
-- [ ] Preserve declared references, validate resolved same-table links and keep unsupported semantics/identity abstentions.
-- [ ] Production RULES/hash/version and boundary regression checks; commit.
+- [x] RED for duplicate/missing/cross-table header references and correction/period/denominator cues.
+- [x] Preserve declared references, validate resolved same-table links and keep unsupported semantics/identity abstentions.
+- [x] Production RULES/hash/version and boundary regression checks; commit.
 
 ## Task 5: live AI verification and evaluation readiness (TASK016/014)
 Files: reproducible smoke/evaluation tooling, owned Korean fixture manifest and sanitized run evidence.

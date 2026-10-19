@@ -1,4 +1,5 @@
 """Bounded static-text parsing and observations, never source authentication."""
+from factlens.table_references import TableReferenceAudit,index_ids,observe_references
 import hashlib
 import ipaddress
 from urllib.parse import urlsplit, urljoin, urlunsplit
@@ -92,6 +93,19 @@ class TableContextFragment(Strict):
     truncated: bool = False
 
 
+class TableCue(Strict):
+    blockIndex:int=Field(ge=0,lt=MAX_BLOCKS)
+    kind:Literal['period','denominator','correction','unit']
+    offset:int=Field(ge=0,lt=500)
+    text:str=Field(min_length=1,max_length=80)
+
+class TableCueAudit(Strict):
+    version:Literal['table-cue-audit-v1']='table-cue-audit-v1'
+    meaningVerified:Literal[False]=False
+    complete:bool
+    cues:list[TableCue]=Field(max_length=32)
+
+
 class TableContext(Strict):
     version: Literal['table-context-v1'] = 'table-context-v1'
     tableIndex: int = Field(ge=0, lt=MAX_NODES)
@@ -99,6 +113,7 @@ class TableContext(Strict):
     meaningVerified: Literal[False] = False
     complete: bool
     fragments: list[TableContextFragment] = Field(max_length=16)
+    cueAudit:TableCueAudit|None=None
 
 
 class SourceTrace(Strict):
@@ -119,6 +134,7 @@ class SourceTrace(Strict):
     sourceLinks: list[SourceLink] = Field(default_factory=list,max_length=32)
     sourceLinksComplete: bool = False
     tableContext: TableContext | None = None
+    tableReferenceAudit: TableReferenceAudit | None = None
 
     @model_validator(mode='after')
     def valid_locations(self):
@@ -129,6 +145,18 @@ class SourceTrace(Strict):
             end = block.position + block.length
         if any(index < 0 or index >= len(self.blocks) for index in self.quoteBlockIndexes):
             raise ValueError('INVALID_QUOTE_BLOCK')
+        if self.tableReferenceAudit is not None:
+            if self.tableReferenceAudit.complete and not self.structureComplete:raise ValueError('INVALID_HEADER_REFERENCE')
+            for reference in self.tableReferenceAudit.references:
+                if reference.cellBlockIndex>=len(self.blocks):raise ValueError('INVALID_HEADER_REFERENCE')
+                cell=self.blocks[reference.cellBlockIndex]
+                if cell.kind not in ('table_header','table_cell') or cell.tableLocation is None:raise ValueError('INVALID_HEADER_REFERENCE')
+                if reference.status=='resolved_same_table_header':
+                    target=reference.headerBlockIndex
+                    if target is None or target>=len(self.blocks):raise ValueError('INVALID_HEADER_REFERENCE')
+                    header=self.blocks[target]
+                    if header.kind!='table_header' or header.tableLocation is None or header.tableLocation.tableIndex!=cell.tableLocation.tableIndex:raise ValueError('INVALID_HEADER_REFERENCE')
+                elif reference.headerBlockIndex is not None:raise ValueError('INVALID_HEADER_REFERENCE')
         if self.tableContext is not None:
             if (self.quoteOccurrences!=1 or not self.quoteBlockIndexes or any(
                     self.blocks[index].tableLocation is None or
@@ -140,6 +168,12 @@ class SourceTrace(Strict):
                 block=self.blocks[fragment.blockIndex]
                 if block.kind!=fragment.kind or block.tableLocation is None or block.tableLocation.tableIndex!=self.tableContext.tableIndex:
                     raise ValueError('INVALID_TABLE_CONTEXT')
+            if self.tableContext.cueAudit is not None:
+                fragments={fragment.blockIndex:fragment for fragment in self.tableContext.fragments}
+                for cue in self.tableContext.cueAudit.cues:
+                    fragment=fragments.get(cue.blockIndex)
+                    if fragment is None or fragment.text[cue.offset:cue.offset+len(cue.text)]!=cue.text:raise ValueError('INVALID_TABLE_CUE')
+                if self.tableContext.cueAudit.complete and not self.tableContext.complete:raise ValueError('INVALID_TABLE_CUE')
             if self.tableContext.complete and (not self.structureComplete or self.extractionTruncated or any(f.truncated for f in self.tableContext.fragments)):
                 raise ValueError('INVALID_TABLE_CONTEXT')
         return self
@@ -214,6 +248,8 @@ def parse_document(body: bytes, content_type: str) -> dict:
         blocks = [TextBlock(kind='text', position=0, length=len(text))] if text else []
         return {'title':None,'text':text,'contentType':mime,'blocks':blocks,'structureComplete':True,'publication':Publication(),'sourceLinksRaw':[],'sourceLinksComplete':True,'hasBase':False}
     soup = BeautifulSoup(decoded, 'html.parser')
+    id_counts,id_index_complete=index_ids(soup)
+    cell_observations=[];block_identities=[]
     title = soup.title.get_text(' ',strip=True) if soup.title else None
     for tag in soup(['script','style','noscript','template']):
         tag.decompose()
@@ -267,6 +303,11 @@ def parse_document(body: bytes, content_type: str) -> dict:
                         rowSpan=observed_span(node,'rowspan',0) if not caption else None,
                         columnSpan=observed_span(node,'colspan',1) if not caption else None)
                     if row is not None and not caption:row['nextCell']+=1
+            if node.name in ('th','td') and location is not None:
+                headers=node.get('headers') if node.has_attr('headers') else None
+                if isinstance(headers,str):headers=headers.split()
+                cell_observations.append({'identity':id(node),'kind':kinds[node.name],'tableIndex':location.tableIndex,
+                    'id':node.get('id') if isinstance(node.get('id'),str) else None,'headers':headers})
             child_normal = (id(node), kinds[node.name], None) if node.name in kinds else normal
             child_special = (id(node), kinds[node.name], location) if node.name in ('th','td','caption','aside') else special
             if len(stack) >= MAX_DEPTH:
@@ -286,9 +327,11 @@ def parse_document(body: bytes, content_type: str) -> dict:
             blocks[-1].length = length - blocks[-1].position
         elif len(blocks) < MAX_BLOCKS:
             blocks.append(TextBlock(kind=kind, position=position, length=len(value),tableLocation=location))
+            block_identities.append(identity)
         else:
             complete = False
         previous = identity
     return {'title':title,'text':' '.join(chunks),'contentType':mime,'blocks':blocks,
             'structureComplete':complete,'publication':publication_observations(soup),
-            'sourceLinksRaw':source_links,'sourceLinksComplete':links_complete,'hasBase':has_base}
+            'sourceLinksRaw':source_links,'sourceLinksComplete':links_complete,'hasBase':has_base,
+            'tableReferenceAudit':observe_references(cell_observations,block_identities,blocks,id_counts,id_index_complete,complete)}

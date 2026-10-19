@@ -77,3 +77,22 @@ it('preserves sampled visual observations and a non-probabilistic claim summary'
  expect(resultSchema.safeParse({...report,visual:{...visual,records:[{...visual.records[0],endSeconds:4}]}}).success).toBe(false);
  expect(resultSchema.safeParse({...report,summary:{...summary,independenceVerified:true}}).success).toBe(false);
 });
+
+it('preserves structural header references and rejects forged resolutions',async()=>{
+ const {sourceTraceSchema}=await import('../src/contracts.js');const missing={state:'missing',value:null,candidates:[]};
+ const location=(tableIndex:number,cellIndex:number)=>({tableIndex,rowIndex:0,cellIndex,rowSpan:1,columnSpan:1});
+ const reference={cellBlockIndex:1,declaredId:'rate',status:'resolved_same_table_header',headerBlockIndex:0};
+ const trace={parserVersion:'static-text-v3',requestedUrl:'https://example.org/',finalUrl:'https://example.org/',retrievedAt:'2026-10-19T00:00:00Z',contentType:'text/html',bodySha256:'a'.repeat(64),textSha256:'b'.repeat(64),textLength:12,blocks:[{kind:'table_header',position:0,length:4,tableLocation:location(0,0)},{kind:'table_cell',position:5,length:3,tableLocation:location(0,1)},{kind:'table_header',position:9,length:3,tableLocation:location(1,0)}],structureComplete:true,publication:{publisher:missing,publishedAt:missing,modifiedAt:missing},quoteOccurrences:null,quoteBlockIndexes:[],extractionTruncated:false,tableReferenceAudit:{version:'table-reference-audit-v1',meaningVerified:false,complete:true,references:[reference]}};
+ expect(sourceTraceSchema.parse(trace)).toHaveProperty('tableReferenceAudit',trace.tableReferenceAudit);
+ for(const index of [1,2,99])expect(sourceTraceSchema.safeParse({...trace,tableReferenceAudit:{...trace.tableReferenceAudit,references:[{...reference,headerBlockIndex:index}]}}).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,tableReferenceAudit:{...trace.tableReferenceAudit,meaningVerified:true}}).success).toBe(false);
+});
+it('preserves literal context cues and rejects invented text or semantic certainty',async()=>{
+ const {sourceTraceSchema}=await import('../src/contracts.js');const missing={state:'missing',value:null,candidates:[]};
+ const cue={blockIndex:0,kind:'correction',offset:0,text:'정정'};
+ const context={version:'table-context-v1',tableIndex:0,association:'same_table_only',meaningVerified:false,complete:true,fragments:[{blockIndex:0,kind:'caption',text:'정정 공지',truncated:false}],cueAudit:{version:'table-cue-audit-v1',meaningVerified:false,complete:true,cues:[cue]}};
+ const trace={parserVersion:'static-text-v3',requestedUrl:'https://example.org/',finalUrl:'https://example.org/',retrievedAt:'2026-10-19T00:00:00Z',contentType:'text/html',bodySha256:'a'.repeat(64),textSha256:'b'.repeat(64),textLength:5,blocks:[{kind:'caption',position:0,length:5,tableLocation:{tableIndex:0,rowIndex:null,cellIndex:null,rowSpan:null,columnSpan:null}}],structureComplete:true,publication:{publisher:missing,publishedAt:missing,modifiedAt:missing},quoteOccurrences:1,quoteBlockIndexes:[0],extractionTruncated:false,tableContext:context};
+ expect(sourceTraceSchema.parse(trace).tableContext).toEqual(context);
+ expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,cueAudit:{...context.cueAudit,cues:[{...cue,text:'추측'}]}}}).success).toBe(false);
+ expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,cueAudit:{...context.cueAudit,meaningVerified:true}}}).success).toBe(false);
+});
