@@ -26,29 +26,34 @@
 ### Task1: reviewed meaning and verdict gate
 Files: worker meaning_review.py, reviewed_sources.json, contracts.py, validator.py, decision.py and tests/test_meaning_review.py.
 Interface: review_meaning(claim,document) -> MeaningReview|None; verified review includes policyId/sourceKind/documentHash/relation/reasons/definition/quote positions. Nullable EvidenceCheck.meaningReview.
-- [ ] RED: paragraph/explicit simple table support/refutation, changed hash/URL/claim context/precision/denominator/truncation/duplicate quote/unsafe source refusal.
-- [ ] Implement narrow deterministic policy/context checks and new version gate without relaxing unreviewed legacy input.
-- [ ] GREEN: focused worker tests plus previous validator/source/contract regressions.
+- [x] RED: paragraph/explicit simple table support/refutation, changed hash/URL/claim context/precision/denominator/truncation/duplicate quote/unsafe source refusal.
+- [x] Implement narrow deterministic policy/context checks and new version gate without relaxing unreviewed legacy input.
+- [x] GREEN: focused worker tests plus previous validator/source/contract regressions.
 
 ### Task2: source policy and real evidence
 Files: reviewed_sources.json, source_registry.json, review report/fixtures and policy tests.
-- [ ] Verify exact official static HTML and definition/publication/identity; fetch via existing production parser, record full normalized hash and exact quote.
-- [ ] Register only reviewed source/fact with source reference and review timestamp; support a simple table only if actual structure is verified.
-- [ ] Exercise the actual fetched document, including adversarial mutations; distinguish synthetic boundaries from real source evidence.
+- [x] Verify exact official static HTML and definition/publication/identity; fetch via existing production parser, record full normalized hash and exact quote.
+- [x] Register only reviewed source/fact with source reference and review timestamp; support a simple table only if actual structure is verified.
+- [x] Exercise the actual fetched document, including adversarial mutations; distinguish synthetic boundaries from real source evidence.
 
 ### Task3: API/report integration
 Files: API contracts.ts/visual-contracts.ts/tests, web types.ts/components EvidencePanel/AnalysisReport/VisualReview and Worker report.py/tests.
-- [ ] RED: new meaning data survives API, rejects malformed verification, accepts legacy null; summary distinguishes conflicts/insufficient/internal mismatch and explains strength without independence claims.
-- [ ] Integrate optional reviewed evidence with policy/comparison definition/position explanation. Keep internal modal result separate.
-- [ ] GREEN: Worker/API tests, typecheck/build, actual report UI and legacy UI checks.
+- [x] RED: new meaning data survives API, rejects malformed verification, accepts legacy null; summary distinguishes conflicts/insufficient/internal mismatch and explains strength without independence claims.
+- [x] Integrate optional reviewed evidence with policy/comparison definition/position explanation. Keep internal modal result separate.
+- [x] GREEN: Worker/API tests, typecheck/build, actual report UI and legacy UI checks.
 
 ### Task4: live run, review and publish
 Files: sanitized execution report and affected guide sections.
-- [ ] User saves keys into existing server0600 env. Verify only presence, controlled test uses production budget wrapper and owned Korean media.
-- [ ] Record actual stages/source/decision/report/cost/deletion or concrete provider blocker; do not label lack of evidence false.
-- [ ] Whole change review and necessary fixes; relevant full checks and work push/actual deployment verification. Update guide with completed/pending distinction.
+- [x] User saves keys into existing server0600 env. Verify only presence, controlled test uses production budget wrapper and owned Korean media.
+- [x] Record actual stages/source/decision/report/cost/deletion or concrete provider blocker; do not label lack of evidence false.
+- [x] Whole change review and necessary fixes; relevant full checks and work push/actual deployment verification. Update guide with completed/pending distinction.
 
 ## Evidence ledger
+
+- Final: Tasks1–3 and controlled attempt/publication steps completed. Real AI end-to-end success remains BLOCKED at transcription429; two calls,1200micros conservative unknown cost, test data cleaned. See ../../reports/2026-10-21-evidence-verdict.md.
+- CI39462037590: API97/Worker391 passed, build/type/deploy checks successful. AWS da04741, rulev5, internal/public ready, AI disabled.
+- Policy ruling: pin the entire stable article block plus exact publication observation; pin the full table and explicit headers/cell. Live dataset publication remains null. Shared underlying survey origin is one group, not independent evidence.
+- [ ] Complete one controlled real AI pipeline after account Billing/Limits resolves429; enable public AI only after successful verification.
 
 - Baseline: local/production keys absent, production disabled; focused67passed/1FFmpeg-missing failure. Source unchanged at baseline d27ca3a.
 - Ruling: exact reviewed document snapshots are the first safe implementation of the approved limited source semantics. It requires re-review on content change and does not imply universal language understanding.

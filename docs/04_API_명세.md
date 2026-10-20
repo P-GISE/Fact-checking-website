@@ -1,5 +1,7 @@
 # 04. API 명세
 
+> **실AI·검토 근거 판정 · 2026-10-21:** Evidence의 선택적 meaningReview와 summary.reviewedEvidence를 추가하고 기존 결과는 null로 호환한다. 정책·문서 해시·관계·Unicode 인용 위치/길이를 검증하며 거짓 검토 표기는 거부한다. 신규 PROVIDER_QUOTA_EXCEEDED는 제공자가 명시한 잔액/조직·프로젝트 사용 제한을 일반429와 구분한다. 이번 실호출의 구체적429 원인은 아직 미확인이다. 상세 [진행 보고서](reports/2026-10-21-evidence-verdict.md).
+
 ## 최신 입력 오류·인증 실행 제한 (2026-10-20, TASK031)
 
 업로드의 잘못된 파일 필드·초과 파일/텍스트 필드는400 INVALID_UPLOAD다. JSON 구문 오류는400 INVALID_INPUT, JSON32KiB/파일100MiB 초과는413 SIZE_LIMIT다. 본문·파일명·파서 원시 오류를 응답에 포함하지 않는다. 그 외 예상치 못한 서버 오류는 기존500 INTERNAL_ERROR다.

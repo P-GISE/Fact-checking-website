@@ -1,0 +1,98 @@
+{
+  "purpose": "owned Korean audio actual provider verification, not accuracy evaluation",
+  "fixture": "evaluation/smoke/owned-korean-2026-10-21.json",
+  "publicAiMode": "disabled",
+  "approvedBudget": {
+    "jobMicros": 200000,
+    "monthMicros": 20000000,
+    "currency": "USD"
+  },
+  "runs": [
+    {
+      "attempt": 1,
+      "exitCode": 1,
+      "claimsCount": 0,
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      },
+      "error": "PROVIDER_RATE_LIMITED",
+      "evidenceCount": 0,
+      "runtime": {
+        "braveKeyPresent": true,
+        "mode": "openai_brave",
+        "openaiKeyPresent": true
+      },
+      "stages": [
+        "transcribing"
+      ],
+      "status": "failed",
+      "usage": {
+        "actualMicros": 0,
+        "calls": 1,
+        "conservativeMicros": 600,
+        "costBasis": "published_tariff_not_invoice",
+        "currency": "USD",
+        "unknownUsageCalls": 1
+      },
+      "verdictCounts": {},
+      "versions": {
+        "claimPromptVersion": "claim-structured-v1",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "languageModel": "gpt-4.1-mini",
+        "providerProfile": "openai_brave",
+        "retrievalVersion": "brave-source-trace-v3",
+        "sourceParserVersion": "static-text-v3",
+        "speechModel": "whisper-1"
+      }
+    },
+    {
+      "attempt": 2,
+      "exitCode": 1,
+      "claimsCount": 0,
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      },
+      "error": "PROVIDER_RATE_LIMITED",
+      "evidenceCount": 0,
+      "runtime": {
+        "braveKeyPresent": true,
+        "mode": "openai_brave",
+        "openaiKeyPresent": true
+      },
+      "stages": [
+        "transcribing"
+      ],
+      "status": "failed",
+      "usage": {
+        "actualMicros": 0,
+        "calls": 1,
+        "conservativeMicros": 600,
+        "costBasis": "published_tariff_not_invoice",
+        "currency": "USD",
+        "unknownUsageCalls": 1
+      },
+      "verdictCounts": {},
+      "versions": {
+        "claimPromptVersion": "claim-structured-v1",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "languageModel": "gpt-4.1-mini",
+        "meaningReviewVersion": "reviewed-meaning-v1",
+        "providerProfile": "openai_brave",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "sourceParserVersion": "static-text-v3",
+        "speechModel": "whisper-1"
+      }
+    }
+  ],
+  "billingNotes": "Both SDK calls had max_retries=0. The second controlled run used revised error classification. Unknown billing keeps reservations; zero actualMicros does not mean free.",
+  "totalConservativeMicros": 1200,
+  "accountBalance": "not_verified",
+  "quotaCause": "not_verified",
+  "overall": "blocked_at_transcription_429"
+}
