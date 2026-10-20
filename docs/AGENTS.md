@@ -1,5 +1,9 @@
 # 프로젝트 가이드 — 공통 지침 (AGENTS.md)
 
+> **자동 배포 준비 · 2026-10-20:** 사용자 요청으로 work push 검증/배포 workflow와 GitHub production 환경을 구성했다. 배포 활성화=false, 전용 factlens-ai 접속 주소/SSH Secret/최초 운영 배포는 미완료다. Aside 로그인은 현재 확인됐지만 브라우저 도구는 여전히 disabled다. 상세08 상단·10 §65. 다른 서비스 lostark-party-vps는 배포 대상에서 제외한다.
+
+> **Windows 도구 설정 · 2026-10-20:** 대상은 FactLens `P-GISE/Fact-checking-website`의 work 브랜치다. Superpowers·insane-search·Aside CLI/스킬/MCP 및 Iron Laws MCP를 설정하고 실제 CodeGraph 인덱스를 만들었다. Aside 앱/로그인·Headroom 프록시·모델 인증/호출은 미완료다. [Windows 검증 기록](../devtools/WINDOWS_SETUP.ko.md)과 10 §64를 따른다. GitHub→AWS 자동 배포는 별도 미완료다.
+
 > **관리자 화면 가독성 개선 · 2026-10-19 (10 §63):** 사용자가 운영 서버에서 관리자 로그인 성공을 확인했다. 후속으로 전체/진행/완료/실패 카드·별도 비용 영역·상태 배지/오류 설명·모바일 검색을 개선했다. 새 화면은 아직 서버 미적용이며 기존 관리자 계정은 유지한다.
 
 > **파일 삭제 실패 회귀 · 2026-10-19 (10 §62):** 실제 권한 오류로 탈퇴202/접근 차단을 재현하고 권한 복구 후 정리 재시도·중복 실행을 검증했다. 실제 Lightsail 갱신은 여전히 대기이며08의 SSH 배포1단계 결과가 필요하다.
