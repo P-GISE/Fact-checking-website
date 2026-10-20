@@ -80,6 +80,92 @@ def test_extract_validates_quote_and_owns_ids():
     assert a.settled==[120]
     assert sdk.requests[0]['max_completion_tokens']==2048
 
+@pytest.mark.parametrize('invalid_first',[False,True])
+def test_extract_keeps_literal_candidate_from_observed_household_credit_response(invalid_first,caplog,capsys):
+    quote='한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.'
+    valid={'quote':quote,'segment_ids':[0],'subject':'가계 신용 잔액','period':'작년 말 현재','metric':'잔액','value':'1,344조 3천억','unit':'원','eligibility':'checkable'}
+    invalid={**valid,'subject':'마이너스 통장 등 대출 비율','metric':'비율','value':'약 13%','unit':'%'}
+    sdk=SDK(completion=response({'claims':[invalid,valid] if invalid_first else [valid,invalid]}))
+    p,a=make(sdk)
+    before=p.limitations[:]
+    claims=p.extract([{'id':0,'start':0,'end':2,'text':quote}])
+    assert len(claims)==1
+    claim=claims[0]
+    assert claim.text==quote and claim.contextText==quote
+    assert (claim.subject,claim.period,claim.metric,claim.value,claim.unit)==('가계 신용 잔액','작년 말 현재','잔액','1,344조 3천억','원')
+    assert (claim.startSeconds,claim.endSeconds,claim.eligibility,claim.verdict)==(0,2,'checkable','INSUFFICIENT')
+    assert p.limitations==before+['일부 주장 후보가 원문 검증을 통과하지 못해 제외되었습니다.']
+    assert p.versions()['claimValidationVersion']=='literal-candidates-v2'
+    assert len(sdk.requests)==1 and a.settled==[120]
+    assert caplog.text=='' and capsys.readouterr()==('','')
+
+
+def test_extract_all_invalid_candidates_fail_closed_without_exposing_validation_values(caplog,capsys):
+    import traceback
+    quote='2025년 한국 고용률 50%'
+    candidate={'quote':quote,'segment_ids':[0],'subject':'한국','period':'2025년','metric':'고용률','value':'50','unit':'%','eligibility':'private-invalid-eligibility'}
+    sdk=SDK(completion=response({'claims':[candidate,{**candidate,'subject':'private-invented-subject'}]}))
+    p,a=make(sdk)
+    before=p.limitations[:]
+    with pytest.raises(ProviderUnavailable,match='^PROVIDER_RESPONSE_INVALID$') as error:
+        p.extract([{'id':0,'start':0,'end':1,'text':quote}])
+    formatted=''.join(traceback.format_exception(error.type,error.value,error.tb))
+    assert 'private-invalid-eligibility' not in formatted
+    assert 'private-invented-subject' not in formatted
+    assert 'ValidationError' not in formatted
+    assert p.limitations==before and a.settled==[120] and len(sdk.requests)==1
+    assert caplog.text=='' and capsys.readouterr()==('','')
+
+
+def test_extract_empty_model_claims_remain_legitimate_without_discard_limitation():
+    sdk=SDK(completion=response({'claims':[]}));p,a=make(sdk)
+    before=p.limitations[:]
+    assert p.extract([{'id':0,'start':0,'end':1,'text':'인사말입니다.'}])==[]
+    assert p.limitations==before and a.settled==[120]
+
+
+def test_extract_sends_original_segments_without_rewriting_context():
+    sdk=SDK(completion=response({'claims':[]}));p,_=make(sdk)
+    segments=[{'id':0,'start':0,'end':1,'text':'원문 그대로'}]
+    assert p.extract(segments)==[]
+    request=sdk.requests[0]
+    assert json.loads(request['messages'][1]['content'])=={'segments':segments}
+    assert p.versions()['claimPromptVersion']=='claim-structured-v2'
+
+
+@pytest.mark.parametrize('segments,candidates',[
+    (
+        [{'id':0,'start':0,'end':1,'text':'해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.'}],
+        [{'quote':'해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.','segment_ids':[0],'subject':None,'period':None,'metric':'유통기한 표시','value':'2016년 10월 1일에서 2016년 11월 19일','unit':'날짜','eligibility':'checkable'}],
+    ),
+    (
+        [{'id':0,'start':0,'end':1,'text':'조금만 해도 각 우주의 주요연령층은 30대와 40대가 존재의 과반이었지만,'},
+         {'id':1,'start':1,'end':2,'text':'올해는 50대와 60대가 절반을 넘었다.'}],
+        [{'quote':'올해는 50대와 60대가 절반을 넘었다.','segment_ids':[1],'subject':'주요연령층','period':'올해','metric':'과반','value':None,'unit':None,'eligibility':'checkable'}],
+    ),
+])
+def test_extract_observed_nonliteral_fields_remain_fail_closed(segments,candidates):
+    p,a=make(SDK(completion=response({'claims':candidates})))
+    before=p.limitations[:]
+    with pytest.raises(ProviderUnavailable,match='^PROVIDER_RESPONSE_INVALID$'):
+        p.extract(segments)
+    assert p.limitations==before and a.settled==[120]
+
+
+@pytest.mark.parametrize('invalid',[
+    {'segment_ids':[-1]}, {'segment_ids':[1]}, {'segment_ids':[0,0]},
+    {'quote':'없는 인용'}, {'value':'5'}, {'unit':'명'},
+    {'eligibility':'private-invalid-eligibility'},
+])
+def test_extract_partial_success_preserves_candidate_validation_guards(invalid):
+    quote='2025년 한국 고용률 50%'
+    valid={'quote':quote,'segment_ids':[0],'subject':'한국','period':'2025년','metric':'고용률','value':'50','unit':'%','eligibility':'checkable'}
+    p,_=make(SDK(completion=response({'claims':[{**valid,**invalid},valid]})))
+    claims=p.extract([{'id':0,'start':0,'end':1,'text':quote}])
+    assert len(claims)==1 and claims[0].text==quote and claims[0].value=='50'
+    assert p.limitations[-1]=='일부 주장 후보가 원문 검증을 통과하지 못해 제외되었습니다.'
+
+
 def test_misheard_statistical_term_cannot_inherit_reviewed_policy(tmp_path):
     text='2024년 한국실험률은 2.8%입니다.'
     sdk=SDK(transcript={'segments':[{'start':0,'end':2,'text':text}]})
@@ -224,6 +310,25 @@ def test_extract_preserves_entire_transcript_including_adjacent_correction():
     segments=[{'id':0,'start':0,'end':1,'text':'2025년 한국 고용률 50%'},{'id':1,'start':1,'end':2,'text':'이 주장은 틀렸다. 실제 수치는 5%다.'}]
     c=p.extract(segments)[0]
     assert c.contextText=='2025년 한국 고용률 50% 이 주장은 틀렸다. 실제 수치는 5%다.'
+    from factlens.validator import validate_evidence
+    from factlens.decision import decide
+    from test_validator import document
+    assert decide(c,[validate_evidence(c,document('50'))])=='REVIEW_REQUIRED'
+
+
+def test_extract_discarding_candidates_keeps_correction_context_and_one_visible_limitation():
+    candidate={'quote':'2025년 한국 고용률 50%','segment_ids':[0],'subject':'한국','period':'2025년','metric':'고용률','value':'50','unit':'%','eligibility':'checkable'}
+    invalid={**candidate,'subject':'원문에 없는 대상'}
+    sdk=SDK(completion=response({'claims':[invalid,candidate,invalid,invalid,invalid]}))
+    p,_=make(sdk)
+    before=p.limitations[:]
+    segments=[{'id':0,'start':0,'end':1,'text':'2025년 한국 고용률 50%'},{'id':1,'start':1,'end':2,'text':'이 주장은 틀렸다. 실제 수치는 5%다.'}]
+    claims=p.extract(segments)
+    assert len(claims)==1
+    c=claims[0]
+    assert c.contextText=='2025년 한국 고용률 50% 이 주장은 틀렸다. 실제 수치는 5%다.'
+    assert (c.startSeconds,c.endSeconds)==(0,1)
+    assert p.limitations==before+['일부 주장 후보가 원문 검증을 통과하지 못해 제외되었습니다.']
     from factlens.validator import validate_evidence
     from factlens.decision import decide
     from test_validator import document

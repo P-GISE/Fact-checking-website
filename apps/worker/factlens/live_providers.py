@@ -158,10 +158,20 @@ class LiveProviders:
         except (KeyError,IndexError,TypeError,ValueError) as exc:raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID') from exc
 
     def extract(self,segments):
-        parsed=self._structured('전사 구간에서 독립 검증 가능한 주장 최대 5개를 뽑아라. quote는 원본 그대로, segment_ids는 제공된 ID만 사용한다. 의견/전망은 eligibility=excluded, 사실 주장은 checkable로 표시한다. 날짜/대상/항목/값/단위는 명시된 경우만 채워라.',{'segments':segments},Candidates)
-        try:
-            output=[]
-            for candidate in parsed.claims:
+        parsed=self._structured(
+            '전사 구간에서 독립 검증 가능한 주장 최대 5개를 뽑아라. quote는 원본 그대로, segment_ids는 제공된 ID만 사용한다. '
+            '의견/전망은 eligibility=excluded, 사실 주장은 checkable로 표시한다. '
+            'subject/period/metric/unit은 candidate.quote 안에 있는 연속된 원문 문자열만 쓰고 없으면 null로 둬라. '
+            '인접 구간에서 필드를 추론하거나 보충하지 마라. '
+            'value는 원문에 나타난 부호/천 단위 쉼표/소수점을 그대로 유지한 단일 숫자 문자열만 쓰고 candidate.quote에 없으면 null로 둬라. '
+            '날짜/범위/여러 수치/한국어 단위가 섞인 복합 수치는 value=null로 둬라. '
+            "모르는 필드는 null로 두고 '비율'/'날짜' 같은 단어를 만들어 넣지 마라. 전사를 고치거나 추측한 값을 정규화하지 마라. "
+            '예외로 퍼센트는 quote에 정확한 value 숫자가 바로 앞에 있을 때만 unit=%로 쓸 수 있다. 퍼센트 포인트에는 이 예외를 적용하지 마라.',
+            {'segments':segments},Candidates)
+        output=[]
+        discarded=False
+        for candidate in parsed.claims:
+            try:
                 if any(type(i) is not int or i<0 or i>=len(segments) for i in candidate.segment_ids):raise ValueError()
                 ids=candidate.segment_ids
                 if ids!=list(range(ids[0],ids[-1]+1)):raise ValueError()
@@ -174,8 +184,12 @@ class LiveProviders:
                 chosen=[segments[i] for i in ids]
                 if candidate.quote not in ' '.join(s['text'] for s in chosen):raise ValueError()
                 output.append(Claim(id=str(uuid4()),text=candidate.quote,contextText=' '.join(s['text'] for s in segments),startSeconds=min(s['start'] for s in chosen),endSeconds=max(s['end'] for s in chosen),subject=candidate.subject,period=candidate.period,metric=candidate.metric,value=candidate.value,unit=candidate.unit,eligibility=candidate.eligibility))
-            return output
-        except (ValueError,IndexError,KeyError,TypeError) as exc:raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID') from exc
+            except (ValueError,IndexError,KeyError,TypeError):
+                discarded=True
+        if parsed.claims and not output:raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID')
+        if discarded:
+            self.limitations.append('일부 주장 후보가 원문 검증을 통과하지 못해 제외되었습니다.')
+        return output
 
     def search(self,claim:Claim):
         if claim.eligibility=='excluded':return []
@@ -229,7 +243,7 @@ class LiveProviders:
 
     def versions(self):
         return {'providerProfile':'openai_brave','speechModel':'whisper-1','speechPromptVersion':'ko-labour-vocabulary-v1','languageModel':MODEL,
-                'claimPromptVersion':'claim-structured-v1','evidencePromptVersion':'evidence-structured-v1',
+                'claimPromptVersion':'claim-structured-v2','claimValidationVersion':'literal-candidates-v2','evidencePromptVersion':'evidence-structured-v1',
                 'retrievalVersion':'brave-reviewed-source-v4','sourceParserVersion':PARSER_VERSION,'meaningReviewVersion':'reviewed-meaning-v1'}
 
     def usage(self):
