@@ -1,6 +1,6 @@
 # 프로젝트 가이드 — 공통 지침 (AGENTS.md)
 
-> **자동 배포 준비 · 2026-10-20:** 사용자 요청으로 work push 검증/배포 workflow와 GitHub production 환경을 구성했다. 배포 활성화=false, 전용 factlens-ai 접속 주소/SSH Secret/최초 운영 배포는 미완료다. Aside 로그인은 현재 확인됐지만 브라우저 도구는 여전히 disabled다. 상세08 상단·10 §65. 다른 서비스 lostark-party-vps는 배포 대상에서 제외한다.
+> **자동 배포 준비 · 2026-10-20:** a01da20/052d1b0을 work에 게시했고 Actions39418486430의 API53/Worker211/배포모의30·타입/빌드가 통과했다. 독립 코드 리뷰 P1/P2 없음. deploy는 활성화=false로 skipped이며 전용 factlens-ai 접속 주소/SSH Secret/최초 운영 배포는 미완료다. Aside 로그인은 확인됐지만 브라우저 도구는 여전히 disabled다. 상세08 상단·10 §65. 다른 서비스 lostark-party-vps는 배포 대상에서 제외한다.
 
 > **Windows 도구 설정 · 2026-10-20:** 대상은 FactLens `P-GISE/Fact-checking-website`의 work 브랜치다. Superpowers·insane-search·Aside CLI/스킬/MCP 및 Iron Laws MCP를 설정하고 실제 CodeGraph 인덱스를 만들었다. Aside 앱/로그인·Headroom 프록시·모델 인증/호출은 미완료다. [Windows 검증 기록](../devtools/WINDOWS_SETUP.ko.md)과 10 §64를 따른다. GitHub→AWS 자동 배포는 별도 미완료다.
 

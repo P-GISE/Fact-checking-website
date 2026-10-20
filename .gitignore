@@ -16,3 +16,4 @@ test-results/
 playwright-report/
 .data/
 .factlens-deploy-target
+.omo/evidence/
