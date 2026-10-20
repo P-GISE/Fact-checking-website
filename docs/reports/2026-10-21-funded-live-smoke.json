@@ -1,0 +1,58 @@
+{
+  "context": "User reported $5 API credit purchase; one controlled owned synthetic Korean audio execution",
+  "researchValidation": false,
+  "publicAiEnabled": false,
+  "result": {
+    "claimsCount": 1,
+    "cleanup": {
+      "filesRemoved": true,
+      "jobTombstoned": true,
+      "mediaTombstoned": true,
+      "usageRetained": true
+    },
+    "error": null,
+    "evidenceCount": 0,
+    "runtime": {
+      "braveKeyPresent": true,
+      "mode": "openai_brave",
+      "openaiKeyPresent": true
+    },
+    "stages": [
+      "transcribing",
+      "extracting",
+      "retrieving",
+      "validating_evidence"
+    ],
+    "status": "completed",
+    "usage": {
+      "actualMicros": 7783,
+      "calls": 6,
+      "conservativeMicros": 8383,
+      "costBasis": "published_tariff_not_invoice",
+      "currency": "USD",
+      "unknownUsageCalls": 1
+    },
+    "verdictCounts": {
+      "REVIEW_REQUIRED": 1
+    },
+    "versions": {
+      "claimPromptVersion": "claim-structured-v1",
+      "evidencePromptVersion": "evidence-structured-v1",
+      "languageModel": "gpt-4.1-mini",
+      "meaningReviewVersion": "reviewed-meaning-v1",
+      "modalVersion": "modal-record-review-v1",
+      "providerProfile": "openai_brave",
+      "retrievalVersion": "brave-reviewed-source-v4",
+      "ruleVersion": "audio-reviewed-numeric-v5",
+      "sourceParserVersion": "static-text-v3",
+      "sourceRegistryVersion": "source-registry-2026-10-21",
+      "sourceReviewVersion": "source-review-v1",
+      "speechModel": "whisper-1",
+      "summaryVersion": "claim-summary-v1",
+      "tableContextVersion": "table-context-v1",
+      "tableCueVersion": "table-cue-audit-v1",
+      "tableReferenceVersion": "table-reference-audit-v1",
+      "visualVersion": "visual-sampled-v1"
+    }
+  }
+}
