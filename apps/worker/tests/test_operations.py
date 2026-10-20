@@ -390,6 +390,7 @@ class OperationsTests(unittest.TestCase):
     def test_real_flock_and_symlink_safety(self):
         import fcntl
         with self.lock.open("w") as handle:
+            self.lock.chmod(0o600)
             fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
             with self.fast_clock(), self.assertRaisesRegex(RuntimeError, "BUSY"):
                 self.backup()
