@@ -106,7 +106,10 @@ jobs:
             -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
             -o UserKnownHostsFile="$RUNNER_TEMP/factlens-ssh/known_hosts" \
             -o ConnectTimeout=15 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
-            "cd factlens && bash -s -- '$DEPLOY_SHA'" < devtools/deploy-production.sh
+            "cd factlens && bash -s -- '$DEPLOY_SHA'" < devtools/deploy-production.sh \
+            | tee "$RUNNER_TEMP/factlens-deploy.log"
+          grep -Fx "Deployed $DEPLOY_SHA; loopback and public health are ready." "$RUNNER_TEMP/factlens-deploy.log" \
+            || grep -Fx 'Stale deployment skipped: requested SHA is not origin/work HEAD.' "$RUNNER_TEMP/factlens-deploy.log"
       - name: Remove temporary SSH credentials
         if: always()
         shell: bash

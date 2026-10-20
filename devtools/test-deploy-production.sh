@@ -85,6 +85,7 @@ set -eu
 case "$1" in
   devtools/production-preflight.py)
     echo preflight >> "$MOCK_LOG"
+    if [[ $SCENARIO == stdin-consumer ]]; then cat >/dev/null; fi
     [[ $SCENARIO != preflight-failure ]] ;;
   devtools/recovery.py)
     [[ "$2 $3 $4 $5 $6 $7" == 'backup --container factlens-postgres-1 --database factlens --directory' ]]
@@ -186,6 +187,10 @@ for SCENARIO in up-failure loopback-failure public-failure not-ready invalid-jso
   assert_present '^compose up -d --wait --wait-timeout 180$'
   assert_absent '^compose start'
 done
+run_case stdin-consumer pass
+assert_present '^backup$'
+assert_present '^compose up -d --wait --wait-timeout 180$'
+assert_present '^health https://factlens.pigs0516.com/api/health$'
 run_case success pass
 grep -E '^(lock|git fetch |git merge |preflight|compose |private-backup-check|active-work-check|backup$|health )' "$MOCK_LOG" > "$evidence/success.order.actual"
 cat > "$evidence/success.order.expected" <<ORDER

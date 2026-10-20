@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Run from ~/factlens: bash -s -- <commit-sha> < devtools/deploy-production.sh
+main() {
 set +x
 set -Eeuo pipefail
 umask 077
@@ -105,3 +106,5 @@ for url in http://127.0.0.1:3300/api/health https://factlens.pigs0516.com/api/he
       >/dev/null 2>&1
 done
 printf 'Deployed %s; loopback and public health are ready.\n' "$sha"
+}
+main "$@" </dev/null
