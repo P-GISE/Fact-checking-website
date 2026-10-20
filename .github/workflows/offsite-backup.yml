@@ -1,0 +1,70 @@
+name: Back up FactLens to encrypted S3
+
+on:
+  schedule:
+    - cron: '15 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: factlens-offsite-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: vars.FACTLENS_OFFSITE_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    env:
+      BACKUP_HOST: ${{ vars.FACTLENS_SSH_HOST }}
+      BACKUP_USER: ${{ vars.FACTLENS_SSH_USER }}
+      BACKUP_PORT: ${{ vars.FACTLENS_SSH_PORT || '22' }}
+      BACKUP_KEY: ${{ secrets.FACTLENS_SSH_PRIVATE_KEY }}
+      BACKUP_KNOWN_HOSTS: ${{ secrets.FACTLENS_SSH_KNOWN_HOSTS }}
+      BACKUP_BUCKET: ${{ vars.FACTLENS_BACKUP_BUCKET }}
+      BACKUP_KMS_KEY: ${{ vars.FACTLENS_BACKUP_KMS_KEY }}
+    steps:
+      - name: Assume upload-only AWS role
+        uses: aws-actions/configure-aws-credentials@ff871ab82db5d1d904d5b2a74b710d951e730e8b
+        with:
+          role-to-assume: ${{ vars.FACTLENS_BACKUP_ROLE }}
+          aws-region: ap-northeast-2
+          role-duration-seconds: 900
+          mask-aws-account-id: true
+      - name: Export validated recovery bundle and upload with KMS
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$BACKUP_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]]
+          [[ "$BACKUP_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$BACKUP_PORT" =~ ^[0-9]{1,5}$ ]]
+          (( 10#$BACKUP_PORT >= 1 && 10#$BACKUP_PORT <= 65535 ))
+          [[ "$BACKUP_BUCKET" == factlens-backups-753805950222-ap-northeast-2 ]]
+          [[ "$BACKUP_KMS_KEY" == arn:aws:kms:ap-northeast-2:753805950222:key/* ]]
+          [[ -n "$BACKUP_KEY" && -n "$BACKUP_KNOWN_HOSTS" ]]
+          private=$(mktemp -d)
+          trap 'rm -rf -- "$private"' EXIT
+          printf '%s\n' "$BACKUP_KEY" > "$private/key"
+          printf '%s\n' "$BACKUP_KNOWN_HOSTS" > "$private/known_hosts"
+          timeout 420 ssh -n -i "$private/key" -p "$BACKUP_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$private/known_hosts" -o ConnectTimeout=10 \
+            -o ServerAliveInterval=15 -o ServerAliveCountMax=2 \
+            "$BACKUP_USER@$BACKUP_HOST" \
+            'cd factlens && python3 devtools/disaster_recovery.py export' \
+            > "$private/recovery.tar.gz"
+          size=$(stat -c %s "$private/recovery.tar.gz")
+          (( size > 0 && size <= 138412032 ))
+          digest=$(sha256sum "$private/recovery.tar.gz" | cut -d ' ' -f 1)
+          object="daily/$(date -u +%Y%m%dT%H%M%SZ)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.tar.gz"
+          aws s3api put-object --bucket "$BACKUP_BUCKET" --key "$object" \
+            --body "$private/recovery.tar.gz" --server-side-encryption aws:kms \
+            --ssekms-key-id "$BACKUP_KMS_KEY" --bucket-key-enabled \
+            --checksum-algorithm SHA256 --metadata "sha256=$digest" \
+            --query '[ServerSideEncryption,ChecksumSHA256]' --output json --no-cli-pager
+          printf 'BACKUP_UPLOADED %s\n' "$object"
