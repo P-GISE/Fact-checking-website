@@ -1,5 +1,11 @@
 # 실AI·근거 판정 진행 기록
 
+## 키 저장 후 재검증 (2026-10-21)
+
+사용자의 키 저장 통보 후 서버 환경 파일0600/ubuntu와 격리 컨테이너의 OpenAI·Brave 키 존재를 값 노출 없이 확인했다. 동일한 직접 제작 음성으로 실제 전사1회를 재실행한 결과 `PROVIDER_QUOTA_EXCEEDED`로 중단됐다. 이전의 일반429와 달리 이번 제공자 분류는 할당량 부족이다. Billing 잔액/조직·프로젝트 한도 중 구체 원인은 아직 확인되지 않았다.
+
+stages=[transcribing], claimsCount=0/evidenceCount=0, calls=1/unknownUsageCalls=1/conservativeMicros=600 USD. actualMicros=0은 무료 증명이 아니다. 이전2회와 합친 보수적 예약은1800micros($0.0018)다. filesRemoved/jobTombstoned/mediaTombstoned/usageRetained 모두true. 별도 서버 입력·스테이징 디렉터리도 제거했다. 내부 health ready/providerConfigured:false를 확인했고 공개 AI 활성화나 추가 반복 호출은 수행하지 않았다. 실제 전 과정 완료는 여전히 대기다.
+
 실AI는429 차단 상태이며 제한된 검토 근거 판정의 구현/검증을 진행했다. 실AI 성공·제품 전체 판정 완료 보고서가 아니다. 사용자는 작성 설계를 승인하고 개발을 지시했다.
 
 ## 현재 외부 조건
