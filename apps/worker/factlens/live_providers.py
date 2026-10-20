@@ -169,6 +169,7 @@ class LiveProviders:
             '전사 구간에서 독립 검증 가능한 주장 최대 5개를 뽑아라. quote는 원본 그대로, segment_ids는 제공된 ID만 사용한다. '
             '의견/전망은 eligibility=excluded, 사실 주장은 checkable로 표시한다. '
             'subject/period/metric/unit은 candidate.quote 안에 있는 연속된 원문 문자열만 쓰고 없으면 null로 둬라. '
+            'subject는 측정 대상인 국가/기관/집단이고 metric은 측정 항목이다. 의로 연결된 대상과 항목은 나누고 항목명을 subject에 합치지 마라. '
             '인접 구간에서 필드를 추론하거나 보충하지 마라. '
             'value는 원문에 나타난 부호/천 단위 쉼표/소수점을 그대로 유지한 단일 숫자 문자열만 쓰고 candidate.quote에 없으면 null로 둬라. '
             '날짜/범위/여러 수치/한국어 단위가 섞인 복합 수치는 value=null로 둬라. '
@@ -250,7 +251,7 @@ class LiveProviders:
 
     def versions(self):
         return {'providerProfile':'openai_brave','speechModel':'whisper-1','speechPromptVersion':'ko-labour-vocabulary-v1','speechTimingVersion':'bounded-tail-v1','languageModel':MODEL,
-                'claimPromptVersion':'claim-structured-v2','claimValidationVersion':'literal-candidates-v2','evidencePromptVersion':'evidence-structured-v1',
+                'claimPromptVersion':'claim-structured-v3','claimValidationVersion':'literal-candidates-v2','evidencePromptVersion':'evidence-structured-v1',
                 'retrievalVersion':'brave-reviewed-source-v4','sourceParserVersion':PARSER_VERSION,'meaningReviewVersion':'reviewed-meaning-v1'}
 
     def usage(self):

@@ -156,7 +156,7 @@ def test_extract_sends_original_segments_without_rewriting_context():
     assert p.extract(segments)==[]
     request=sdk.requests[0]
     assert json.loads(request['messages'][1]['content'])=={'segments':segments}
-    assert p.versions()['claimPromptVersion']=='claim-structured-v2'
+    assert p.versions()['claimPromptVersion']=='claim-structured-v3'
 
 
 @pytest.mark.parametrize('segments,candidates',[
