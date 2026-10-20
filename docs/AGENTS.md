@@ -1,5 +1,7 @@
 # 프로젝트 가이드 — 공통 지침 (AGENTS.md)
 
+> **AWS 연결·자동 배포 활성화 · 2026-10-20:** Aside의 인증된 Lightsail 콘솔에서 Sydney factlens-ai/54.206.55.200/ubuntu를 확인했다. 콘솔 SSH 지문 대조·사용자 승인 전용 공개키 등록·GitHub host/Secrets·직접 SSH/preflight 검증 완료. FACTLENS_DEPLOY_ENABLED=true로 전환했으며 첫 push 배포 실행 검증을 진행한다. 기존 disabled/접속 대기 절은 당시 이력이다. 실행 결과는10 §66을 따른다.
+
 > **배포 인증 연결 후속 · 2026-10-20:** 전용 SSH 배포 키 생성/사용자 ACL/GitHub production Secret 등록 완료. 일반 AWS HTTPS 탭 열기/페이지 읽기가 복구됐고 현재 사용자 AWS 로그인/MFA 대기다. 서버 공개키·접속 주소·known_hosts/최초 배포는 미완료, 활성화=false 유지. 아래 이전 브라우저 disabled 기록은 당시 이력이다.
 
 > **자동 배포 준비 · 2026-10-20:** a01da20/052d1b0을 work에 게시했고 Actions39418486430의 API53/Worker211/배포모의30·타입/빌드가 통과했다. 독립 코드 리뷰 P1/P2 없음. deploy는 활성화=false로 skipped이며 전용 factlens-ai 접속 주소/SSH Secret/최초 운영 배포는 미완료다. Aside 로그인은 확인됐지만 브라우저 도구는 여전히 disabled다. 상세08 상단·10 §65. 다른 서비스 lostark-party-vps는 배포 대상에서 제외한다.
