@@ -1,0 +1,10 @@
+[Unit]
+Description=FactLens daily backup at 03:00 Asia/Seoul
+
+[Timer]
+OnCalendar=*-*-* 18:00:00 UTC
+Persistent=true
+Unit=factlens-backup.service
+
+[Install]
+WantedBy=timers.target

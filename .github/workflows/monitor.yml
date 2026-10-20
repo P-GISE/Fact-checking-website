@@ -1,0 +1,51 @@
+name: Monitor FactLens operations
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: factlens-operations-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: vars.FACTLENS_MONITOR_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: production
+    env:
+      MONITOR_HOST: ${{ vars.FACTLENS_SSH_HOST }}
+      MONITOR_USER: ${{ vars.FACTLENS_SSH_USER }}
+      MONITOR_PORT: ${{ vars.FACTLENS_SSH_PORT || '22' }}
+      MONITOR_KEY: ${{ secrets.FACTLENS_SSH_PRIVATE_KEY }}
+      MONITOR_KNOWN_HOSTS: ${{ secrets.FACTLENS_SSH_KNOWN_HOSTS }}
+    steps:
+      - name: Check service health, disk reserve and backup freshness
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$MONITOR_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]]
+          [[ "$MONITOR_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$MONITOR_PORT" =~ ^[0-9]{1,5}$ ]]
+          (( 10#$MONITOR_PORT >= 1 && 10#$MONITOR_PORT <= 65535 ))
+          [[ -n "$MONITOR_KEY" && -n "$MONITOR_KNOWN_HOSTS" ]]
+          key=$(mktemp)
+          hosts=$(mktemp)
+          trap 'rm -f "$key" "$hosts"' EXIT
+          printf '%s\n' "$MONITOR_KEY" > "$key"
+          printf '%s\n' "$MONITOR_KNOWN_HOSTS" > "$hosts"
+          timeout 240 ssh -n -i "$key" -p "$MONITOR_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$hosts" -o ConnectTimeout=10 \
+            -o ServerAliveInterval=15 -o ServerAliveCountMax=2 \
+            "$MONITOR_USER@$MONITOR_HOST" \
+            'cd factlens && python3 devtools/operations.py check'
+          curl --fail --silent --show-error --max-time 15 \
+            https://factlens.pigs0516.com/api/health \
+            | python3 -c 'import json,sys; assert json.load(sys.stdin).get("status")=="ready"'
