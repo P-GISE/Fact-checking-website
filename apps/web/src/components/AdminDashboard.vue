@@ -10,6 +10,7 @@ const totals=computed(()=>{
  return {all:Object.values(counts).reduce((a,b)=>a+b,0),active:['validating','transcribing','extracting','retrieving','validating_evidence'].reduce((n,key)=>n+(counts[key]??0),0),completed:counts.completed??0,failed:counts.failed??0};
 });
 const errorLabels:Record<string,string>={PROVIDER_NOT_CONFIGURED:'AI 연결 미설정',PROVIDER_RATE_LIMITED:'제공자 호출 제한',PROVIDER_AUTH_FAILED:'제공자 인증 실패',BUDGET_EXCEEDED:'예산 한도 도달',BILLING_REVIEW_REQUIRED:'사용량 정산 확인 필요',INVALID_MEDIA:'미디어 확인 필요',TIMEOUT:'처리 시간 초과'};
+errorLabels.PROVIDER_QUOTA_EXCEEDED='OpenAI 잔액·할당량 확인 필요';
 function resetFilters(){search.value='';statusFilter.value='';return applyFilters();}
 let appliedSearch='',appliedStatus='';
 function applyFilters(){appliedSearch=search.value;appliedStatus=statusFilter.value;return load(1);}

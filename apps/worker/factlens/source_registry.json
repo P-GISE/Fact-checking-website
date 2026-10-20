@@ -1,4 +1,12 @@
 {
-  "version": "source-registry-v1-empty",
-  "entries": []
+  "version": "source-registry-2026-10-21",
+  "entries": [
+    {
+      "publisherId": "mods-kr",
+      "name": "국가데이터처",
+      "hosts": ["mods.go.kr", "www.index.go.kr"],
+      "reviewedAt": "2026-10-21",
+      "reviewReference": "https://mods.go.kr/board.es?act=view&bid=10820&list_no=435687&mid=a10301060500"
+    }
+  ]
 }

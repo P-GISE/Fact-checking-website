@@ -1,0 +1,57 @@
+[
+  {
+    "policyId": "mods-2024-social-unemployment-2026-10-21",
+    "originId": "kostat-labour-force-2024-unemployment",
+    "url": "https://mods.go.kr/board.es?act=view&bid=10820&list_no=435687&mid=a10301060500",
+    "documentHash": null,
+    "sourceKind": "paragraph",
+    "quote": "ㅇ (고용과 실업) ’24년 15세이상 고용률은 전년(62.6%)보다 0.1%p 상승한 62.7%로 통계작성 이후 가장 높은 수준이며 실업률은 2.8%로 전년(2.7%)보다 0.1%p 상승함",
+    "quotePosition": 848,
+    "publisher": "통계청",
+    "publishedAt": "2025-03-25",
+    "subject": "한국",
+    "period": "2024년",
+    "metric": "실업률",
+    "value": "2.8",
+    "unit": "%",
+    "definition": "2024년 대한민국 연간 경제활동인구조사 실업률. 실업자/경제활동인구(취업자+실업자)×100, 15세 이상. 공표된 소수 한 자리 수치를 비교하며 고용률·청년실업률·월별·계절조정 지표와 구분한다.",
+    "precision": 1,
+    "reviewReference": "https://mods.go.kr/board.es?act=view&bid=10820&list_no=435687&mid=a10301060500",
+    "reviewedAt": "2026-10-21",
+    "context": {
+      "kind": "text",
+      "sha256": "720b32278f378ad55320a0d611744272f510b5a0b07ed3ad92d47b34b0d6b0cc",
+      "title": "2024 한국의 사회지표.pdf (11.6MB) 다운로드 미리보기"
+    },
+    "publicationDateText": "게시일 2025-03-25"
+  },
+  {
+    "policyId": "index-2024-unemployment-table-2026-10-21",
+    "originId": "kostat-labour-force-2024-unemployment",
+    "url": "https://www.index.go.kr/unity/potal/eNara/sub/showStblGams3.do?freq=Y&idx_cd=1063&period=N&stts_cd=106301",
+    "documentHash": "f4b6a225608264d859b16710684ec90bc519023ba6b87db84344cccbee06adfa",
+    "sourceKind": "table",
+    "quote": "2.8",
+    "quotePosition": 565,
+    "publisher": "국가데이터처",
+    "publishedAt": null,
+    "publicationMode": "live_dataset",
+    "subject": "한국",
+    "period": "2024년",
+    "metric": "실업률",
+    "value": "2.8",
+    "unit": "%",
+    "definition": "2024년 대한민국 연간 경제활동인구조사 실업률. 실업자/경제활동인구(취업자+실업자)×100, 15세 이상, 구직기간4주 기준. 실업률(%) 행과2024 열의 공표된 소수 한 자리 값을 비교한다. 별도 발행일이 표시되지 않은 갱신형 통계표이며 검토일은 발행일이 아니다.",
+    "precision": 1,
+    "reviewReference": "https://www.index.go.kr/unity/potal/eNara/sub/showStblGams3.do?freq=Y&idx_cd=1063&period=N&stts_cd=106301",
+    "reviewedAt": "2026-10-21",
+    "table": {
+      "tableIndex": 0,
+      "rowHeaderBlockIndex": 83,
+      "columnHeaderBlockIndex": 10,
+      "valueBlockIndex": 88,
+      "rowHeaderText": "실업률(%)",
+      "columnHeaderText": "2024"
+    }
+  }
+]

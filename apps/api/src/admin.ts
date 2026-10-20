@@ -2,6 +2,7 @@ import {Router} from 'express';
 import {z} from 'zod';
 import {pool} from './db.js';
 const errorCodes=new Set(['PROVIDER_NOT_CONFIGURED','PROVIDER_AUTH_FAILED','PROVIDER_RATE_LIMITED','PROVIDER_MODEL_UNAVAILABLE','PROVIDER_INPUT_LIMIT','PROVIDER_RESPONSE_INVALID','PROVIDER_REQUEST_FAILED','PROVIDER_SEARCH_LIMIT','BUDGET_EXCEEDED','BILLING_REVIEW_REQUIRED','SIZE_LIMIT','DURATION_LIMIT','INVALID_MEDIA','FORMAT_MISMATCH','NO_AUDIO','TIMEOUT','INTERNAL_ERROR']);
+errorCodes.add('PROVIDER_QUOTA_EXCEEDED');
 const querySchema=z.object({
  status:z.enum(['queued','validating','transcribing','extracting','retrieving','validating_evidence','completed','failed','cancelled','deleted']).optional(),
  q:z.string().regex(/^[a-fA-F0-9-]{0,36}$/).default(''),

@@ -1,0 +1,17 @@
+{
+  "version": "connection-fixture-v1",
+  "id": "owned-korean-2026-10-21",
+  "purpose": "connection_smoke_only",
+  "synthetic": true,
+  "rights": "self-authored text rendered locally using installed Microsoft Heami Desktop; no third-party recording or personal information",
+  "text": "2024년 한국 실업률은 2.8퍼센트입니다.",
+  "engine": "Windows System.Speech / Microsoft Heami Desktop ko-KR",
+  "durationSeconds": 4.838548752834467,
+  "audioBytes": 213426,
+  "audioSha256": "f1cf1339467bdf6cfb9e39d923cebb712706063af6e50b540a400e1fc64ad938",
+  "audioRetained": true,
+  "audioTracked": false,
+  "liveRunStatus": "blocked_at_transcription_429",
+  "goldLabels": null,
+  "researchSplit": null
+}

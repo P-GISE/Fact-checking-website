@@ -23,7 +23,7 @@ def process_job(job):
         complete_job(job_id,version,result)
     except ProviderUnavailable as exc:
         code=str(exc)
-        allowed={'PROVIDER_NOT_CONFIGURED','PROVIDER_AUTH_FAILED','PROVIDER_RATE_LIMITED','PROVIDER_MODEL_UNAVAILABLE','PROVIDER_INPUT_LIMIT','PROVIDER_RESPONSE_INVALID','PROVIDER_REQUEST_FAILED','PROVIDER_SEARCH_LIMIT'}
+        allowed={'PROVIDER_NOT_CONFIGURED','PROVIDER_AUTH_FAILED','PROVIDER_RATE_LIMITED','PROVIDER_QUOTA_EXCEEDED','PROVIDER_MODEL_UNAVAILABLE','PROVIDER_INPUT_LIMIT','PROVIDER_RESPONSE_INVALID','PROVIDER_REQUEST_FAILED','PROVIDER_SEARCH_LIMIT'}
         fail_job(job_id,version,code if code in allowed else 'PROVIDER_REQUEST_FAILED')
     except BudgetDenied:
         fail_job(job_id,version,'BUDGET_EXCEEDED')

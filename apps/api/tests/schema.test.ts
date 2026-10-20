@@ -96,3 +96,66 @@ it('preserves literal context cues and rejects invented text or semantic certain
  expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,cueAudit:{...context.cueAudit,cues:[{...cue,text:'추측'}]}}}).success).toBe(false);
  expect(sourceTraceSchema.safeParse({...trace,tableContext:{...context,cueAudit:{...context.cueAudit,meaningVerified:true}}}).success).toBe(false);
 });
+
+const reviewedMeaning={version:'reviewed-meaning-v1',verified:true,policyId:'fixture-policy',sourceKind:'paragraph',documentHash:'a'.repeat(64),definition:'15세 이상 고용률',quotePosition:7,quoteLength:3,relation:'SUPPORTED',reviewReference:'https://example.org/review',reviewedAt:'2026-10-21'};
+const reviewedEvidence={url:'https://example.org/report',title:'검토 원문',quote:'가😀나',position:7,publisher:null,publishedAt:null,relation:'SUPPORTED',usable:true,reasons:[],lineage:'example.org',meaningReview:reviewedMeaning};
+describe('reviewed meaning boundary',()=>{
+ it('preserves reviewed audit and defaults legacy to null',async()=>{
+  const {evidenceSchema}=await import('../src/contracts.js');
+  expect(evidenceSchema.parse(reviewedEvidence)).toHaveProperty('meaningReview',reviewedMeaning);
+  const {meaningReview,...legacy}=reviewedEvidence;
+  expect(evidenceSchema.parse(legacy)).toHaveProperty('meaningReview',null);
+  expect(evidenceSchema.parse({...legacy,meaningReview:null})).toHaveProperty('meaningReview',null);
+ });
+ it.each([
+  {verified:false},{policyId:'x'.repeat(121)},{sourceKind:'model'},{documentHash:'invalid'},
+  {definition:'x'.repeat(1001)},{quotePosition:8},{quotePosition:-1},{quotePosition:7.5},
+  {quoteLength:4},{quoteLength:0},{relation:'REFUTED'},{relation:'INSUFFICIENT'},
+  {reviewReference:'http://example.org/review'},{reviewReference:'javascript:alert(1)'},
+  {reviewedAt:'yesterday'},{meaningVerified:true},{version:'unversioned'},
+ ])('rejects malformed or mismatched review %j',async change=>{
+  const {evidenceSchema}=await import('../src/contracts.js');
+  expect(evidenceSchema.safeParse({...reviewedEvidence,meaningReview:{...reviewedMeaning,...change}}).success).toBe(false);
+ });
+ it.each([{usable:false},{reasons:['CONTEXT_UNVERIFIED']}])('rejects unusable reviewed evidence %j',async change=>{
+  const {evidenceSchema}=await import('../src/contracts.js');
+  expect(evidenceSchema.safeParse({...reviewedEvidence,...change}).success).toBe(false);
+ });
+ it('matches the normalized trace hash without promoting observation semantics',async()=>{
+  const {evidenceSchema}=await import('../src/contracts.js');const missing={state:'missing',value:null,candidates:[]};
+  const trace={parserVersion:'static-text-v3',requestedUrl:reviewedEvidence.url,finalUrl:reviewedEvidence.url,retrievedAt:'2026-10-21T00:00:00Z',contentType:'text/html',bodySha256:'b'.repeat(64),textSha256:'a'.repeat(64),textLength:10,blocks:[{kind:'paragraph',position:0,length:10}],structureComplete:true,publication:{publisher:missing,publishedAt:missing,modifiedAt:missing},quoteOccurrences:1,quoteBlockIndexes:[0],extractionTruncated:false};
+  expect(evidenceSchema.safeParse({...reviewedEvidence,sourceTrace:trace}).success).toBe(true);
+  expect(evidenceSchema.safeParse({...reviewedEvidence,sourceTrace:{...trace,textSha256:'c'.repeat(64)}}).success).toBe(false);
+ });
+});
+it('round trips selected reviewed summary while retaining legacy unassessed strength',async()=>{
+ const {resultSchema}=await import('../src/contracts.js');
+ const assessed={version:'reviewed-summary-v1',claimIds:['c1'],documentCount:1,originGroupCount:1,strength:'moderate',reasons:['DIRECT_REVIEWED_EVIDENCE','INDEPENDENCE_UNVERIFIED']};
+ const summary={version:'claim-summary-v1',scope:'claim_summary',overall:'supported_claims',counts:{CONFIRMED:1,REFUTED:0,INSUFFICIENT:0,REVIEW_REQUIRED:0,EXCLUDED:0},strength:'not_assessed',independenceVerified:false,crossModalReviewRequired:false,reviewedEvidence:assessed};
+ const report={scope:'audio_only',claims:[{...claim,verdict:'CONFIRMED',evidence:[reviewedEvidence]}],limitations:[],summary};
+ expect(resultSchema.parse(report).summary).toEqual(summary);
+ for(const change of [{strength:'high'},{documentCount:0},{originGroupCount:2},{claimIds:['missing']},{claimIds:['c1','c1']},{reasons:Array(11).fill('reason')}]){
+  expect(resultSchema.safeParse({...report,summary:{...summary,reviewedEvidence:{...assessed,...change}}}).success).toBe(false);
+ }
+ expect(resultSchema.safeParse({...report,summary:{...summary,crossModalReviewRequired:true}}).success).toBe(false);
+});
+
+it('returns a validation failure for an invalid review URL rather than throwing',async()=>{
+ const {evidenceSchema}=await import('../src/contracts.js');
+ expect(evidenceSchema.safeParse({...reviewedEvidence,meaningReview:{...reviewedMeaning,reviewReference:'not a URL'}}).success).toBe(false);
+});
+
+it('preserves a calendar ISO review date and rejects an impossible date',async()=>{
+ const {evidenceSchema}=await import('../src/contracts.js');
+ expect(evidenceSchema.parse({...reviewedEvidence,meaningReview:{...reviewedMeaning,reviewedAt:'2026-10-21'}}).meaningReview?.reviewedAt).toBe('2026-10-21');
+ expect(evidenceSchema.safeParse({...reviewedEvidence,meaningReview:{...reviewedMeaning,reviewedAt:'2026-02-30'}}).success).toBe(false);
+ expect(evidenceSchema.safeParse({...reviewedEvidence,meaningReview:{...reviewedMeaning,reviewedAt:'2026-10-21T00:00:00Z'}}).success).toBe(false);
+});
+
+it('uses the same Unicode character bounds as Worker meaning review',async()=>{
+ const {evidenceSchema}=await import('../src/contracts.js');
+ const review={...reviewedMeaning,policyId:'😀'.repeat(120),definition:'😀'.repeat(1000)};
+ expect(evidenceSchema.parse({...reviewedEvidence,meaningReview:review}).meaningReview).toEqual(review);
+ expect(evidenceSchema.safeParse({...reviewedEvidence,meaningReview:{...review,definition:'😀'.repeat(1001)}}).success).toBe(false);
+ expect(evidenceSchema.safeParse({...reviewedEvidence,meaningReview:{...review,policyId:'😀'.repeat(121)}}).success).toBe(false);
+});

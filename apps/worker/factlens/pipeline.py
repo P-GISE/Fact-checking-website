@@ -30,7 +30,7 @@ def run_analysis(job:dict,providers,stage=lambda name:True)->AnalysisResult:
     visual=extract_visual(Path(job['sourcePath']),job['duration']) if job.get('sourcePath') else None
     advance('extracting')
     claims=[Claim.model_validate(c) for c in providers.extract(segments)]
-    limitations=['음성만 분석했습니다. 자막·화면 맥락은 검증하지 않았습니다.','정형 수치 발화와 전체 전사 맥락이 일치하는 범위만 확정 비교합니다. 일반 발언은 검토 또는 유보합니다.']
+    limitations=['음성만 분석했습니다. 자막·화면 맥락은 검증하지 않았습니다.','정형 기록 또는 검토된 출처 정책에 맞는 단일 수치 발화만 확정 비교합니다. 다른 문장·정의·맥락은 검토 또는 유보합니다.']
     if visual is not None and visual.status!='not_applicable':
         limitations[0]='음성과 자막·화면 표본을 별도로 확인했습니다. 전체 영상의 시각적 의미를 검증하지는 않았습니다.'
         limitations.extend(visual.limitations)

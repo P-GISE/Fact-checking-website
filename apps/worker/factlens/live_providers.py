@@ -16,6 +16,7 @@ from factlens.pipeline import Providers, ProviderUnavailable
 from factlens.retrieval import fetch_evidence
 from factlens.validator import EvidenceDocument, Fact
 from factlens.source_document import SourceTrace, PARSER_VERSION
+from factlens.meaning_review import matching_policies, review_meaning, _scope_start
 
 MODEL = 'gpt-4.1-mini'
 MAX_OUTPUT = 2048
@@ -84,6 +85,21 @@ def text_cost(usage: dict) -> int | None:
         return None
     return (inp*4+out*16+9)//10
 
+def reviewed_document(claim:Claim,source:dict)->EvidenceDocument|None:
+    if not source.get('sourceTrace'):return None
+    trace=SourceTrace.model_validate(source['sourceTrace'])
+    matches=[]
+    for policy in matching_policies(claim):
+        if policy.url!=source['url']:continue
+        start=_scope_start(policy,source['text'],trace)
+        if start is None:continue
+        document=EvidenceDocument(url=source['url'],title=source['title'],text=source['text'],quote=policy.quote,
+            position=start+policy.quotePosition,publisher=policy.publisher,publishedAt=policy.publishedAt,
+            fact=Fact(subject=policy.subject,period=policy.period,metric=policy.metric,value=policy.value,unit=policy.unit),
+            lineage='reviewed-origin:'+policy.originId if policy.originId else source['lineage'],sourceTrace=trace)
+        if review_meaning(claim,document) is not None:matches.append(document)
+    return matches[0] if len(matches)==1 else None
+
 class LiveProviders:
     def __init__(self,sdk,search_client,billing:BudgetedCall,*,duration:float,brave_key:str,fetch=fetch_evidence):
         if not math.isfinite(duration) or not 0 < duration <= 180:
@@ -91,12 +107,15 @@ class LiveProviders:
         self.sdk,self.search_client,self.billing=sdk,search_client,billing
         self.duration,self.brave_key,self.fetch=duration,brave_key,fetch
         self.searches=0
-        self.limitations=['일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록과 일치하지 않는 원문은 판정을 유보합니다.']
+        self.limitations=['일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.']
 
     def _invoke(self,fn):
         try:return fn().model_dump()
         except AuthenticationError as exc:raise ProviderUnavailable('PROVIDER_AUTH_FAILED') from exc
-        except RateLimitError as exc:raise ProviderUnavailable('PROVIDER_RATE_LIMITED') from exc
+        except RateLimitError as exc:
+            quota=exc.type=='insufficient_quota' or exc.code in ('insufficient_quota','credit_balance_exhausted','organization_usage_limit_exceeded','organization_spend_limit_exceeded','project_spend_limit_exceeded')
+            code='PROVIDER_QUOTA_EXCEEDED' if quota else 'PROVIDER_RATE_LIMITED'
+            raise ProviderUnavailable(code) from exc
         except NotFoundError as exc:raise ProviderUnavailable('PROVIDER_MODEL_UNAVAILABLE') from exc
         except (OpenAIError,httpx.HTTPError) as exc:raise ProviderUnavailable('PROVIDER_REQUEST_FAILED') from exc
 
@@ -148,7 +167,8 @@ class LiveProviders:
                 if ids!=list(range(ids[0],ids[-1]+1)):raise ValueError()
                 for field in ('subject','period','metric','unit'):
                     value=getattr(candidate,field)
-                    if value is not None and (not value or value not in candidate.quote):raise ValueError()
+                    spoken_percent=field=='unit' and value=='%' and candidate.value and re.search(r'(?<![\d.,+−-])'+re.escape(candidate.value)+r'\s*퍼센트(?!\s*포인트)',candidate.quote)
+                    if value is not None and (not value or (value not in candidate.quote and not spoken_percent)):raise ValueError()
                 if candidate.value is not None:
                     if not candidate.value or not re.search(r'(?<![\d.,+−-])'+re.escape(candidate.value)+r'(?![\d.,])',candidate.quote):raise ValueError()
                 chosen=[segments[i] for i in ids]
@@ -175,7 +195,8 @@ class LiveProviders:
         except (ValueError,TypeError,AttributeError) as exc:raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID') from exc
         if not isinstance(results,list):raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID')
         documents=[];seen=set()
-        for candidate in results[:3]:
+        primary=[{'url':url} for url in dict.fromkeys(policy.url for policy in matching_policies(claim))]
+        for candidate in (primary+results)[:3]:
             try:
                 document=self.fetch(urldefrag(candidate['url'])[0])
                 final_url=urldefrag(document['url'])[0]
@@ -186,6 +207,10 @@ class LiveProviders:
                 if excerpt!=original:self.limitations.append('원문 일부만 구조화 대상으로 전송했습니다. 원문 전체 문맥 검증 제한을 유지합니다.')
             except (KeyError,TypeError,ValueError,OSError,httpx.HTTPError):
                 self.limitations.append('검색 후보 원문에 접근하지 못했습니다. 접근 실패를 반박 근거로 사용하지 않습니다.')
+                continue
+            reviewed=reviewed_document(claim,document)
+            if reviewed is not None:
+                documents.append(reviewed)
                 continue
             fact=self._structured('원문에서 주장과 비교할 직접 인용을 원문 그대로 추출하고 기간/대상/항목/수치/단위를 구조화하라. 없으면 quote를 빈 문자열, 나머지 미확인 값은 null로 둬라. publisher와 publishedAt도 원문에 직접 존재하는 값만 쓰고 외부 지식으로 채우지 마라.',{'claim':claim.text,'document':excerpt},SourceFact)
             if not fact.quote or fact.quote not in original:
@@ -205,7 +230,7 @@ class LiveProviders:
     def versions(self):
         return {'providerProfile':'openai_brave','speechModel':'whisper-1','languageModel':MODEL,
                 'claimPromptVersion':'claim-structured-v1','evidencePromptVersion':'evidence-structured-v1',
-                'retrievalVersion':'brave-source-trace-v3','sourceParserVersion':PARSER_VERSION}
+                'retrievalVersion':'brave-reviewed-source-v4','sourceParserVersion':PARSER_VERSION,'meaningReviewVersion':'reviewed-meaning-v1'}
 
     def usage(self):
         return {**self.billing.usage(),'currency':'USD','costBasis':'published_tariff_not_invoice','providerProfile':'openai_brave','model':MODEL,'priceDate':'2026-10-16'}

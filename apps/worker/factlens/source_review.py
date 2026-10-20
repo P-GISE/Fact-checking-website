@@ -63,7 +63,7 @@ class SourceReview(Strict):
     signals: list[Signal] = Field(max_length=6)
 
 
-DEFAULT_REGISTRY=SourceRegistry.model_validate_json(Path(__file__).with_name('source_registry.json').read_text())
+DEFAULT_REGISTRY=SourceRegistry.model_validate_json(Path(__file__).with_name('source_registry.json').read_text(encoding='utf-8'))
 
 
 def normalized(value: str) -> str | None:

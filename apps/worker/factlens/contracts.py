@@ -3,8 +3,9 @@ from factlens.multimodal import ModalCheck
 from factlens.report import ClaimSummary
 from factlens.source_document import SourceTrace
 from factlens.source_review import SourceReview
+from factlens.meaning_review import MeaningReview
 from typing import Literal
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, PrivateAttr, model_validator
 
 Verdict = Literal['CONFIRMED','REFUTED','INSUFFICIENT','REVIEW_REQUIRED','EXCLUDED']
 class EvidenceCheck(BaseModel):
@@ -20,6 +21,8 @@ class EvidenceCheck(BaseModel):
     lineage: str
     sourceTrace: SourceTrace | None = None
     sourceReview: SourceReview | None = None
+    meaningReview: MeaningReview | None = None
+    _validatedMeaningScope: tuple[str, str] | None = PrivateAttr(default=None)
 
 class Claim(BaseModel):
     id: str

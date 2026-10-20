@@ -55,7 +55,7 @@ def test_provider_limitations_are_preserved(tmp_path):
 def test_new_results_record_actual_rule_version_without_relabeling_old_results(tmp_path):
     from factlens.contracts import AnalysisResult
     result=run_analysis({'consent':True,'path':str(tmp_path/'a.wav'),'duration':1},TestProviders())
-    assert result.versions['ruleVersion']=='audio-numeric-canonical-v4'
+    assert result.versions['ruleVersion']=='audio-reviewed-numeric-v5'
     old=AnalysisResult(claims=[],limitations=[])
     assert old.versions=={}
 
@@ -65,4 +65,4 @@ def test_provider_versions_are_preserved_but_cannot_override_actual_rule_version
         def versions(self):return {'languageModel':'fixture-model','ruleVersion':'incorrect-provider-rule'}
     result=run_analysis({'consent':True,'path':str(tmp_path/'a.wav'),'duration':1},Versioned())
     assert result.versions['languageModel']=='fixture-model'
-    assert result.versions['ruleVersion']=='audio-numeric-canonical-v4'
+    assert result.versions['ruleVersion']=='audio-reviewed-numeric-v5'

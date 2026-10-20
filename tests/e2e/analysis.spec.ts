@@ -136,6 +136,7 @@ test('table quote displays physical source location without claiming verified me
 });
 
 test('visual observations remain separate from external verdicts and escape OCR text',async({page})=>{
+ await page.route('**/api/auth/session',route=>route.fulfill({json:{mode:'local',user:null}}));
  const text='<img src=x onerror=window.ocrInjected=true> 화면 40%';
  const item={id:'visual',status:'completed',stage:'completed',createdAt:'2026-10-19T00:00:00Z',expiresAt:'',scope:'audio_visual',demo:false,error:null,claims:[{id:'claim',text:'음성 50%',startSeconds:0,endSeconds:1,verdict:'INSUFFICIENT',evidence:[]}],limitations:['15초 간격 표본 추출'],usage:{},visual:{version:'visual-sampled-v1',status:'partial',durationSeconds:2,subtitleStatus:'not_present',ocrStatus:'partial',frames:[{frameId:'frame',timeSeconds:0}],records:[{source:'ocr',startSeconds:0,endSeconds:2,text,frameId:'frame'}],limitations:['OCR 오인식 가능']},modalChecks:[{claimId:'claim',source:'ocr',startSeconds:0,endSeconds:2,observedText:text,status:'possible_mismatch',reasons:['OCR_UNCERTAIN'],frameId:'frame'}],summary:{overall:'review_required',counts:{CONFIRMED:0,REFUTED:0,INSUFFICIENT:1,REVIEW_REQUIRED:0,EXCLUDED:0},strength:'not_assessed',independenceVerified:false,crossModalReviewRequired:true}};
  await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
@@ -149,4 +150,36 @@ test('visual observations remain separate from external verdicts and escape OCR 
  expect(await page.evaluate(()=>Object.hasOwn(window,'ocrInjected'))).toBe(false);
  await page.setViewportSize({width:390,height:844});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+for(const reviewed of [false,true])test(`reviewed report audit and legacy summary ${reviewed?'reviewed':'legacy'}`,async({page},testInfo)=>{
+ const errors:string[]=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ page.on('console',message=>{if(message.type()==='error')errors.push(message.text());});
+ const definition='15세 이상 고용률 <img src=x onerror=window.meaningInjected=true>';
+ const evidence={url:'https://example.org/report',title:'검토 원문',quote:'2025년 한국 고용률 50%',position:7,publisher:null,publishedAt:null,relation:'SUPPORTED',usable:true,reasons:[],lineage:'example.org',...(reviewed?{meaningReview:{version:'reviewed-meaning-v1',verified:true,policyId:'fixture-policy',sourceKind:'paragraph',documentHash:'a'.repeat(64),definition,quotePosition:7,quoteLength:16,relation:'SUPPORTED',reviewReference:'https://example.org/review',reviewedAt:'2026-10-21'}}:{})};
+ const item={id:'reviewed-report',status:'completed',stage:'completed',createdAt:'2026-10-21T00:00:00Z',expiresAt:'',scope:'audio_only',demo:false,error:null,claims:[{id:'c1',text:'선택 주장',startSeconds:0,endSeconds:1,verdict:'CONFIRMED',evidence:[evidence]},{id:'c2',text:'미확인 주장',startSeconds:1,endSeconds:2,verdict:'INSUFFICIENT',evidence:[]}],limitations:['합성 보고서 UI 검증'],usage:{},summary:{version:'claim-summary-v1',scope:'claim_summary',overall:'insufficient',counts:{CONFIRMED:1,REFUTED:0,INSUFFICIENT:1,REVIEW_REQUIRED:0,EXCLUDED:0},strength:'not_assessed',independenceVerified:false,crossModalReviewRequired:false,...(reviewed?{reviewedEvidence:{version:'reviewed-summary-v1',claimIds:['c1','c2'],documentCount:1,originGroupCount:1,strength:'low',reasons:['UNRESOLVED_CLAIMS','INDEPENDENCE_UNVERIFIED']}}:{})}};
+ await page.route('**/api/auth/session',route=>route.fulfill({json:{mode:'local',user:null}}));
+ await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
+ await page.route('**/api/analyses/reviewed-report',route=>route.fulfill({json:item}));
+ await page.goto('/');await page.locator('.history-item').first().click();
+ await expect(page.getByText('집계 결과: 검증 불충분',{exact:true})).toBeVisible();
+ if(reviewed){
+  await expect(page.getByText('선택한 주장 2개를 집계했습니다.',{exact:true})).toBeVisible();
+  await expect(page.getByText('검토 근거 강도: 낮음',{exact:true})).toBeVisible();
+  await expect(page.getByText('문서 1개 · 가능한 공통 출처 그룹 1개',{exact:true})).toBeVisible();
+  await page.getByText('검토된 비교 정의·인용 위치',{exact:true}).click();
+  await expect(page.getByText(definition,{exact:true})).toBeVisible();
+  await expect(page.getByText('시작 7 · 길이 16자 (정규화 원문 기준)',{exact:true})).toBeVisible();
+  await expect(page.getByRole('link',{name:'검토 참조 열기'})).toHaveAttribute('href','https://example.org/review');
+  expect(await page.evaluate(()=>Object.hasOwn(window,'meaningInjected'))).toBe(false);
+ }else{
+  await expect(page.getByText('전체 영상의 진실 판정이 아닙니다. 근거 강도와 출처 독립성은 평가하지 않았습니다.',{exact:true})).toBeVisible();
+  await expect(page.getByText('검토된 비교 정의·인용 위치',{exact:true})).toHaveCount(0);
+ }
+ await page.screenshot({path:testInfo.outputPath('desktop.png'),fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.screenshot({path:testInfo.outputPath('mobile.png'),fullPage:true});
+ expect(errors).toEqual([]);
 });

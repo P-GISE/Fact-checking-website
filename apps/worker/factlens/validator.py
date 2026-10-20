@@ -5,8 +5,9 @@ from urllib.parse import urlsplit
 from factlens.contracts import Claim, EvidenceCheck
 from factlens.source_document import SourceTrace, fingerprint
 from factlens.table_context import build_table_context
+from factlens.meaning_review import matching_policies, review_meaning
 
-RULE_VERSION = 'audio-numeric-canonical-v4'
+RULE_VERSION = 'audio-reviewed-numeric-v5'
 SUPPORTED_SUBJECTS = {'한국','대한민국'}
 METRIC_UNITS = {'고용률':'%','실업률':'%','인구':'명'}
 
@@ -70,6 +71,13 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
     trace=d.sourceTrace.model_copy(deep=True) if d.sourceTrace else None
     if trace is not None:
         trace.tableContext=None
+        trace.quoteBlockIndexes=[]
+        try:trace=SourceTrace.model_validate(trace.model_dump())
+        except ValueError:
+            reasons.append('SOURCE_TRACE_MISMATCH')
+            trace=None
+    if trace is not None:
+        trace.tableContext=None
         # A page's metadata is a statement, not an authenticated issuer identity.
         reasons.append('SOURCE_AUTHENTICITY_UNVERIFIED')
         if trace.textSha256!=fingerprint(d.text.encode()) or trace.textLength!=len(d.text) or trace.finalUrl!=d.url:
@@ -107,4 +115,16 @@ def validate_evidence(claim:Claim,document:EvidenceDocument)->EvidenceCheck:
             elif '.' in (claim.value or '') or '.' in f.value:reasons.append('PRECISION_REVIEW_REQUIRED')
             else:relation='REFUTED'
     except InvalidOperation:reasons.append('INVALID_NUMERIC_VALUE')
-    return EvidenceCheck(url=d.url,title=d.title,quote=d.quote,position=max(0,d.position),publisher=d.publisher,publishedAt=d.publishedAt,relation=relation,usable=not reasons,reasons=reasons,lineage=d.lineage or urlsplit(d.url).hostname or d.url,sourceTrace=trace)
+    meaning=review_meaning(claim,d)
+    publisher,published_at=d.publisher,d.publishedAt
+    if meaning is not None:
+        reasons=[];relation=meaning.relation
+        policy=next(p for p in matching_policies(claim) if p.policyId==meaning.policyId)
+        publisher,published_at=policy.publisher,policy.publishedAt
+        if meaning.sourceKind=='table' and trace is not None:
+            trace.quoteBlockIndexes=[policy.table.valueBlockIndex]
+            if trace.quoteOccurrences!=1:trace.tableContext=None
+    check=EvidenceCheck(url=d.url,title=d.title,quote=d.quote,position=max(0,d.position),publisher=publisher,publishedAt=published_at,relation=relation,usable=not reasons,reasons=reasons,lineage=d.lineage or urlsplit(d.url).hostname or d.url,sourceTrace=trace,meaningReview=meaning)
+    if meaning is not None:
+        check._validatedMeaningScope=(claim.model_dump_json(exclude={'evidence','verdict'}),check.model_dump_json(exclude={'sourceReview'}))
+    return check

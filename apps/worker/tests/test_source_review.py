@@ -92,7 +92,7 @@ def test_pipeline_preserves_review_versions_and_dependency_results(tmp_path):
         def versions(self):return {'sourceReviewVersion':'untrusted-override'}
     result=run_analysis({'consent':True,'path':str(tmp_path/'audio.wav'),'duration':1},SourceProviders())
     assert result.versions['sourceReviewVersion']=='source-review-v1'
-    assert result.versions['sourceRegistryVersion']=='source-registry-v1-empty'
+    assert result.versions['sourceRegistryVersion']=='source-registry-2026-10-21'
     assert result.claims[0].evidence[0].sourceReview.independence=='unverified'
     # Matching host alone never creates a shared-origin or independence claim.
     assert result.claims[0].evidence[0].sourceReview.groupSize==1

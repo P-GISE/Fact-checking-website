@@ -35,6 +35,7 @@ jobs:
           --health-interval 5s --health-timeout 3s --health-retries 20
     env:
       DATABASE_URL: postgresql://factlens:ci-only-password@127.0.0.1:5432/factlens
+      FACTLENS_SMOKE_TEST_DATABASE_URL: postgresql://factlens:ci-only-password@127.0.0.1:5432/factlens
       REDIS_URL: redis://127.0.0.1:6379
       FACTLENS_AI_MODE: disabled
       PYTHONPATH: apps/worker
