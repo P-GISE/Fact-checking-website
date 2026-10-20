@@ -107,8 +107,10 @@ export function createApp(options:Options){
  app.use((_req,_res,next)=>next(new ApiError(404,'NOT_FOUND')));
  app.use(async(err:any,_req:Request,res:Response,_next:NextFunction)=>{
   await res.locals.releaseUpload?.().catch(()=>{});
-  const status=err instanceof z.ZodError?400:err.code==='LIMIT_FILE_SIZE'?413:err.code==='23505'?409:err.status??500;
-  const code=err instanceof z.ZodError?'INVALID_INPUT':err.code==='LIMIT_FILE_SIZE'?'SIZE_LIMIT':err.code==='23505'?'ANALYSIS_CONFLICT':(err instanceof ApiError||err instanceof UploadLimitError)?err.code:'INTERNAL_ERROR';
+  const sizeLimit=err.code==='LIMIT_FILE_SIZE'||err.type==='entity.too.large';
+  const invalidInput=err instanceof z.ZodError||err.type==='entity.parse.failed',invalidUpload=err instanceof multer.MulterError;
+  const status=sizeLimit?413:invalidInput||invalidUpload?400:err.code==='23505'?409:err.status??500;
+  const code=sizeLimit?'SIZE_LIMIT':invalidInput?'INVALID_INPUT':invalidUpload?'INVALID_UPLOAD':err.code==='23505'?'ANALYSIS_CONFLICT':(err instanceof ApiError||err instanceof UploadLimitError)?err.code:'INTERNAL_ERROR';
   res.status(status).json({error:{code,message:status===500?'서버 처리 중 오류가 발생했습니다.':code,requestId:randomUUID()}});
  });return app;
 }

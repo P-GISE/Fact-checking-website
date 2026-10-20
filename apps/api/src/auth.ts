@@ -15,11 +15,12 @@ export function authentication(mode:AuthMode,secure:boolean,mediaRoot:string){
  const router=Router(),name=secure?'__Host-factlens_session':'factlens_session';
  // Bound password hashing work and unauthenticated attempt accounting per API process.
  const attempts=new Map<string,{count:number;until:number}>();let pending=0;
- const limit:RequestHandler=(req,res,next)=>{
+ const limit=(handler:RequestHandler):RequestHandler=>async(req,res,next)=>{
   const now=Date.now();for(const [key,value] of attempts)if(value.until<=now)attempts.delete(key);
   const key=req.ip??'unknown',entry=attempts.get(key)??{count:0,until:now+60000};
   if(entry.count>=20||pending>=4||(!attempts.has(key)&&attempts.size>=10000)){res.status(429).json({error:{code:'AUTH_RATE_LIMITED'}});return;}
-  entry.count++;attempts.set(key,entry);pending++;let released=false;const release=()=>{if(!released){pending--;released=true;}};res.once('finish',release);res.once('close',release);next();
+  entry.count++;attempts.set(key,entry);pending++;
+  try{await handler(req,res,next);}finally{pending--;}
  };
  const read:RequestHandler=async(req,res,next)=>{
   res.locals.ownerId=null;res.locals.user=null;
@@ -37,14 +38,14 @@ export function authentication(mode:AuthMode,secure:boolean,mediaRoot:string){
   await db.query('INSERT INTO app_sessions(token_hash,user_id) VALUES($1,$2)',[digest(token),user.id]);
   res.cookie(name,token,{httpOnly:true,secure,sameSite:'strict',path:'/',maxAge:86400000});return {mode,user};
  }
- router.post('/register',limit,async(req,res)=>{
+ router.post('/register',limit(async(req,res)=>{
   if(mode!=='accounts'){res.status(404).end();return;}
   const b=credentials.parse(req.body),passwordHash=await encode(b.password),user={id:randomUUID(),username:b.username,role:'user' as const};
   const r=await pool.query('INSERT INTO app_users(id,username,password_hash) VALUES($1,$2,$3) ON CONFLICT(username) DO NOTHING RETURNING id',[user.id,user.username,passwordHash]);
   if(!r.rowCount){res.status(409).json({error:{code:'USERNAME_UNAVAILABLE'}});return;}
   res.status(201).json(await issue(res,user));
- });
- router.post('/login',limit,async(req,res)=>{
+ }));
+ router.post('/login',limit(async(req,res)=>{
   if(mode!=='accounts'){res.status(404).end();return;}
   const b=credentials.parse(req.body),client=await pool.connect();
   try{
@@ -56,11 +57,11 @@ export function authentication(mode:AuthMode,secure:boolean,mediaRoot:string){
    const session=await issue(res,{id:user.id,username:user.username,role:user.role},client);
    await client.query('COMMIT');res.json(session);
   }catch(cause){await client.query('ROLLBACK');throw cause;}finally{client.release();}
- });
+ }));
  router.post('/logout',async(req,res)=>{const token=cookie(req,secure);if(token)await pool.query('DELETE FROM app_sessions WHERE token_hash=$1',[digest(token)]);res.clearCookie(name,{httpOnly:true,secure,sameSite:'strict',path:'/'});res.status(204).end();});
  const requireUser:RequestHandler=async(req,res,next)=>{await read(req,res,()=>{});if(mode==='accounts'&&!res.locals.user){res.status(401).json({error:{code:'AUTH_REQUIRED'}});return;}next();};
  const changes=z.object({username:z.string().regex(/^[a-z0-9_-]{3,32}$/),currentPassword:z.string().min(12).max(128),newPassword:z.string().min(12).max(128).optional()}).strict();
- router.patch('/account',requireUser,limit,async(req,res)=>{
+ router.patch('/account',requireUser,limit(async(req,res)=>{
   if(mode!=='accounts'||!res.locals.user){res.status(401).json({error:{code:'AUTH_REQUIRED'}});return;}
   const body=changes.parse(req.body),client=await pool.connect();
   try{
@@ -80,9 +81,9 @@ export function authentication(mode:AuthMode,secure:boolean,mediaRoot:string){
    if((cause as {code?:string}).code==='23505'){res.status(409).json({error:{code:'USERNAME_UNAVAILABLE'}});return;}
    throw cause;
   }finally{client.release();}
- });
+ }));
  const closure=z.object({currentPassword:z.string().min(12).max(128),confirmation:z.literal('DELETE')}).strict();
- router.delete('/account',requireUser,limit,async(req,res)=>{
+ router.delete('/account',requireUser,limit(async(req,res)=>{
   if(mode!=='accounts'||!res.locals.user){res.status(401).json({error:{code:'AUTH_REQUIRED'}});return;}
   const body=closure.parse(req.body),client=await pool.connect();let mediaIds:string[]=[];
   try{
@@ -114,7 +115,7 @@ export function authentication(mode:AuthMode,secure:boolean,mediaRoot:string){
   for(const mediaId of mediaIds){try{await eraseFiles(mediaRoot,mediaId);}catch{cleanupPending=true;}}
   res.clearCookie(name,{httpOnly:true,secure,sameSite:'strict',path:'/'});
   if(cleanupPending){res.status(202).json({cleanupPending:true});return;}res.status(204).end();
- });
+ }));
  const requireAdmin:RequestHandler=async(req,res,next)=>{await read(req,res,()=>{});if(!res.locals.user){res.status(401).json({error:{code:'AUTH_REQUIRED'}});return;}if(res.locals.user.role!=='admin'){res.status(403).json({error:{code:'ADMIN_REQUIRED'}});return;}next();};
  return {router,requireUser,requireAdmin};
 }
