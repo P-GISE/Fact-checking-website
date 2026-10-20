@@ -1,0 +1,248 @@
+{
+  "speech": {
+    "version": "real-media-diagnostic-v1",
+    "date": "2026-10-21",
+    "selection": "Eight preselected test utterances, eight distinct speaker IDs; numbers/dates/ordinary speech; no claim of representative sample",
+    "purpose": "diagnostic_only_not_research_benchmark",
+    "rights": {
+      "license": "CC-BY-4.0",
+      "source": "https://www.openslr.org/40/",
+      "attribution": "Zeroth-Korean corpus; Lucas Jo, Atlas Guide Inc., Wonkyum Lee, Gridspace Inc.",
+      "mirror": "https://huggingface.co/datasets/kresnik/zeroth_korean",
+      "revision": "1fe937899f828af822293d05e086200946088bdf",
+      "modifications": "Selected utterances decoded from FLAC to mono PCM WAV; no speech synthesis or transcript conditioning"
+    },
+    "cases": [
+      {
+        "id": "105_003_0478",
+        "speakerId": "105",
+        "sourceType": "real_read_speech",
+        "sourceRow": 1,
+        "referenceText": "차 문이 종잇장처럼 얇지 않으니 문 두께 스물 센티미터를 빼면 실제 승 하차 여유 공간은 스물 센티미터라는 계산이 나옵니다",
+        "file": "105_003_0478.wav",
+        "expectedDecisive": false,
+        "referenceScope": "Corpus utterance transcript; not a fact truth label; outside existing reviewed fact policy"
+      },
+      {
+        "id": "126_003_0681",
+        "speakerId": "126",
+        "sourceType": "real_read_speech",
+        "sourceRow": 49,
+        "referenceText": "삼 분기에만 매출 일 조 이천 구백 십 구 억원 영업이익 육백 십 팔 억원을 올렸다",
+        "file": "126_003_0681.wav",
+        "expectedDecisive": false,
+        "referenceScope": "Corpus utterance transcript; not a fact truth label; outside existing reviewed fact policy"
+      },
+      {
+        "id": "132_003_2339",
+        "speakerId": "132",
+        "sourceType": "real_read_speech",
+        "sourceRow": 108,
+        "referenceText": "한국은행에 따르면 작년 말 현재 가계신용 잔액은 천 삼백 사십 사 조 삼천 억원으로 이 가운데 약 십 삼 퍼센트가 마이너스통장 등 대출로 추산된다",
+        "file": "132_003_2339.wav",
+        "expectedDecisive": false,
+        "referenceScope": "Corpus utterance transcript; not a fact truth label; outside existing reviewed fact policy"
+      },
+      {
+        "id": "104_003_0664",
+        "speakerId": "104",
+        "sourceType": "real_read_speech",
+        "sourceRow": 131,
+        "referenceText": "작년 십 이 월 천 이백 십 원대까지 올랐던 원 달러 환율은 최근 천 백 오십 원대로 오 퍼센트가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다",
+        "file": "104_003_0664.wav",
+        "expectedDecisive": false,
+        "referenceScope": "Corpus utterance transcript; not a fact truth label; outside existing reviewed fact policy"
+      },
+      {
+        "id": "137_003_1848",
+        "speakerId": "137",
+        "sourceType": "real_read_speech",
+        "sourceRow": 247,
+        "referenceText": "회수대상은 이천 십 육 년 시 월 일 일 에서 이천 십 육 년 십 일 월 십 구 일 내로 유통기한이 표시된 제품들이다",
+        "file": "137_003_1848.wav",
+        "expectedDecisive": false,
+        "referenceScope": "Corpus utterance transcript; not a fact truth label; outside existing reviewed fact policy"
+      },
+      {
+        "id": "149_003_0995",
+        "speakerId": "149",
+        "sourceType": "real_read_speech",
+        "sourceRow": 265,
+        "referenceText": "이천 년만 해도 가구주의 주요 연령층은 삼십 대와 사십 대가 전체의 과반이었지만 올해는 오십 대와 육십 대가 절반을 넘었다",
+        "file": "149_003_0995.wav",
+        "expectedDecisive": false,
+        "referenceScope": "Corpus utterance transcript; not a fact truth label; outside existing reviewed fact policy"
+      },
+      {
+        "id": "112_003_0108",
+        "speakerId": "112",
+        "sourceType": "real_read_speech",
+        "sourceRow": 284,
+        "referenceText": "이천 십 오 년에는 전국 모든 대학을 평가해 오 등급으로 나누고 등급에 따라 정원감축을 추진했다",
+        "file": "112_003_0108.wav",
+        "expectedDecisive": false,
+        "referenceScope": "Corpus utterance transcript; not a fact truth label; outside existing reviewed fact policy"
+      },
+      {
+        "id": "118_003_0251",
+        "speakerId": "118",
+        "sourceType": "real_read_speech",
+        "sourceRow": 377,
+        "referenceText": "첫번째는 엘니뇨로 인해 해수면 온도가 높아 대류 현상이 강하게 발달하는 것이고 두번째는 상층 고기압이 발달하면서 대류 현상을 더 강화시키는 역할을 하고 있습니다",
+        "file": "118_003_0251.wav",
+        "expectedDecisive": false,
+        "referenceScope": "Corpus utterance transcript; not a fact truth label; outside existing reviewed fact policy"
+      }
+    ]
+  },
+  "video": {
+    "version": "real-media-diagnostic-v1",
+    "date": "2026-10-21",
+    "purpose": "diagnostic_only_not_research_benchmark",
+    "rights": {
+      "license": "KOGL-1",
+      "source": "https://www.kogl.or.kr/open/info/license.do",
+      "attribution": "성평등가족부; 전북특별자치도소방본부",
+      "externalProcessingBasis": "Per-item KOGL-1 reuse/adaptation permission; no OpenAI-specific separate grant claimed",
+      "modifications": "Bounded excerpts, scale640, reencode H264/AAC; speech and source frames preserved"
+    },
+    "cases": [
+      {
+        "id": "briefing-30-75",
+        "file": "briefing-30-75.mp4",
+        "sourceType": "government_press_briefing_video",
+        "title": "제19차 양성평등위원회 사전 브리핑",
+        "publishedAt": "2026-04-17",
+        "sourceUrl": "https://www.mogef.go.kr/nw/rpd/nw_rpd_s001d.do?bbtSn=711027&mid=news407",
+        "mediaUrl": "https://www.mogef.go.kr/news/down.do?mid=news407&bbid=news407&bbtSn=711027&atfileSn=710627&atfileSeq=3",
+        "licenseProof": "본 저작물은 공공누리 제1유형(출처표시) 조건에 따라 이용",
+        "referenceUrl": "https://www.korea.kr/briefing/policyBriefingView.do?newsId=156756652",
+        "referencePublishedAt": "2026-04-20",
+        "originalSha256": "8b03a53aa1829945a6de41e4e1e7f487be55f9047985d262c0fe165adb61d626",
+        "clipStartSeconds": 30,
+        "clipEndSeconds": 75,
+        "referenceText": "성평등은 사회 통합과 포용, 지속 가능한 사회를 실현하는 핵심 가치로 정부는 기회와 권리가 보장되는 성평등 사회를 국정과제로 추진하고 있습니다. 이를 위해 그간 위축되었던 성평등정책 채널을 복원·확대하고 성평등정책 총괄·조정 기능을 활성화하기 위한 방안 등을 이번 제19차 양성평등위원회에서 논의할 예정입니다. 주요 안건에 대해 말씀드리겠습니다. 첫째, 제3차 양성평등정책 기본계획 2026년 시행계획입니다.",
+        "referenceScope": "Official transcript context; clip boundaries not word-aligned; no CER truth score for this video",
+        "expectedDecisive": false
+      },
+      {
+        "id": "safety-20-60",
+        "file": "safety-20-60.mp4",
+        "sourceType": "public_safety_discussion_video",
+        "title": "#131 가을 산악사고 대처법",
+        "publishedAt": "2023-10-12",
+        "sourceUrl": "https://www.sobang.kr/board/view.sobang?boardId=BBS_0000028&dataSid=49820&menuCd=DOM_000001804004000000&paging=ok&startPage=3",
+        "mediaUrl": "https://www.sobang.kr/upload_data/board_data/BBS_0000028/169708514164302.mp4",
+        "licenseProof": "전북특별자치도소방본부에서 제작한 본 공공저작물 제1유형 출처표시",
+        "clipStartSeconds": 20,
+        "clipEndSeconds": 60,
+        "referenceText": "요즘 가을 산행을 즐기는 등산객들이 많아지고 있는데요. 그런만큼 산악사고의 위험도 높아지고 있습니다. 실제 지난해 산악사고의 25%가 …",
+        "referenceScope": "Script context for actual 20–60s clip: acting/music then introduction; clip ends mid sentence. Later 119 passage was not tested. No aligned reference/CER.",
+        "expectedDecisive": false
+      }
+    ]
+  },
+  "contentHashes": [
+    {
+      "file": "104_003_0664.flac",
+      "bytes": 211637,
+      "sha256": "af3bb4be7b8a6a5a70fe05ee6ffb422c261b98f489eeb680eb6d8a094402b0a2"
+    },
+    {
+      "file": "104_003_0664.wav",
+      "bytes": 377846,
+      "sha256": "17c71d2fc8a677a4ec6dff1cd19bc8cad98e0771fd59fe7ef21161a00f62b718"
+    },
+    {
+      "file": "105_003_0478.flac",
+      "bytes": 296769,
+      "sha256": "25ae21c3dc8a4d5ede6f725b2cc99a780e24a5cf3ded8f257628723491f2d631"
+    },
+    {
+      "file": "105_003_0478.wav",
+      "bytes": 654606,
+      "sha256": "ae8dc4f22cad437e51179c1e2dd282a577e8574252bf2c5a34c7490f76092185"
+    },
+    {
+      "file": "112_003_0108.flac",
+      "bytes": 147095,
+      "sha256": "8ed70f70915fd8b990dbfe76191d19b10839f61abae7650371d11322df1d2e18"
+    },
+    {
+      "file": "112_003_0108.wav",
+      "bytes": 297142,
+      "sha256": "a3dd0facffe95902c79be0054193c33b32a75b33e66c687cd7b6b800eabfc9ac"
+    },
+    {
+      "file": "118_003_0251.flac",
+      "bytes": 142401,
+      "sha256": "e5ffdaee7824374de8fb775ad60ac3e2889fa021ecb4f737f871e644ec928ce9"
+    },
+    {
+      "file": "118_003_0251.wav",
+      "bytes": 391056,
+      "sha256": "5bb1708a8bde90a874fec4e1d363e912a6725dfbc11b0975572c147dfc6cd045"
+    },
+    {
+      "file": "126_003_0681.flac",
+      "bytes": 109238,
+      "sha256": "9a3e59a48a57ea7b60188e90912c49e87a780bdb7cc5f974139d3337c0e88f30"
+    },
+    {
+      "file": "126_003_0681.wav",
+      "bytes": 274552,
+      "sha256": "884e3cb1ad05b177f6a0cd323dce8dc025c1771fd2719a6b6736764d6d8d8223"
+    },
+    {
+      "file": "132_003_2339.flac",
+      "bytes": 178750,
+      "sha256": "d8b433db931d1405bc2b4ce5c247beebf987eb03fa9057af3ebb3be6ec1c3559"
+    },
+    {
+      "file": "132_003_2339.wav",
+      "bytes": 426032,
+      "sha256": "093858064aa4cd82724127d2017c01a16b83a2e48fba0f34e5825ba9c838b9f6"
+    },
+    {
+      "file": "137_003_1848.flac",
+      "bytes": 139008,
+      "sha256": "06d01945a6ac48c53d722da5095da01177db549efe67e2eb94b2f1b4b5b8be28"
+    },
+    {
+      "file": "137_003_1848.wav",
+      "bytes": 327250,
+      "sha256": "bfe3b38d20a63612d6fc1a6afc73d7d9f893ee35bed013958b1fd7ca9a1f5a3a"
+    },
+    {
+      "file": "149_003_0995.flac",
+      "bytes": 108286,
+      "sha256": "aab2bf6f481f5be1379cc11cb1ac65a52336d379dc413bb8fe01b3d1f5f6a664"
+    },
+    {
+      "file": "149_003_0995.wav",
+      "bytes": 252404,
+      "sha256": "7cc2303b49dd3a3f2d723b8864c3adc4d47d00ae4409c5806c78a18bc29d2797"
+    },
+    {
+      "file": "briefing-30-75.mp4",
+      "bytes": 2720303,
+      "sha256": "f468a0c9f5f7414e93fafda35ff5d2f118eff28716711be8a612b5524f577a76"
+    },
+    {
+      "file": "briefing-original.mp4",
+      "bytes": 164299965,
+      "sha256": "8b03a53aa1829945a6de41e4e1e7f487be55f9047985d262c0fe165adb61d626"
+    },
+    {
+      "file": "safety-20-60.mp4",
+      "bytes": 6794427,
+      "sha256": "34196e3960f22f2011cda0a7750c11039342e1951026db1c16afc9981bba18a7"
+    },
+    {
+      "file": "safety-original.mp4",
+      "bytes": 29693728,
+      "sha256": "7e4803ddd1d66d48978b1130e0fe8183b20e5d6134b81b33a2493962c4989964"
+    }
+  ],
+  "mediaInGit": false
+}

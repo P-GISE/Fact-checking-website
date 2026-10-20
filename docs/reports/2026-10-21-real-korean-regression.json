@@ -1,0 +1,1245 @@
+{
+  "date": "2026-10-21",
+  "finalSource": "1da60d67f225607acbc3acf9c474fae0a291ede8",
+  "canonicalV2Initial": [
+    {
+      "file": "owned-clear-20261021.wav",
+      "claimsCount": 1,
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      },
+      "error": null,
+      "evidenceCount": 3,
+      "runtime": {
+        "braveKeyPresent": true,
+        "mode": "openai_brave",
+        "openaiKeyPresent": true
+      },
+      "stages": [
+        "transcribing",
+        "extracting",
+        "retrieving",
+        "validating_evidence"
+      ],
+      "status": "completed",
+      "usage": {
+        "actualMicros": 8961,
+        "calls": 6,
+        "conservativeMicros": 9761,
+        "costBasis": "published_tariff_not_invoice",
+        "currency": "USD",
+        "unknownUsageCalls": 1
+      },
+      "verdictCounts": {
+        "REVIEW_REQUIRED": 1
+      },
+      "versions": {
+        "claimPromptVersion": "claim-structured-v2",
+        "claimValidationVersion": "literal-candidates-v2",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "languageModel": "gpt-4.1-mini",
+        "meaningReviewVersion": "reviewed-meaning-v1",
+        "modalVersion": "modal-record-review-v1",
+        "providerProfile": "openai_brave",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "ruleVersion": "audio-reviewed-numeric-v5",
+        "sourceParserVersion": "static-text-v3",
+        "sourceRegistryVersion": "source-registry-2026-10-21",
+        "sourceReviewVersion": "source-review-v1",
+        "speechModel": "whisper-1",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "speechTimingVersion": "bounded-tail-v1",
+        "summaryVersion": "claim-summary-v1",
+        "tableContextVersion": "table-context-v1",
+        "tableCueVersion": "table-cue-audit-v1",
+        "tableReferenceVersion": "table-reference-audit-v1",
+        "visualVersion": "visual-sampled-v1"
+      }
+    },
+    {
+      "file": "owned-refutation-20261021.wav",
+      "claimsCount": 1,
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      },
+      "error": null,
+      "evidenceCount": 2,
+      "runtime": {
+        "braveKeyPresent": true,
+        "mode": "openai_brave",
+        "openaiKeyPresent": true
+      },
+      "stages": [
+        "transcribing",
+        "extracting",
+        "retrieving",
+        "validating_evidence"
+      ],
+      "status": "completed",
+      "usage": {
+        "actualMicros": 8029,
+        "calls": 5,
+        "conservativeMicros": 8829,
+        "costBasis": "published_tariff_not_invoice",
+        "currency": "USD",
+        "unknownUsageCalls": 1
+      },
+      "verdictCounts": {
+        "REVIEW_REQUIRED": 1
+      },
+      "versions": {
+        "claimPromptVersion": "claim-structured-v2",
+        "claimValidationVersion": "literal-candidates-v2",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "languageModel": "gpt-4.1-mini",
+        "meaningReviewVersion": "reviewed-meaning-v1",
+        "modalVersion": "modal-record-review-v1",
+        "providerProfile": "openai_brave",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "ruleVersion": "audio-reviewed-numeric-v5",
+        "sourceParserVersion": "static-text-v3",
+        "sourceRegistryVersion": "source-registry-2026-10-21",
+        "sourceReviewVersion": "source-review-v1",
+        "speechModel": "whisper-1",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "speechTimingVersion": "bounded-tail-v1",
+        "summaryVersion": "claim-summary-v1",
+        "tableContextVersion": "table-context-v1",
+        "tableCueVersion": "table-cue-audit-v1",
+        "tableReferenceVersion": "table-reference-audit-v1",
+        "visualVersion": "visual-sampled-v1"
+      }
+    }
+  ],
+  "canonicalV2Captured": [
+    {
+      "caseId": "canonical-confirm",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2024년 한국의 실업률은 2.8%입니다.",
+          "start": 0,
+          "end": 5.5
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "2024년 한국의 실업률은 2.8%입니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "한국의 실업률",
+          "period": "2024년",
+          "metric": "실업률",
+          "value": "2.8",
+          "unit": "%",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "2024년 한국의 실업률은 2.8%입니다.",
+          "subject": "한국의 실업률",
+          "period": "2024년",
+          "metric": "실업률",
+          "value": "2.8",
+          "unit": "%",
+          "verdict": "REVIEW_REQUIRED",
+          "evidence": [
+            {
+              "url": "https://datafact.org/articles/unemployment-rate-25year-low-2023",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_STRUCTURE_REVIEW_REQUIRED",
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "SUBJECT_NOT_IN_QUOTE",
+                "SUBJECT_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED"
+              ],
+              "policyId": null
+            },
+            {
+              "url": "https://datafact.org/articles/youth-unemployment-neet-korea",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_STRUCTURE_REVIEW_REQUIRED",
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "SUBJECT_NOT_IN_QUOTE",
+                "SUBJECT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED"
+              ],
+              "policyId": null
+            },
+            {
+              "url": "https://www.index.go.kr/unity/potal/main/EachDtlPageDetail.do?idx_cd=1063",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_STRUCTURE_REVIEW_REQUIRED",
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED"
+              ],
+              "policyId": null
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "rawSpeech": {
+        "duration": 6.190000057220459,
+        "segments": [
+          {
+            "start": 0,
+            "end": 5.5,
+            "text": " 2024년 한국의 실업률은 2.8%입니다.",
+            "avg_logprob": -0.4121403694152832,
+            "no_speech_prob": 0.0002033805358223617
+          }
+        ]
+      },
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "REVIEW_REQUIRED": 1
+        },
+        "evidenceCount": 3,
+        "usage": {
+          "calls": 6,
+          "actualMicros": 8953,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 9753,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "canonical-refute",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2024년 한국의 실업률은 2.9%입니다.",
+          "start": 0,
+          "end": 6
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "2024년 한국의 실업률은 2.9%입니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "한국의 실업률",
+          "period": "2024년",
+          "metric": "실업률",
+          "value": "2.9",
+          "unit": "%",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "2024년 한국의 실업률은 2.9%입니다.",
+          "subject": "한국의 실업률",
+          "period": "2024년",
+          "metric": "실업률",
+          "value": "2.9",
+          "unit": "%",
+          "verdict": "REVIEW_REQUIRED",
+          "evidence": [
+            {
+              "url": "https://www.index.go.kr/unity/potal/main/EachDtlPageDetail.do?idx_cd=1063",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_STRUCTURE_REVIEW_REQUIRED",
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED"
+              ],
+              "policyId": null
+            },
+            {
+              "url": "https://datafact.org/articles/unemployment-rate-25year-low-2023",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_STRUCTURE_REVIEW_REQUIRED",
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "SUBJECT_NOT_IN_QUOTE",
+                "SUBJECT_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED"
+              ],
+              "policyId": null
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "검색 후보 원문에 접근하지 못했습니다. 접근 실패를 반박 근거로 사용하지 않습니다."
+      ],
+      "rawSpeech": {
+        "duration": 6.150000095367432,
+        "segments": [
+          {
+            "start": 0,
+            "end": 6,
+            "text": " 2024년 한국의 실업률은 2.9%입니다.",
+            "avg_logprob": -0.4066964089870453,
+            "no_speech_prob": 0.00015353341586887836
+          }
+        ]
+      },
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "REVIEW_REQUIRED": 1
+        },
+        "evidenceCount": 2,
+        "usage": {
+          "calls": 5,
+          "actualMicros": 8024,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 8824,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    }
+  ],
+  "canonicalV3": [
+    {
+      "caseId": "canonical-confirm",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2024년 한국의 실업률은 2.8%입니다.",
+          "start": 0,
+          "end": 5.5
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "2024년 한국의 실업률은 2.8%입니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "한국",
+          "period": "2024년",
+          "metric": "실업률",
+          "value": "2.8",
+          "unit": "%",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "2024년 한국의 실업률은 2.8%입니다.",
+          "subject": "한국",
+          "period": "2024년",
+          "metric": "실업률",
+          "value": "2.8",
+          "unit": "%",
+          "verdict": "CONFIRMED",
+          "evidence": [
+            {
+              "url": "https://mods.go.kr/board.es?act=view&bid=10820&list_no=435687&mid=a10301060500",
+              "usable": true,
+              "relation": "SUPPORTED",
+              "reasons": [],
+              "policyId": "mods-2024-social-unemployment-2026-10-21"
+            },
+            {
+              "url": "https://www.index.go.kr/unity/potal/eNara/sub/showStblGams3.do?freq=Y&idx_cd=1063&period=N&stts_cd=106301",
+              "usable": true,
+              "relation": "SUPPORTED",
+              "reasons": [],
+              "policyId": "index-2024-unemployment-table-2026-10-21"
+            },
+            {
+              "url": "https://datafact.org/articles/unemployment-rate-25year-low-2023",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "SUBJECT_NOT_IN_QUOTE",
+                "METRIC_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED"
+              ],
+              "policyId": null
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "rawSpeech": {
+        "duration": 6.190000057220459,
+        "segments": [
+          {
+            "start": 0,
+            "end": 5.5,
+            "text": " 2024년 한국의 실업률은 2.8%입니다.",
+            "avg_logprob": -0.4121403694152832,
+            "no_speech_prob": 0.0002033805358223617
+          }
+        ]
+      },
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "CONFIRMED": 1
+        },
+        "evidenceCount": 3,
+        "usage": {
+          "calls": 4,
+          "actualMicros": 6097,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 6897,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "canonical-refute",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2024년 한국의 실업률은 2.9%입니다.",
+          "start": 0,
+          "end": 6
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "2024년 한국의 실업률은 2.9%입니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "한국",
+          "period": "2024년",
+          "metric": "실업률",
+          "value": "2.9",
+          "unit": "%",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "2024년 한국의 실업률은 2.9%입니다.",
+          "subject": "한국",
+          "period": "2024년",
+          "metric": "실업률",
+          "value": "2.9",
+          "unit": "%",
+          "verdict": "REFUTED",
+          "evidence": [
+            {
+              "url": "https://mods.go.kr/board.es?act=view&bid=10820&list_no=435687&mid=a10301060500",
+              "usable": true,
+              "relation": "REFUTED",
+              "reasons": [],
+              "policyId": "mods-2024-social-unemployment-2026-10-21"
+            },
+            {
+              "url": "https://www.index.go.kr/unity/potal/eNara/sub/showStblGams3.do?freq=Y&idx_cd=1063&period=N&stts_cd=106301",
+              "usable": true,
+              "relation": "REFUTED",
+              "reasons": [],
+              "policyId": "index-2024-unemployment-table-2026-10-21"
+            },
+            {
+              "url": "https://www.index.go.kr/unity/potal/main/EachDtlPageDetail.do?idx_cd=1063",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED"
+              ],
+              "policyId": null
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "rawSpeech": {
+        "duration": 6.150000095367432,
+        "segments": [
+          {
+            "start": 0,
+            "end": 6,
+            "text": " 2024년 한국의 실업률은 2.9%입니다.",
+            "avg_logprob": -0.4066964089870453,
+            "no_speech_prob": 0.00015353341586887836
+          }
+        ]
+      },
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "REFUTED": 1
+        },
+        "evidenceCount": 3,
+        "usage": {
+          "calls": 4,
+          "actualMicros": 7267,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 8067,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    }
+  ],
+  "focusedActualV3": [
+    {
+      "caseId": "118_003_0251",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고, 두번째는 상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": null,
+          "metric": "해수면 온도",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": null,
+          "metric": "대륙현상 발달 강도",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": null,
+          "metric": "상층 고기업 발달",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": null,
+          "metric": "대륙현상 강화",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것",
+          "subject": null,
+          "period": null,
+          "metric": "해수면 온도",
+          "value": null,
+          "unit": null,
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://aboda.kr/entry/%EC%97%98%EB%8B%88%EB%87%A8-%EC%9B%90%EC%9D%B8%EA%B3%BC-%ED%8A%B9%EC%A7%95-11%EC%9B%94-%EB%A7%8E%EC%9D%80-%EB%B9%84-%EC%98%81%ED%96%A5",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "SUBJECT_MISMATCH",
+                "PERIOD_MISMATCH",
+                "UNIT_MISMATCH",
+                "VALUE_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ],
+              "policyId": null
+            },
+            {
+              "url": "https://encykorea.aks.ac.kr/Article/E0066622",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ],
+              "policyId": null
+            },
+            {
+              "url": "https://www.ekoreanews.co.kr/news/articleView.html?idxno=88548",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "VALUE_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ],
+              "policyId": null
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "일부 주장 후보가 원문 검증을 통과하지 못해 제외되었습니다."
+      ],
+      "rawSpeech": {
+        "duration": 12.210000038146973,
+        "segments": [
+          {
+            "start": 0,
+            "end": 11,
+            "text": " 첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고, 두번째는 상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+            "avg_logprob": -0.2585608661174774,
+            "no_speech_prob": 0.015166138298809528
+          }
+        ]
+      },
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "INSUFFICIENT": 1
+        },
+        "evidenceCount": 3,
+        "usage": {
+          "calls": 6,
+          "actualMicros": 9711,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 11111,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "safety-20-60",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "하...",
+          "start": 0.5,
+          "end": 3.740000009536743
+        },
+        {
+          "id": 1,
+          "text": "아, 어?",
+          "start": 19.760000228881836,
+          "end": 21.479999542236328
+        },
+        {
+          "id": 2,
+          "text": "어우.",
+          "start": 21.860000610351562,
+          "end": 22.600000381469727
+        },
+        {
+          "id": 3,
+          "text": "단목, 단목.",
+          "start": 22.780000686645508,
+          "end": 23.920000076293945
+        },
+        {
+          "id": 4,
+          "text": "이 반장님, 반족, 저쪽에 앉어야 된대요, 아우.",
+          "start": 23.920000076293945,
+          "end": 28.239999771118164
+        },
+        {
+          "id": 5,
+          "text": "요즘 가을 산행을 즐기는 등산객들이 많아지고 있는데요.",
+          "start": 29.100000381469727,
+          "end": 33.15999984741211
+        },
+        {
+          "id": 6,
+          "text": "그런만큼 산악사고의 위험도 높아지고 있습니다.",
+          "start": 33.15999984741211,
+          "end": 36.84000015258789
+        },
+        {
+          "id": 7,
+          "text": "실제 지난해 산악사고의 25%가 가을 산행을 즐겼습니다.",
+          "start": 36.84000015258789,
+          "end": 40.007
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "요즘 가을 산행을 즐기는 등산객들이 많아지고 있는데요.",
+          "segment_ids": [
+            5
+          ],
+          "subject": "등산객",
+          "period": "요즘",
+          "metric": "가을 산행 즐김",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "그런만큼 산악사고의 위험도 높아지고 있습니다.",
+          "segment_ids": [
+            6
+          ],
+          "subject": "산악사고",
+          "period": "요즘",
+          "metric": "위험도",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "실제 지난해 산악사고의 25%가 가을 산행을 즐겼습니다.",
+          "segment_ids": [
+            7
+          ],
+          "subject": "산악사고",
+          "period": "지난해",
+          "metric": "가을 산행 즐김 비율",
+          "value": "25",
+          "unit": "%",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "전사 마지막 구간의 시간이 미디어 길이를 0.25초 이내로 초과해 끝 시간을 조정했습니다. 시간 정밀도는 제한됩니다."
+      ],
+      "rawSpeech": {
+        "duration": 40,
+        "segments": [
+          {
+            "start": 0.5,
+            "end": 3.740000009536743,
+            "text": " 하...",
+            "avg_logprob": -2.656282424926758,
+            "no_speech_prob": 0.08377101272344589
+          },
+          {
+            "start": 19.760000228881836,
+            "end": 21.479999542236328,
+            "text": " 아, 어?",
+            "avg_logprob": -2.656282424926758,
+            "no_speech_prob": 0.08377101272344589
+          },
+          {
+            "start": 21.860000610351562,
+            "end": 22.600000381469727,
+            "text": " 어우.",
+            "avg_logprob": -2.656282424926758,
+            "no_speech_prob": 0.08377101272344589
+          },
+          {
+            "start": 22.780000686645508,
+            "end": 23.920000076293945,
+            "text": " 단목, 단목.",
+            "avg_logprob": -2.656282424926758,
+            "no_speech_prob": 0.08377101272344589
+          },
+          {
+            "start": 23.920000076293945,
+            "end": 28.239999771118164,
+            "text": " 이 반장님, 반족, 저쪽에 앉어야 된대요, 아우.",
+            "avg_logprob": -2.656282424926758,
+            "no_speech_prob": 0.08377101272344589
+          },
+          {
+            "start": 29.100000381469727,
+            "end": 33.15999984741211,
+            "text": " 요즘 가을 산행을 즐기는 등산객들이 많아지고 있는데요.",
+            "avg_logprob": -0.3968828618526459,
+            "no_speech_prob": 0.6178073287010193
+          },
+          {
+            "start": 33.15999984741211,
+            "end": 36.84000015258789,
+            "text": " 그런만큼 산악사고의 위험도 높아지고 있습니다.",
+            "avg_logprob": -0.3968828618526459,
+            "no_speech_prob": 0.6178073287010193
+          },
+          {
+            "start": 36.84000015258789,
+            "end": 40.119998931884766,
+            "text": " 실제 지난해 산악사고의 25%가 가을 산행을 즐겼습니다.",
+            "avg_logprob": -0.3968828618526459,
+            "no_speech_prob": 0.6178073287010193
+          }
+        ]
+      },
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 2,
+          "actualMicros": 658,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 4858,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    }
+  ],
+  "totalThisTask": {
+    "jobs": 46,
+    "calls": 152,
+    "conservativeMicros": 292354,
+    "unknownUsageCalls": 46,
+    "allCleanup": true
+  },
+  "ironLaws": {
+    "passed": true,
+    "scan_status": "complete",
+    "files_scanned": 1,
+    "findings_total": 6,
+    "findings": [
+      {
+        "rule_id": "TYP-302",
+        "path": "live_providers.py",
+        "line": 42,
+        "severity": "LOW",
+        "confidence": "REVIEW",
+        "message": "프로젝트는 타입 힌트를 쓰는데 이 파일의 함수 6개에는 타입 표기가 없습니다 (from_env, request, request, extract …).",
+        "finding_id": "F-3775ad21edd3"
+      },
+      {
+        "rule_id": "IL-301",
+        "path": "live_providers.py",
+        "line": 194,
+        "severity": "MEDIUM",
+        "confidence": "REVIEW",
+        "message": "예외를 로그나 전파 없이 처리합니다. 대체 동작이 의도된 것인지 확인하고 최소한 로그를 남기십시오.",
+        "finding_id": "F-c3b629d5df6e"
+      },
+      {
+        "rule_id": "AI-101",
+        "path": "live_providers.py",
+        "line": 207,
+        "severity": "MEDIUM",
+        "confidence": "REVIEW",
+        "message": "URL ****이(가) 코드에 고정되어 있습니다. 환경별로 바뀌는 주소는 설정으로 분리하십시오.",
+        "finding_id": "F-0ca0c5d4de3b"
+      },
+      {
+        "rule_id": "IL-301",
+        "path": "live_providers.py",
+        "line": 229,
+        "severity": "MEDIUM",
+        "confidence": "REVIEW",
+        "message": "예외를 로그나 전파 없이 처리합니다. 대체 동작이 의도된 것인지 확인하고 최소한 로그를 남기십시오.",
+        "finding_id": "F-aebe7f0b357f"
+      },
+      {
+        "rule_id": "AI-101",
+        "path": "live_providers.py",
+        "line": 264,
+        "severity": "MEDIUM",
+        "confidence": "REVIEW",
+        "message": "URL ****이(가) 코드에 고정되어 있습니다. 환경별로 바뀌는 주소는 설정으로 분리하십시오.",
+        "finding_id": "F-77cd9d415770"
+      },
+      {
+        "rule_id": "ARC-211",
+        "path": "live_providers.py",
+        "line": 265,
+        "severity": "LOW",
+        "confidence": "REVIEW",
+        "message": "HTTP 클라이언트 생성을(를) 함수 안에서 매번 생성합니다. 한 번만 만들어 재사용하십시오.",
+        "finding_id": "F-485ff124fab3"
+      }
+    ],
+    "truncated": false,
+    "diagnostics": []
+  },
+  "review": "Independent code review found prose-pinning assertions; removed. Parent checked delta and 185 passed/2 skipped. No claim that this proves real-model compliance.",
+  "intermediateRuntimeChecked": "5b8236e36b8fb304bcbb66c1bb84daf67d3d8993\n{\"mode\": \"openai_brave\", \"jobBudget\": \"200000\", \"monthBudget\": \"20000000\", \"versions\": {\"providerProfile\": \"openai_brave\", \"speechModel\": \"whisper-1\", \"speechPromptVersion\": \"ko-labour-vocabulary-v1\", \"speechTimingVersion\": \"bounded-tail-v1\", \"languageModel\": \"gpt-4.1-mini\", \"claimPromptVersion\": \"claim-structured-v2\", \"claimValidationVersion\": \"literal-candidates-v2\", \"evidencePromptVersion\": \"evidence-structured-v1\", \"retrievalVersion\": \"brave-reviewed-source-v4\", \"sourceParserVersion\": \"static-text-v3\", \"meaningReviewVersion\": \"reviewed-meaning-v1\"}}\n{\"status\":\"ready\",\"scope\":\"audio_only\",\"providerConfigured\":false}",
+  "runtimeChecked": "1da60d67f225607acbc3acf9c474fae0a291ede8\n{\"mode\": \"openai_brave\", \"jobBudget\": \"200000\", \"monthBudget\": \"20000000\", \"versions\": {\"providerProfile\": \"openai_brave\", \"speechModel\": \"whisper-1\", \"speechPromptVersion\": \"ko-labour-vocabulary-v1\", \"speechTimingVersion\": \"bounded-tail-v1\", \"languageModel\": \"gpt-4.1-mini\", \"claimPromptVersion\": \"claim-structured-v3\", \"claimValidationVersion\": \"literal-candidates-v2\", \"evidencePromptVersion\": \"evidence-structured-v1\", \"retrievalVersion\": \"brave-reviewed-source-v4\", \"sourceParserVersion\": \"static-text-v3\", \"meaningReviewVersion\": \"reviewed-meaning-v1\"}}\n{\"status\":\"ready\",\"scope\":\"audio_only\",\"providerConfigured\":false}{\"status\":\"ready\",\"scope\":\"audio_only\",\"providerConfigured\":false}",
+  "delivery": {
+    "source": "1da60d67f225607acbc3acf9c474fae0a291ede8",
+    "workflow": 39479454352,
+    "verify": "success",
+    "deploy": "success",
+    "apiTests": 97,
+    "workerTests": 419,
+    "loopbackReady": true,
+    "publicReady": true,
+    "cleanup": {
+      "ownedStagingFilesRemoved": 27,
+      "stagingDirectoryAbsent": true
+    }
+  }
+}

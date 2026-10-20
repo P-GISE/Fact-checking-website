@@ -1,0 +1,4107 @@
+{
+  "date": "2026-10-21",
+  "scope": "diagnostic development sample; no accuracy benchmark",
+  "sourceBefore": "34ae4fa950d94b5baf88f10078a1b10c99ee348e",
+  "claimFix": "282eac48c26f95424846169f2a0925fae1d14cc5",
+  "timingFix": "5b8236e",
+  "baselineSpeech": [
+    {
+      "caseId": "105_003_0478",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "실장처럼 얕지 않은 이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "실장처럼 얕지 않은 이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": null,
+          "metric": "승차 여유 공간",
+          "value": "20",
+          "unit": "cm",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "실장처럼 얕지 않은 이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "subject": null,
+          "period": null,
+          "metric": "승차 여유 공간",
+          "value": "20",
+          "unit": "cm",
+          "verdict": "INSUFFICIENT",
+          "evidence": []
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다.",
+        "원문 일부만 구조화 대상으로 전송했습니다. 원문 전체 문맥 검증 제한을 유지합니다.",
+        "검색 후보 원문에 접근하지 못했습니다. 접근 실패를 반박 근거로 사용하지 않습니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "INSUFFICIENT": 1
+        },
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 5,
+          "actualMicros": 8150,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 10350,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "126_003_0681",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "start": 0,
+          "end": 7
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": "3분기",
+          "metric": "매출",
+          "value": "1조 2,919",
+          "unit": "원",
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": "3분기",
+          "metric": "영업이익",
+          "value": "618",
+          "unit": "억 원",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "subject": null,
+          "period": "3분기",
+          "metric": "매출",
+          "value": "1조 2,919",
+          "unit": "원",
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://www.webeconomy.co.kr/news/articleView.html?idxno=2338937",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://supple.kr/news/cmv9c0bex006q13m2vn7mlnus",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "QUOTE_CONTEXT_REVIEW_REQUIRED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-2026%EB%85%84-3%EB%B6%84%EA%B8%B0-%EC%9E%A0%EC%A0%95%EC%8B%A4%EC%A0%81-%EB%B0%9C%ED%91%9C",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        },
+        {
+          "text": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "subject": null,
+          "period": "3분기",
+          "metric": "영업이익",
+          "value": "618",
+          "unit": "억 원",
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://www.webeconomy.co.kr/news/articleView.html?idxno=2338937",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-2026%EB%85%84-3%EB%B6%84%EA%B8%B0-%EC%9E%A0%EC%A0%95%EC%8B%A4%EC%A0%81-%EB%B0%9C%ED%91%9C",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_MISMATCH",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED"
+              ]
+            },
+            {
+              "url": "https://supple.kr/news/cmv9c0bex006q13m2vn7mlnus",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "QUOTE_CONTEXT_REVIEW_REQUIRED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 2,
+        "verdictCounts": {
+          "INSUFFICIENT": 2
+        },
+        "evidenceCount": 6,
+        "usage": {
+          "calls": 10,
+          "actualMicros": 15687,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 16687,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "132_003_2339",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "가계 신용 잔액",
+          "period": "작년 말 현재",
+          "metric": "잔액",
+          "value": "1,344조 3천억",
+          "unit": "원",
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "마이너스 통장 등 대출 비율",
+          "period": "작년 말 현재",
+          "metric": "비율",
+          "value": "약 13%",
+          "unit": "%",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 2,
+          "actualMicros": 482,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1982,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "104_003_0664",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "start": 0,
+          "end": 10
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "원달러 환율",
+          "period": "작년 12월",
+          "metric": "환율",
+          "value": "1,210",
+          "unit": "원",
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "원달러 환율",
+          "period": "최근",
+          "metric": "환율",
+          "value": "1,150",
+          "unit": "원",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "subject": "원달러 환율",
+          "period": "작년 12월",
+          "metric": "환율",
+          "value": "1,210",
+          "unit": "원",
+          "verdict": "REVIEW_REQUIRED",
+          "evidence": []
+        },
+        {
+          "text": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "subject": "원달러 환율",
+          "period": "최근",
+          "metric": "환율",
+          "value": "1,150",
+          "unit": "원",
+          "verdict": "REVIEW_REQUIRED",
+          "evidence": [
+            {
+              "url": "https://view.asiae.co.kr/article/2026090715283829714",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_STRUCTURE_REVIEW_REQUIRED",
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "CLAIM_VALUE_INVALID",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "VALUE_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "원문 일부만 구조화 대상으로 전송했습니다. 원문 전체 문맥 검증 제한을 유지합니다.",
+        "검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다.",
+        "검색 후보 원문에 접근하지 못했습니다. 접근 실패를 반박 근거로 사용하지 않습니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 2,
+        "verdictCounts": {
+          "REVIEW_REQUIRED": 2
+        },
+        "evidenceCount": 1,
+        "usage": {
+          "calls": 7,
+          "actualMicros": 18203,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 19503,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "137_003_1848",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "해수 대상",
+          "period": "2016년 10월 1일에서 2016년 11월 19일",
+          "metric": "유통기한 표시",
+          "value": "2016년 10월 1일에서 2016년 11월 19일 내",
+          "unit": "날짜",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 2,
+          "actualMicros": 351,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1551,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "149_003_0995",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "조금만 해도 각 우주의 주요연령층은 30대와 40대가 존재의 과반이었지만,",
+          "start": 0,
+          "end": 4.159999847412109
+        },
+        {
+          "id": 1,
+          "text": "올해는 50대와 60대가 절반을 넘었다.",
+          "start": 4.159999847412109,
+          "end": 6.400000095367432
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "조금만 해도 각 우주의 주요연령층은 30대와 40대가 존재의 과반이었지만,",
+          "segment_ids": [
+            0
+          ],
+          "subject": "주요연령층",
+          "period": null,
+          "metric": "과반",
+          "value": "30대와 40대",
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "올해는 50대와 60대가 절반을 넘었다.",
+          "segment_ids": [
+            1
+          ],
+          "subject": "주요연령층",
+          "period": "올해",
+          "metric": "과반",
+          "value": "50대와 60대",
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 2,
+          "actualMicros": 397,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1297,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "112_003_0108",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원 감축을 추진했다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원 감축을 추진했다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "전국 모든 대학",
+          "period": "2015년",
+          "metric": "대학 등급",
+          "value": "5등급",
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 2,
+          "actualMicros": 278,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1378,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "118_003_0251",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고, 두번째는 상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고",
+          "segment_ids": [
+            0
+          ],
+          "subject": "엘니요",
+          "period": null,
+          "metric": "해수면 온도",
+          "value": "높아",
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고",
+          "segment_ids": [
+            0
+          ],
+          "subject": "대륙현상",
+          "period": null,
+          "metric": "발달 정도",
+          "value": "강하게",
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "두번째는 상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "상층 고기업",
+          "period": null,
+          "metric": "발달 정도",
+          "value": "발달",
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "두번째는 상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "대륙현상",
+          "period": null,
+          "metric": "강화 정도",
+          "value": "더 강화",
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 2,
+          "actualMicros": 598,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1998,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    }
+  ],
+  "afterClaimFixSpeech": [
+    {
+      "caseId": "105_003_0478",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "실장처럼 얕지 않은 이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "실장처럼 얕지 않은 이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": null,
+          "metric": "문 두께",
+          "value": "20",
+          "unit": "cm",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "실장처럼 얕지 않은 이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "subject": null,
+          "period": null,
+          "metric": "문 두께",
+          "value": "20",
+          "unit": "cm",
+          "verdict": "INSUFFICIENT",
+          "evidence": []
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다.",
+        "원문 일부만 구조화 대상으로 전송했습니다. 원문 전체 문맥 검증 제한을 유지합니다."
+      ],
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "INSUFFICIENT": 1
+        },
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 6,
+          "actualMicros": 10740,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 12940,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "126_003_0681",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "start": 0,
+          "end": 7
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": "3분기",
+          "metric": "매출",
+          "value": "12919",
+          "unit": "원",
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": null,
+          "period": "3분기",
+          "metric": "영업이익",
+          "value": "618",
+          "unit": "억 원",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "subject": null,
+          "period": "3분기",
+          "metric": "영업이익",
+          "value": "618",
+          "unit": "억 원",
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://www.webeconomy.co.kr/news/articleView.html?idxno=2338937",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://news.samsung.com/kr/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-2026%EB%85%84-3%EB%B6%84%EA%B8%B0-%EC%9E%A0%EC%A0%95%EC%8B%A4%EC%A0%81-%EB%B0%9C%ED%91%9C",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_MISMATCH",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED"
+              ]
+            },
+            {
+              "url": "https://supple.kr/news/cmv9c0bex006q13m2vn7mlnus",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "QUOTE_CONTEXT_REVIEW_REQUIRED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "일부 주장 후보가 원문 검증을 통과하지 못해 제외되었습니다."
+      ],
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "INSUFFICIENT": 1
+        },
+        "evidenceCount": 3,
+        "usage": {
+          "calls": 6,
+          "actualMicros": 8079,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 9079,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "132_003_2339",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "가계 신용 잔액",
+          "period": "작년 말 현재",
+          "metric": "잔액",
+          "value": "1,344조 3천억",
+          "unit": "원",
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "마이너스 통장 등 대출 비중",
+          "period": "작년 말 현재",
+          "metric": "비중",
+          "value": "13",
+          "unit": "%",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "subject": "가계 신용 잔액",
+          "period": "작년 말 현재",
+          "metric": "잔액",
+          "value": "1,344조 3천억",
+          "unit": "원",
+          "verdict": "REVIEW_REQUIRED",
+          "evidence": []
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "일부 주장 후보가 원문 검증을 통과하지 못해 제외되었습니다.",
+        "검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다."
+      ],
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "REVIEW_REQUIRED": 1
+        },
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 6,
+          "actualMicros": 7961,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 9461,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "104_003_0664",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "start": 0,
+          "end": 10
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "원달러 환율",
+          "period": "작년 12월",
+          "metric": "환율",
+          "value": "1,210",
+          "unit": "원",
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "원달러 환율",
+          "period": "최근",
+          "metric": "환율",
+          "value": "1,150",
+          "unit": "원",
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "subject": "원달러 환율",
+          "period": "작년 12월",
+          "metric": "환율",
+          "value": "1,210",
+          "unit": "원",
+          "verdict": "REVIEW_REQUIRED",
+          "evidence": []
+        },
+        {
+          "text": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "subject": "원달러 환율",
+          "period": "최근",
+          "metric": "환율",
+          "value": "1,150",
+          "unit": "원",
+          "verdict": "REVIEW_REQUIRED",
+          "evidence": []
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "원문 일부만 구조화 대상으로 전송했습니다. 원문 전체 문맥 검증 제한을 유지합니다.",
+        "검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다.",
+        "검색 후보 원문에 접근하지 못했습니다. 접근 실패를 반박 근거로 사용하지 않습니다."
+      ],
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 2,
+        "verdictCounts": {
+          "REVIEW_REQUIRED": 2
+        },
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 7,
+          "actualMicros": 18180,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 19480,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "137_003_1848",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "해수 대상",
+          "period": "2016년 10월 1일에서 2016년 11월 19일 내",
+          "metric": "유통기한이 표시된 제품",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+          "subject": "해수 대상",
+          "period": "2016년 10월 1일에서 2016년 11월 19일 내",
+          "metric": "유통기한이 표시된 제품",
+          "value": null,
+          "unit": null,
+          "verdict": "INSUFFICIENT",
+          "evidence": []
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다.",
+        "원문 일부만 구조화 대상으로 전송했습니다. 원문 전체 문맥 검증 제한을 유지합니다."
+      ],
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "INSUFFICIENT": 1
+        },
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 6,
+          "actualMicros": 9894,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 11094,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "149_003_0995",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "조금만 해도 각 우주의 주요연령층은 30대와 40대가 존재의 과반이었지만,",
+          "start": 0,
+          "end": 4.159999847412109
+        },
+        {
+          "id": 1,
+          "text": "올해는 50대와 60대가 절반을 넘었다.",
+          "start": 4.159999847412109,
+          "end": 6.440000057220459
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "조금만 해도 각 우주의 주요연령층은 30대와 40대가 존재의 과반이었지만,",
+          "segment_ids": [
+            0
+          ],
+          "subject": "각 우주의 주요연령층",
+          "period": "조금만 해도",
+          "metric": "존재의 과반",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "올해는 50대와 60대가 절반을 넘었다.",
+          "segment_ids": [
+            1
+          ],
+          "subject": "50대와 60대",
+          "period": "올해",
+          "metric": "절반을 넘었다",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "조금만 해도 각 우주의 주요연령층은 30대와 40대가 존재의 과반이었지만,",
+          "subject": "각 우주의 주요연령층",
+          "period": "조금만 해도",
+          "metric": "존재의 과반",
+          "value": null,
+          "unit": null,
+          "verdict": "INSUFFICIENT",
+          "evidence": []
+        },
+        {
+          "text": "올해는 50대와 60대가 절반을 넘었다.",
+          "subject": "50대와 60대",
+          "period": "올해",
+          "metric": "절반을 넘었다",
+          "value": null,
+          "unit": null,
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://www.insight.co.kr/news/563674",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://supple.kr/news/cmrsm1jcg005767c7redvpcja",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://www.youthdaily.co.kr/news/article.html?no=223292",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "VALUE_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "검색 후보 원문에 접근하지 못했습니다. 접근 실패를 반박 근거로 사용하지 않습니다."
+      ],
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 2,
+        "verdictCounts": {
+          "INSUFFICIENT": 2
+        },
+        "evidenceCount": 3,
+        "usage": {
+          "calls": 7,
+          "actualMicros": 14054,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 14954,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "112_003_0108",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원 감축을 추진했다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원 감축을 추진했다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "전국 모든 대학",
+          "period": "2015년",
+          "metric": "등급",
+          "value": "5",
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원 감축을 추진했다.",
+          "subject": "전국 모든 대학",
+          "period": "2015년",
+          "metric": "등급",
+          "value": "5",
+          "unit": null,
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://www.seoul.co.kr/news/society/2013/11/12/20131112800035",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "VALUE_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://www.hankookilbo.com/news/article/201412232079240726",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "QUOTE_CONTEXT_REVIEW_REQUIRED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://www.sisain.co.kr/news/articleView.html?idxno=18463",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "VALUE_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "visual": {
+        "status": "not_applicable",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "no_video",
+        "frameCount": 0,
+        "recordCount": 0,
+        "limitations": []
+      },
+      "modalChecks": [],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 1,
+        "verdictCounts": {
+          "INSUFFICIENT": 1
+        },
+        "evidenceCount": 3,
+        "usage": {
+          "calls": 6,
+          "actualMicros": 8978,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 10078,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "118_003_0251",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고, 두번째는 상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고",
+          "segment_ids": [
+            0
+          ],
+          "subject": "해수면 온도",
+          "period": null,
+          "metric": "대륙현상 발달 정도",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다",
+          "segment_ids": [
+            0
+          ],
+          "subject": "상층 고기업 발달",
+          "period": null,
+          "metric": "대륙현상 강화 역할",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 2,
+          "actualMicros": 464,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1864,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    }
+  ],
+  "speechOnlyHintComparisons": [
+    {
+      "caseId": "105_003_0478",
+      "speechOnly": true,
+      "hint": "none",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 2200,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "105_003_0478",
+      "speechOnly": true,
+      "hint": "news_units",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "시장처럼 얕지 않은 이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 2200,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "126_003_0681",
+      "speechOnly": true,
+      "hint": "none",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "start": 0,
+          "end": 7
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1000,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "126_003_0681",
+      "speechOnly": true,
+      "hint": "news_units",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "start": 0,
+          "end": 7
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1000,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "132_003_2339",
+      "speechOnly": true,
+      "hint": "none",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1500,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "132_003_2339",
+      "speechOnly": true,
+      "hint": "news_units",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1500,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "104_003_0664",
+      "speechOnly": true,
+      "hint": "none",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "작년 12월 1210원대까지 올랐던 원달러 환율은 최근 1150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "start": 0,
+          "end": 10
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1300,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "104_003_0664",
+      "speechOnly": true,
+      "hint": "news_units",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "작년 12월 1210원대까지 올랐던 원-달러 환율은 최근 1150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "start": 0,
+          "end": 10
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1300,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "137_003_1848",
+      "speechOnly": true,
+      "hint": "none",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1200,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "137_003_1848",
+      "speechOnly": true,
+      "hint": "news_units",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1200,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "149_003_0995",
+      "speechOnly": true,
+      "hint": "none",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "조금만 해도 각 우주의 주요 연령층은 30대와 40대가 존재의 과반이었지만,",
+          "start": 0,
+          "end": 4.159999847412109
+        },
+        {
+          "id": 1,
+          "text": "올해는 50대와 60대가 절반을 넘었다.",
+          "start": 4.159999847412109,
+          "end": 6.440000057220459
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 900,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "149_003_0995",
+      "speechOnly": true,
+      "hint": "news_units",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "조금만 해도 각 우주의 주요연령층은 30대와 40대가 존재의 과반이었지만, 올해는 50대와 60대가 절반을 넘었다.",
+          "start": 0,
+          "end": 6.440000057220459
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 900,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "112_003_0108",
+      "speechOnly": true,
+      "hint": "none",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원 감축을 추진했다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1100,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "112_003_0108",
+      "speechOnly": true,
+      "hint": "news_units",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원 감축을 추진했다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1100,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "118_003_0251",
+      "speechOnly": true,
+      "hint": "none",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고, 두번째는 상층 고기압이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1400,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "118_003_0251",
+      "speechOnly": true,
+      "hint": "news_units",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고, 두번째는 상층 고기압이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1400,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    }
+  ],
+  "baselineVideos": [
+    {
+      "caseId": "briefing-30-75",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "성평등사회를 국정가제로 추진하고 있습니다.",
+          "start": 0,
+          "end": 4
+        },
+        {
+          "id": 1,
+          "text": "이를 위해 그간 위축되었던 성평등정책채널을 복원 확대하고",
+          "start": 4,
+          "end": 9
+        },
+        {
+          "id": 2,
+          "text": "성평등정책총괄, 조정기능을 활성화하기 위한 방안 등을",
+          "start": 9,
+          "end": 14
+        },
+        {
+          "id": 3,
+          "text": "이번 제19차 양성평등위원회에서 논의할 예정입니다.",
+          "start": 14,
+          "end": 20
+        },
+        {
+          "id": 4,
+          "text": "주요안건에 대해 말씀드리겠습니다.",
+          "start": 20,
+          "end": 23
+        },
+        {
+          "id": 5,
+          "text": "첫째, 제3차 양성평등정책기본계획 26년 시행계획입니다.",
+          "start": 23,
+          "end": 29
+        },
+        {
+          "id": 6,
+          "text": "먼저 공정하고 성평등한 노동환경 조성을 위해",
+          "start": 29,
+          "end": 33
+        },
+        {
+          "id": 7,
+          "text": "기업의 자발적인 성별 격차 해소를 유도할 수 있도록",
+          "start": 33,
+          "end": 37
+        },
+        {
+          "id": 8,
+          "text": "고용평등공시제의 법적 근거를 마련하고 공시시스템을 구축할 예정입니다.",
+          "start": 37,
+          "end": 44
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "성평등사회를 국정가제로 추진하고 있습니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "성평등사회",
+          "period": null,
+          "metric": "국정가제 추진 여부",
+          "value": "추진 중",
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "그간 위축되었던 성평등정책채널을 복원 확대하고",
+          "segment_ids": [
+            1
+          ],
+          "subject": "성평등정책채널",
+          "period": "최근",
+          "metric": "복원 및 확대 여부",
+          "value": "복원 확대",
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "이번 제19차 양성평등위원회에서 논의할 예정입니다.",
+          "segment_ids": [
+            3
+          ],
+          "subject": "제19차 양성평등위원회",
+          "period": "이번 회의",
+          "metric": "논의 예정 여부",
+          "value": "논의 예정",
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "제3차 양성평등정책기본계획 26년 시행계획입니다.",
+          "segment_ids": [
+            5
+          ],
+          "subject": "제3차 양성평등정책기본계획",
+          "period": "2026년",
+          "metric": "시행 계획",
+          "value": "있음",
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "고용평등공시제의 법적 근거를 마련하고 공시시스템을 구축할 예정입니다.",
+          "segment_ids": [
+            8
+          ],
+          "subject": "고용평등공시제",
+          "period": "향후",
+          "metric": "법적 근거 마련 및 공시시스템 구축 여부",
+          "value": "예정",
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing",
+          "extracting"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 2,
+          "actualMicros": 832,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 5532,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "safety-20-60",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 4200,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v1",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    }
+  ],
+  "afterClaimFixVideos": [
+    {
+      "caseId": "briefing-30-75",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "성평등사회를 국정가제로 추진하고 있습니다.",
+          "start": 0,
+          "end": 4
+        },
+        {
+          "id": 1,
+          "text": "이를 위해 그간 위축되었던 성평등정책채널을 복원 확대하고",
+          "start": 4,
+          "end": 9
+        },
+        {
+          "id": 2,
+          "text": "성평등정책총괄, 조정기능을 활성화하기 위한 방안 등을",
+          "start": 9,
+          "end": 14
+        },
+        {
+          "id": 3,
+          "text": "이번 제19차 양성평등위원회에서 논의할 예정입니다.",
+          "start": 14,
+          "end": 20
+        },
+        {
+          "id": 4,
+          "text": "주요안건에 대해 말씀드리겠습니다.",
+          "start": 20,
+          "end": 23
+        },
+        {
+          "id": 5,
+          "text": "첫째, 제3차 양성평등정책기본계획 26년 시행계획입니다.",
+          "start": 23,
+          "end": 29
+        },
+        {
+          "id": 6,
+          "text": "먼저 공정하고 성평등한 노동환경 조성을 위해",
+          "start": 29,
+          "end": 33
+        },
+        {
+          "id": 7,
+          "text": "기업의 자발적인 성별 격차 해소를 유도할 수 있도록",
+          "start": 33,
+          "end": 37
+        },
+        {
+          "id": 8,
+          "text": "고용평등공시제의 법적 근거를 마련하고 공시시스템을 구축할 예정입니다.",
+          "start": 37,
+          "end": 44
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "성평등사회를 국정가제로 추진하고 있습니다.",
+          "segment_ids": [
+            0
+          ],
+          "subject": "성평등사회",
+          "period": null,
+          "metric": null,
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "그간 위축되었던 성평등정책채널을 복원 확대하고",
+          "segment_ids": [
+            1
+          ],
+          "subject": "성평등정책채널",
+          "period": null,
+          "metric": "복원 확대",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "성평등정책총괄, 조정기능을 활성화하기 위한 방안 등을 이번 제19차 양성평등위원회에서 논의할 예정입니다.",
+          "segment_ids": [
+            2,
+            3
+          ],
+          "subject": "성평등정책총괄, 조정기능 활성화 방안",
+          "period": "이번 제19차 양성평등위원회",
+          "metric": "논의 예정",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "제3차 양성평등정책기본계획 26년 시행계획입니다.",
+          "segment_ids": [
+            5
+          ],
+          "subject": "제3차 양성평등정책기본계획",
+          "period": "26년",
+          "metric": "시행계획",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "고용평등공시제의 법적 근거를 마련하고 공시시스템을 구축할 예정입니다.",
+          "segment_ids": [
+            8
+          ],
+          "subject": "고용평등공시제",
+          "period": null,
+          "metric": "법적 근거 마련 및 공시시스템 구축 예정",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [
+        {
+          "text": "성평등사회를 국정가제로 추진하고 있습니다.",
+          "subject": "성평등사회",
+          "period": null,
+          "metric": null,
+          "value": null,
+          "unit": null,
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://www.korea.kr/briefing/policyBriefingView.do?newsId=156549427",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "SOURCE_EXTRACTION_TRUNCATED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://www.womennews.co.kr/news/articleView.html?idxno=279535",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://www.nars.go.kr/report/view.do?cmsCode=CM0190&brdSeq=38225",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "SUBJECT_MISMATCH",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        },
+        {
+          "text": "그간 위축되었던 성평등정책채널을 복원 확대하고",
+          "subject": "성평등정책채널",
+          "period": null,
+          "metric": "복원 확대",
+          "value": null,
+          "unit": null,
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://view.asiae.co.kr/article/2026042010450403263",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://www.newspim.com/news/view/20260623000136",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_MISMATCH",
+                "VALUE_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "SOURCE_EXTRACTION_TRUNCATED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "QUOTE_CONTEXT_REVIEW_REQUIRED",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        },
+        {
+          "text": "제3차 양성평등정책기본계획 26년 시행계획입니다.",
+          "subject": "제3차 양성평등정책기본계획",
+          "period": "26년",
+          "metric": "시행계획",
+          "value": null,
+          "unit": null,
+          "verdict": "INSUFFICIENT",
+          "evidence": [
+            {
+              "url": "https://www.mogef.go.kr/mp/pcd/mp_pcd_s001d.do?mid=plc500&bbtSn=705041",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "SOURCE_EXTRACTION_TRUNCATED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "QUOTE_AMBIGUOUS",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            },
+            {
+              "url": "https://www.mogef.go.kr/mp/pcd/mp_pcd_s001d.do?mid=plc500&bbtSn=704946",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "reasons": [
+                "CLAIM_FIELDS_INCOMPLETE",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_MISMATCH",
+                "PERIOD_MISMATCH",
+                "METRIC_NOT_IN_QUOTE",
+                "METRIC_MISMATCH",
+                "UNIT_NOT_IN_QUOTE",
+                "UNIT_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "SOURCE_EXTRACTION_TRUNCATED",
+                "PUBLICATION_METADATA_UNVERIFIED",
+                "QUOTE_AMBIGUOUS",
+                "INVALID_NUMERIC_VALUE"
+              ]
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다.",
+        "일부 주장 후보가 원문 검증을 통과하지 못해 제외되었습니다.",
+        "원문 일부만 구조화 대상으로 전송했습니다. 원문 전체 문맥 검증 제한을 유지합니다.",
+        "검색 후보 원문에 접근하지 못했습니다. 접근 실패를 반박 근거로 사용하지 않습니다.",
+        "검색 후보 원문에서 직접 인용을 확인하지 못했습니다. 다른 후보를 확인합니다."
+      ],
+      "visual": {
+        "status": "partial",
+        "subtitleStatus": "not_present",
+        "ocrStatus": "partial",
+        "frameCount": 3,
+        "recordCount": 2,
+        "limitations": [
+          "15초 간격의 최대 12개 프레임을 표본으로 확인했습니다. 전체 화면의 의미 검증이 아닙니다.",
+          "OCR에는 인식 오류가 있을 수 있으며 사실 여부를 확정하지 않습니다."
+        ]
+      },
+      "modalChecks": [
+        {
+          "source": "ocr",
+          "status": "review_required",
+          "reasons": [
+            "VISUAL_MEANING_UNVERIFIED",
+            "OCR_UNCERTAIN"
+          ]
+        },
+        {
+          "source": "ocr",
+          "status": "review_required",
+          "reasons": [
+            "VISUAL_MEANING_UNVERIFIED",
+            "OCR_UNCERTAIN"
+          ]
+        },
+        {
+          "source": "ocr",
+          "status": "review_required",
+          "reasons": [
+            "VISUAL_MEANING_UNVERIFIED",
+            "OCR_UNCERTAIN"
+          ]
+        }
+      ],
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing",
+          "extracting",
+          "retrieving",
+          "validating_evidence",
+          "retrieving",
+          "validating_evidence",
+          "retrieving",
+          "validating_evidence"
+        ],
+        "claimsCount": 3,
+        "verdictCounts": {
+          "INSUFFICIENT": 3
+        },
+        "evidenceCount": 7,
+        "usage": {
+          "calls": 13,
+          "actualMicros": 31642,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 36342,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1",
+          "ruleVersion": "audio-reviewed-numeric-v5",
+          "sourceReviewVersion": "source-review-v1",
+          "sourceRegistryVersion": "source-registry-2026-10-21",
+          "tableContextVersion": "table-context-v1",
+          "tableCueVersion": "table-cue-audit-v1",
+          "tableReferenceVersion": "table-reference-audit-v1",
+          "visualVersion": "visual-sampled-v1",
+          "modalVersion": "modal-record-review-v1",
+          "summaryVersion": "claim-summary-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    },
+    {
+      "caseId": "safety-20-60",
+      "speechOnly": false,
+      "hint": "current",
+      "transcript": [],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "run": {
+        "status": "failed",
+        "error": "PROVIDER_RESPONSE_INVALID",
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 4200,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "whisper-1",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v2",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      }
+    }
+  ],
+  "safetyTimingDiagnostic": {
+    "caseId": "safety-20-60",
+    "speechOnly": true,
+    "hint": "current",
+    "transcript": [
+      {
+        "id": 0,
+        "text": "쓰읍 하아...",
+        "start": 0.7599999904632568,
+        "end": 3.0999999046325684
+      },
+      {
+        "id": 1,
+        "text": "아악.",
+        "start": 20.31999969482422,
+        "end": 20.780000686645508
+      },
+      {
+        "id": 2,
+        "text": "어, 어.",
+        "start": 20.780000686645508,
+        "end": 22
+      },
+      {
+        "id": 3,
+        "text": "발목, 발목 조심하세요.",
+        "start": 22,
+        "end": 25.18000030517578
+      },
+      {
+        "id": 4,
+        "text": "어어...",
+        "start": 25.18000030517578,
+        "end": 26.559999465942383
+      },
+      {
+        "id": 5,
+        "text": "아, 이거.",
+        "start": 26.719999313354492,
+        "end": 27.68000030517578
+      },
+      {
+        "id": 6,
+        "text": "요즘 가을 산행을 즐기는 등산객들이 많아지고 있는데요.",
+        "start": 29.1200008392334,
+        "end": 33.20000076293945
+      },
+      {
+        "id": 7,
+        "text": "그런만큼 산악사고의 위험도 높아지고 있습니다.",
+        "start": 33.20000076293945,
+        "end": 36.880001068115234
+      },
+      {
+        "id": 8,
+        "text": "실제 지난해 산악사고의 25%가 가을...",
+        "start": 36.880001068115234,
+        "end": 40
+      }
+    ],
+    "candidates": [],
+    "claims": [],
+    "limitations": [
+      "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+    ],
+    "visual": {
+      "status": "complete",
+      "subtitleStatus": "not_present",
+      "ocrStatus": "complete",
+      "frameCount": 3,
+      "recordCount": 3,
+      "limitations": [
+        "15초 간격의 최대 12개 프레임을 표본으로 확인했습니다. 전체 화면의 의미 검증이 아닙니다.",
+        "OCR에는 인식 오류가 있을 수 있으며 사실 여부를 확정하지 않습니다."
+      ]
+    },
+    "modalChecks": [],
+    "run": {
+      "status": "completed",
+      "error": null,
+      "stages": [
+        "transcribing",
+        "extracting"
+      ],
+      "claimsCount": 0,
+      "verdictCounts": {},
+      "evidenceCount": 0,
+      "usage": {
+        "calls": 1,
+        "actualMicros": 0,
+        "unknownUsageCalls": 1,
+        "conservativeMicros": 4200,
+        "currency": "USD",
+        "costBasis": "published_tariff_not_invoice"
+      },
+      "versions": {
+        "providerProfile": "openai_brave",
+        "speechModel": "whisper-1",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "languageModel": "gpt-4.1-mini",
+        "claimPromptVersion": "claim-structured-v1",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "sourceParserVersion": "static-text-v3",
+        "meaningReviewVersion": "reviewed-meaning-v1",
+        "ruleVersion": "audio-reviewed-numeric-v5",
+        "sourceReviewVersion": "source-review-v1",
+        "sourceRegistryVersion": "source-registry-2026-10-21",
+        "tableContextVersion": "table-context-v1",
+        "tableCueVersion": "table-cue-audit-v1",
+        "tableReferenceVersion": "table-reference-audit-v1",
+        "visualVersion": "visual-sampled-v1",
+        "modalVersion": "modal-record-review-v1",
+        "summaryVersion": "claim-summary-v1"
+      },
+      "runtime": {
+        "mode": "openai_brave",
+        "openaiKeyPresent": true,
+        "braveKeyPresent": true
+      },
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      }
+    }
+  },
+  "safetyAfterTimingFix": {
+    "caseId": "safety-20-60",
+    "speechOnly": false,
+    "hint": "current",
+    "transcript": [
+      {
+        "id": 0,
+        "text": "하...",
+        "start": 0.7599999904632568,
+        "end": 6.260000228881836
+      },
+      {
+        "id": 1,
+        "text": "아! 아...",
+        "start": 20.479999542236328,
+        "end": 22.280000686645508
+      },
+      {
+        "id": 2,
+        "text": "달..달목?",
+        "start": 22.420000076293945,
+        "end": 23.559999465942383
+      },
+      {
+        "id": 3,
+        "text": "어, 내 달목 젖크,젖크 같네.",
+        "start": 23.579999923706055,
+        "end": 24.979999542236328
+      },
+      {
+        "id": 4,
+        "text": "아하...",
+        "start": 25.020000457763672,
+        "end": 25.760000228881836
+      },
+      {
+        "id": 5,
+        "text": "아, 이게...",
+        "start": 26.68000030517578,
+        "end": 27.399999618530273
+      },
+      {
+        "id": 6,
+        "text": "쓰읍, 쓰읍.",
+        "start": 27.420000076293945,
+        "end": 28.700000762939453
+      },
+      {
+        "id": 7,
+        "text": "요즘, 가을 산행을 즐기는 등산객들이 많아지고 있는데요.",
+        "start": 29.100000381469727,
+        "end": 32.959999084472656
+      },
+      {
+        "id": 8,
+        "text": "그런만큼 산악사고의 위험도 높아지고 있습니다.",
+        "start": 33.15999984741211,
+        "end": 36.540000915527344
+      },
+      {
+        "id": 9,
+        "text": "실제 지난해 산악사고의 25%가 가을 산행을 즐겼는데요.",
+        "start": 36.86000061035156,
+        "end": 39.900001525878906
+      }
+    ],
+    "candidates": [
+      {
+        "quote": "요즘, 가을 산행을 즐기는 등산객들이 많아지고 있는데요.",
+        "segment_ids": [
+          7
+        ],
+        "subject": "등산객",
+        "period": "가을",
+        "metric": "산행 즐김",
+        "value": null,
+        "unit": null,
+        "eligibility": "checkable"
+      },
+      {
+        "quote": "그런만큼 산악사고의 위험도 높아지고 있습니다.",
+        "segment_ids": [
+          8
+        ],
+        "subject": "산악사고 위험도",
+        "period": null,
+        "metric": "위험도",
+        "value": null,
+        "unit": null,
+        "eligibility": "checkable"
+      },
+      {
+        "quote": "실제 지난해 산악사고의 25%가 가을 산행을 즐겼는데요.",
+        "segment_ids": [
+          9
+        ],
+        "subject": "산악사고",
+        "period": "지난해",
+        "metric": "산악사고 중 가을 산행 즐긴 비율",
+        "value": "25",
+        "unit": "%",
+        "eligibility": "checkable"
+      }
+    ],
+    "claims": [],
+    "limitations": [
+      "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+    ],
+    "run": {
+      "status": "failed",
+      "error": "PROVIDER_RESPONSE_INVALID",
+      "stages": [
+        "transcribing",
+        "extracting"
+      ],
+      "claimsCount": 0,
+      "verdictCounts": {},
+      "evidenceCount": 0,
+      "usage": {
+        "calls": 2,
+        "actualMicros": 684,
+        "unknownUsageCalls": 1,
+        "conservativeMicros": 4884,
+        "currency": "USD",
+        "costBasis": "published_tariff_not_invoice"
+      },
+      "versions": {
+        "providerProfile": "openai_brave",
+        "speechModel": "whisper-1",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "speechTimingVersion": "bounded-tail-v1",
+        "languageModel": "gpt-4.1-mini",
+        "claimPromptVersion": "claim-structured-v2",
+        "claimValidationVersion": "literal-candidates-v2",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "sourceParserVersion": "static-text-v3",
+        "meaningReviewVersion": "reviewed-meaning-v1"
+      },
+      "runtime": {
+        "mode": "openai_brave",
+        "openaiKeyPresent": true,
+        "braveKeyPresent": true
+      },
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      }
+    }
+  },
+  "timingFailureRawSegments": {
+    "duration": 40,
+    "segments": [
+      {
+        "start": 1,
+        "end": 1.7200000286102295,
+        "text": " 아,",
+        "avg_logprob": -2.8271799087524414,
+        "no_speech_prob": 0.08377101272344589
+      },
+      {
+        "start": 21.479999542236328,
+        "end": 22.3799991607666,
+        "text": " 아, 아우.",
+        "avg_logprob": -2.8271799087524414,
+        "no_speech_prob": 0.08377101272344589
+      },
+      {
+        "start": 22.3799991607666,
+        "end": 23.940000534057617,
+        "text": " 그걸 발목, 발목.",
+        "avg_logprob": -2.8271799087524414,
+        "no_speech_prob": 0.08377101272344589
+      },
+      {
+        "start": 23.959999084472656,
+        "end": 27.440000534057617,
+        "text": " 어이구 발목 조심 요 fuzzy.",
+        "avg_logprob": -2.8271799087524414,
+        "no_speech_prob": 0.08377101272344589
+      },
+      {
+        "start": 27.440000534057617,
+        "end": 33.20000076293945,
+        "text": " 요즘 가을 산행을 즐기는 등산객들이 많아지고 있는데요.",
+        "avg_logprob": -0.2733627259731293,
+        "no_speech_prob": 0.46768152713775635
+      },
+      {
+        "start": 33.20000076293945,
+        "end": 36.880001068115234,
+        "text": " 그런만큼 산악사고의 위험도 높아지고 있습니다.",
+        "avg_logprob": -0.2733627259731293,
+        "no_speech_prob": 0.46768152713775635
+      },
+      {
+        "start": 36.880001068115234,
+        "end": 40.119998931884766,
+        "text": " 실제 지난해 산악사고의 25%가 가을",
+        "avg_logprob": -0.2733627259731293,
+        "no_speech_prob": 0.46768152713775635
+      }
+    ]
+  },
+  "redTest": "FFF.......                                                               [100%]\r\n================================== FAILURES ===================================\r\nC:\\코덱스\\졸업프로젝트 중간고사 V2\\Fact-checking-website\\apps\\worker\\factlens\\live_providers.py:139: factlens.pipeline.ProviderUnavailable: PROVIDER_RESPONSE_INVALID\r\nC:\\코덱스\\졸업프로젝트 중간고사 V2\\Fact-checking-website\\apps\\worker\\factlens\\live_providers.py:139: factlens.pipeline.ProviderUnavailable: PROVIDER_RESPONSE_INVALID\r\nC:\\코덱스\\졸업프로젝트 중간고사 V2\\Fact-checking-website\\apps\\worker\\factlens\\live_providers.py:139: factlens.pipeline.ProviderUnavailable: PROVIDER_RESPONSE_INVALID\r\n=========================== short test summary info ===========================\r\nFAILED apps/worker/tests/test_live_providers.py::test_transcription_clips_only_small_tail_overshoot_and_reports_it[3.0000001]\r\nFAILED apps/worker/tests/test_live_providers.py::test_transcription_clips_only_small_tail_overshoot_and_reports_it[3.119998931884766]\r\nFAILED apps/worker/tests/test_live_providers.py::test_transcription_clips_only_small_tail_overshoot_and_reports_it[3.25]\r\n3 failed, 7 passed, 48 deselected in 1.30s\r\n",
+  "limits": [
+    "ASR references compared as text; not blind manual listening",
+    "No CER/WER: number spellings differ and video references are not word aligned",
+    "Government briefing and public safety video are not broadcaster news",
+    "No new transcription model used; comparison awaits user reply",
+    "No unrelated member content accessed; controlled jobs tombstoned and usage retained"
+  ]
+}
