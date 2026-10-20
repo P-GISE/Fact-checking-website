@@ -1,5 +1,13 @@
 # 보안·디버깅 병행 점검 (2026-10-20)
 
+## 최종 배포·운영 확인
+
+[Actions39436575823](https://github.com/P-GISE/Fact-checking-website/actions/runs/39436575823)의 verify/deploy 성공. 운영 코드는 `6a6e7b878fa300befa9aaccda20e210a5495606e`다. API72개·Worker211개·타입/빌드·배포 회귀 단계가 통과했다. 완료 로그의 정확한 SHA를 대조하고 별도 고정 지문 SSH로 원격 HEAD·API/web/worker 새 실행·신규 deploy-6a6e7b878fa3.* DB 백업 파일0600·내부/공개 health ready를 확인했다. 기존 PostgreSQL/Redis 컨테이너는 유지됐다.
+
+공개 malformed JSON은 수정 전400 INTERNAL_ERROR에서 수정 후400 INVALID_INPUT으로 바뀌었다. 미인증 관리자 overview401 AUTH_REQUIRED, 비허용 Origin의 health403 ORIGIN_DENIED도 유지됐다. 실제 운영 해시/DB 과부하 공격은 하지 않았다. 인증 제한 수정은 격리 실제 HTTP 회귀·원격 코드 SHA와 전체 CI로 검증하며 운영 장애 재현으로 과장하지 않는다.
+
+수정 후 동일 범위 Iron Laws check도12파일24지적/passed:false였다. verify_patch는 응답이 완료되지 않아 중단했으며 검증 성공으로 계산하지 않는다. 독립 리뷰 APPROVE/새 회귀19개 통과·전체 CI와 구분한다. 문서 후속 게시에는 [skip ci]를 사용해 운영 코드 SHA를 보존한다. 아래 진행형 문구는 조사 단계 기록이며 이 결과가 현재 기준이다.
+
 대상은 FactLens `P-GISE/Fact-checking-website`의 API 인증/관리자·업로드/삭제·오류 경계다. 기존 작업/회원 데이터에 대한 공격 요청이나 운영 부하 테스트는 하지 않는다. CodeGraph·수동 추적·격리 회귀, 독립 에이전트, Iron Laws와 의존성 감사를 함께 사용한다.
 
 ## 재현된 문제와 수정
