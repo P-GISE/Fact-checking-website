@@ -80,6 +80,27 @@ def test_extract_validates_quote_and_owns_ids():
     assert a.settled==[120]
     assert sdk.requests[0]['max_completion_tokens']==2048
 
+def test_misheard_statistical_term_cannot_inherit_reviewed_policy(tmp_path):
+    text='2024년 한국실험률은 2.8%입니다.'
+    sdk=SDK(transcript={'segments':[{'start':0,'end':2,'text':text}]})
+    p,_=make(sdk);audio=tmp_path/'owned.wav';audio.write_bytes(b'wave')
+    segments=p.transcribe(audio)
+    assert segments[0]['text']==text
+    candidate={'quote':text,'segment_ids':[0],'subject':'한국','period':'2024년','metric':'실험률','value':'2.8','unit':'%','eligibility':'checkable'}
+    sdk.completion=response({'claims':[candidate]})
+    claim=p.extract(segments)[0]
+    from factlens.meaning_review import matching_policies
+    from factlens.decision import decide
+    assert matching_policies(claim)==[]
+    assert decide(claim,[])=='REVIEW_REQUIRED'
+
+def test_transcription_uses_fact_free_labour_vocabulary(tmp_path):
+    sdk=SDK(transcript={'segments':[{'start':0,'end':2,'text':'실험률'}]})
+    p,_=make(sdk);audio=tmp_path/'owned.wav';audio.write_bytes(b'wave')
+    assert p.transcribe(audio)[0]['text']=='실험률'
+    assert sdk.requests[0].get('prompt')=='경제활동인구조사, 취업자, 실업자, 실업률, 고용률, 경제활동인구'
+    assert p.versions()['speechPromptVersion']=='ko-labour-vocabulary-v1'
+
 def test_extract_preserves_spoken_percent_without_rejecting_equivalent_unit():
     quote='2024년 한국 실업률은 2.8퍼센트입니다.'
     candidate={'quote':quote,'segment_ids':[0],'subject':'한국','period':'2024년','metric':'실업률','value':'2.8','unit':'%','eligibility':'checkable'}

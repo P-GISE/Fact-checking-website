@@ -123,7 +123,7 @@ class LiveProviders:
         if path.stat().st_size>25000000:raise ProviderUnavailable('PROVIDER_INPUT_LIMIT')
         def request():
             with path.open('rb') as audio:
-                raw=self._invoke(lambda:self.sdk.audio.transcriptions.create(model='whisper-1',file=audio,language='ko',response_format='verbose_json',timestamp_granularities=['segment']))
+                raw=self._invoke(lambda:self.sdk.audio.transcriptions.create(model='whisper-1',file=audio,language='ko',prompt='경제활동인구조사, 취업자, 실업자, 실업률, 고용률, 경제활동인구',response_format='verbose_json',timestamp_granularities=['segment']))
             # Whisper verbose output is not a monetary invoice. Keep the conservative reservation.
             return ChargedResult(raw,None)
         raw=self.billing.run('transcribe',(math.ceil(self.duration)+1)*100,request)
@@ -228,7 +228,7 @@ class LiveProviders:
         return documents
 
     def versions(self):
-        return {'providerProfile':'openai_brave','speechModel':'whisper-1','languageModel':MODEL,
+        return {'providerProfile':'openai_brave','speechModel':'whisper-1','speechPromptVersion':'ko-labour-vocabulary-v1','languageModel':MODEL,
                 'claimPromptVersion':'claim-structured-v1','evidencePromptVersion':'evidence-structured-v1',
                 'retrievalVersion':'brave-reviewed-source-v4','sourceParserVersion':PARSER_VERSION,'meaningReviewVersion':'reviewed-meaning-v1'}
 
