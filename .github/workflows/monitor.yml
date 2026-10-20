@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: factlens-operations-monitor
@@ -49,3 +50,41 @@ jobs:
           curl --fail --silent --show-error --max-time 15 \
             https://factlens.pigs0516.com/api/health \
             | python3 -c 'import json,sys; assert json.load(sys.stdin).get("status")=="ready"'
+      - name: Assume metadata-only offsite inspection role
+        if: vars.FACTLENS_OFFSITE_ENABLED == 'true'
+        uses: aws-actions/configure-aws-credentials@ff871ab82db5d1d904d5b2a74b710d951e730e8b
+        with:
+          role-to-assume: ${{ vars.FACTLENS_BACKUP_INSPECT_ROLE }}
+          aws-region: ap-northeast-2
+          role-duration-seconds: 900
+          mask-aws-account-id: true
+      - name: Check offsite backup age without reading backup contents
+        if: vars.FACTLENS_OFFSITE_ENABLED == 'true'
+        env:
+          BACKUP_BUCKET: ${{ vars.FACTLENS_BACKUP_BUCKET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$BACKUP_BUCKET" == factlens-backups-753805950222-ap-northeast-2 ]]
+          OFFSITE_METADATA="$(aws s3api list-objects-v2 --bucket "$BACKUP_BUCKET" \
+            --prefix daily/ --query Contents --output json --no-cli-pager)"
+          export OFFSITE_METADATA
+          python3 - <<'PY'
+          from datetime import datetime, timedelta, timezone
+          import json, os
+          now = datetime.now(timezone.utc)
+          def fresh(rows):
+              return any(
+                  row['Key'].endswith('.tar.gz') and 0 < row['Size'] <= 138412032
+                  and timedelta(0) <= now - datetime.fromisoformat(row['LastModified'].replace('Z', '+00:00')) <= timedelta(hours=26)
+                  for row in (rows or [])
+              )
+          def sample(hours, size=1):
+              return [{'Key': 'daily/test.tar.gz', 'Size': size,
+                       'LastModified': (now - timedelta(hours=hours)).isoformat()}]
+          assert fresh(sample(0)) and fresh(sample(26))
+          assert not any((fresh([]), fresh(sample(27)), fresh(sample(-1)), fresh(sample(0, 0))))
+          if not fresh(json.loads(os.environ['OFFSITE_METADATA'])):
+              raise SystemExit('OFFSITE_BACKUP_MISSING_OR_STALE')
+          print('OFFSITE_FRESH')
+          PY
