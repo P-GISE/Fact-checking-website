@@ -17,6 +17,7 @@ class NoRedirect(HTTPRedirectHandler):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base-url',default='http://127.0.0.1:3000')
+    parser.add_argument('--auth-mode',choices=('local','account'),default='local')
     args=parser.parse_args()
     url=urlsplit(args.base_url)
     try:
@@ -36,8 +37,8 @@ def main():
         'Referrer-Policy':'no-referrer',
         'Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
     }
-    cases=[('/api/health',{},200),('/api/not-found',{},404),
-           ('/api/media/not-an-id',{},400),
+    cases=[('/api/health',{},200),('/api/not-found',{},401 if args.auth_mode=='account' else 404),
+           ('/api/media/not-an-id',{},401 if args.auth_mode=='account' else 400),
            ('/api/analyses',{'Origin':'https://untrusted.example'},403)]
     results=[]
     for path,headers,status in cases:
