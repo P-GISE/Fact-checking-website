@@ -97,6 +97,26 @@ def test_transcription_does_not_clip_an_intermediate_out_of_range_segment(tmp_pa
     assert p.limitations==before and p.usage()['calls']==1
 
 
+def test_saved_gtv_all_invalid_response_still_fails_closed():
+    fixture=json.loads((Path(__file__).parents[3]/'docs/reports/2026-10-21-transcription-model-comparison.json').read_text(encoding='utf-8'))['modernProduction']['observed']
+    p,_=make(SDK(completion=response({'claims':fixture['candidates']})))
+    with pytest.raises(ProviderUnavailable,match='^PROVIDER_RESPONSE_INVALID$'):
+        p.extract(fixture['transcript'])
+
+
+def test_literal_event_with_null_metric_keeps_quote_timing_and_correction_context():
+    text='도서관은 어제 문을 열었습니다.'
+    segments=[{'id':0,'start':0,'end':2,'text':text},{'id':1,'start':2,'end':3,'text':'정정합니다. 아직 개관하지 않았습니다.'}]
+    candidate={'quote':text,'segment_ids':[0],'subject':'도서관','period':'어제','metric':None,'value':None,'unit':None,'eligibility':'checkable'}
+    p,_=make(SDK(completion=response({'claims':[candidate]})))
+    c=p.extract(segments)[0]
+    assert c.text==text and c.metric is None and c.value is None and c.unit is None
+    assert (c.startSeconds,c.endSeconds)==(0,2)
+    assert c.contextText==' '.join(s['text'] for s in segments)
+    from factlens.decision import decide
+    assert decide(c,[]) not in ('CONFIRMED','REFUTED')
+
+
 def test_extract_validates_quote_and_owns_ids():
     candidate={'quote':'2025년 한국 고용률 50%','segment_ids':[0],'subject':'한국','period':'2025년','metric':'고용률','value':'50','unit':'%','eligibility':'checkable'}
     sdk=SDK(completion=response({'claims':[candidate]}));p,a=make(sdk)
@@ -156,7 +176,7 @@ def test_extract_sends_original_segments_without_rewriting_context():
     assert p.extract(segments)==[]
     request=sdk.requests[0]
     assert json.loads(request['messages'][1]['content'])=={'segments':segments}
-    assert p.versions()['claimPromptVersion']=='claim-structured-v3'
+    assert p.versions()['claimPromptVersion']=='claim-structured-v4'
 
 
 @pytest.mark.parametrize('segments,candidates',[

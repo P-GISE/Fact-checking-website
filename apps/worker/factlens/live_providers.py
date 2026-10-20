@@ -51,11 +51,11 @@ class Strict(BaseModel):
 class Candidate(Strict):
     quote: str = Field(min_length=1,max_length=2000)
     segment_ids: list[int] = Field(min_length=1,max_length=20)
-    subject: str | None
-    period: str | None
-    metric: str | None
-    value: str | None
-    unit: str | None
+    subject: str | None = Field(description='quote에 실제로 있는 측정 대상의 연속 문자열. 다른 구간의 주체나 대명사의 해석을 보충하지 말고 없으면 null.')
+    period: str | None = Field(description='quote에 실제로 있는 기간의 연속 문자열. 다른 구간에서 가져오거나 날짜를 추론하지 말고 없으면 null.')
+    metric: str | None = Field(description='quote에 실제로 있는 측정 항목의 연속 문자열. 사건을 요약한 개최 여부/진행 여부/협력 의사 등을 만들지 말고 측정 항목이 없으면 null.')
+    value: str | None = Field(description='quote에 실제로 있는 단일 숫자 문자열. 표기와 정밀도를 유지하고 날짜/복합값/숫자가 없으면 null.')
+    unit: str | None = Field(description='quote에 실제로 있는 단위의 연속 문자열 또는 명시적으로 허용한 퍼센트의 %. 없으면 null.')
     eligibility: str
 
 class Candidates(Strict):
@@ -168,6 +168,8 @@ class LiveProviders:
         parsed=self._structured(
             '전사 구간에서 독립 검증 가능한 주장 최대 5개를 뽑아라. quote는 원본 그대로, segment_ids는 제공된 ID만 사용한다. '
             '의견/전망은 eligibility=excluded, 사실 주장은 checkable로 표시한다. '
+            '비수치 사건도 주장으로 유지하되 측정 항목이 없으면 metric=null, 숫자/단위가 없으면 value/unit=null로 둬라. '
+            '주장 검증에 필요해 보인다는 이유로 필드를 채우지 마라. quote 자체가 사건을 담으므로 개최 여부/진행 여부 같은 요약 필드는 필요 없다. '
             'subject/period/metric/unit은 candidate.quote 안에 있는 연속된 원문 문자열만 쓰고 없으면 null로 둬라. '
             'subject는 측정 대상인 국가/기관/집단이고 metric은 측정 항목이다. 의로 연결된 대상과 항목은 나누고 항목명을 subject에 합치지 마라. '
             '인접 구간에서 필드를 추론하거나 보충하지 마라. '
@@ -251,7 +253,7 @@ class LiveProviders:
 
     def versions(self):
         return {'providerProfile':'openai_brave','speechModel':'whisper-1','speechPromptVersion':'ko-labour-vocabulary-v1','speechTimingVersion':'bounded-tail-v1','languageModel':MODEL,
-                'claimPromptVersion':'claim-structured-v3','claimValidationVersion':'literal-candidates-v2','evidencePromptVersion':'evidence-structured-v1',
+                'claimPromptVersion':'claim-structured-v4','claimValidationVersion':'literal-candidates-v2','evidencePromptVersion':'evidence-structured-v1',
                 'retrievalVersion':'brave-reviewed-source-v4','sourceParserVersion':PARSER_VERSION,'meaningReviewVersion':'reviewed-meaning-v1'}
 
     def usage(self):
