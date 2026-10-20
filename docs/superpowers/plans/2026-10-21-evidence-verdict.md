@@ -53,7 +53,7 @@ Files: sanitized execution report and affected guide sections.
 - Final: Tasks1–3 and controlled attempt/publication steps completed. Real AI end-to-end success remains BLOCKED at transcription429; two calls,1200micros conservative unknown cost, test data cleaned. See ../../reports/2026-10-21-evidence-verdict.md.
 - CI39462037590: API97/Worker391 passed, build/type/deploy checks successful. AWS da04741, rulev5, internal/public ready, AI disabled.
 - Policy ruling: pin the entire stable article block plus exact publication observation; pin the full table and explicit headers/cell. Live dataset publication remains null. Shared underlying survey origin is one group, not independent evidence.
-- [ ] Complete one controlled real AI pipeline after account Billing/Limits resolves429; enable public AI only after successful verification.
+- [x] Funding resolved quota; fact-free ASR vocabulary gave a controlled real confirmed verdict, then public signup/login/upload/queue/report confirmed2.8/refuted2.9 and deletion/account closure succeeded. AI enabled with original budgets; see ../../reports/2026-10-21-public-live-verification.md. General accuracy remains unmeasured.
 
 - Baseline: local/production keys absent, production disabled; focused67passed/1FFmpeg-missing failure. Source unchanged at baseline d27ca3a.
 - Ruling: exact reviewed document snapshots are the first safe implementation of the approved limited source semantics. It requires re-review on content change and does not imply universal language understanding.

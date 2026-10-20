@@ -1,0 +1,29 @@
+{
+  "version": "connection-fixture-v1",
+  "purpose": "connection_and_reviewed_verdict_smoke_only",
+  "synthetic": true,
+  "rights": "Self-authored text rendered locally using Microsoft Heami Desktop; no third-party recording or personal information",
+  "engine": "Windows System.Speech / Microsoft Heami Desktop ko-KR",
+  "rate": -2,
+  "audioTracked": false,
+  "researchSplit": null,
+  "goldLabels": null,
+  "cases": [
+    {
+      "id": "owned-clear-20261021",
+      "text": "2024년 한국의 실업률은 2.8퍼센트입니다.",
+      "durationSeconds": 6.190294784580499,
+      "audioBytes": 273038,
+      "audioSha256": "e0d332fea56a2793d55da0f66d1d6030c5af28d1adae400e8781c5e65cdbb055",
+      "actualPublicVerdict": "CONFIRMED"
+    },
+    {
+      "id": "owned-refutation-20261021",
+      "text": "2024년 한국의 실업률은 2.9퍼센트입니다.",
+      "durationSeconds": 6.1532426303854875,
+      "audioBytes": 271404,
+      "audioSha256": "da13c883e4d0636e0c9f45adb6a9778b89fad2d8f93b3ee486d3be5c37dde00c",
+      "actualPublicVerdict": "REFUTED"
+    }
+  ]
+}

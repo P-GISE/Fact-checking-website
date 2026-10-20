@@ -1,0 +1,244 @@
+{
+  "date": "2026-10-21",
+  "scope": "owned synthetic Korean annual unemployment examples only",
+  "researchValidation": false,
+  "deployedSha": "34ae4fa950d94b5baf88f10078a1b10c99ee348e",
+  "publicAiMode": "openai_brave",
+  "budgetsMicros": {
+    "job": 200000,
+    "month": 20000000
+  },
+  "publicRuns": [
+    {
+      "status": "completed",
+      "demo": false,
+      "claims": [
+        {
+          "text": "2024년 한국의 실업률은 2.8%입니다.",
+          "verdict": "CONFIRMED",
+          "evidence": [
+            {
+              "url": "https://mods.go.kr/board.es?act=view&bid=10820&list_no=435687&mid=a10301060500",
+              "usable": true,
+              "relation": "SUPPORTED",
+              "policyId": "mods-2024-social-unemployment-2026-10-21",
+              "reasons": []
+            },
+            {
+              "url": "https://www.index.go.kr/unity/potal/eNara/sub/showStblGams3.do?freq=Y&idx_cd=1063&period=N&stts_cd=106301",
+              "usable": true,
+              "relation": "SUPPORTED",
+              "policyId": "index-2024-unemployment-table-2026-10-21",
+              "reasons": []
+            },
+            {
+              "url": "https://datafact.org/articles/unemployment-rate-25year-low-2023",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "policyId": null,
+              "reasons": [
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "SUBJECT_NOT_IN_QUOTE",
+                "METRIC_NOT_IN_QUOTE",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED"
+              ]
+            }
+          ]
+        }
+      ],
+      "usage": {
+        "calls": 4,
+        "model": "gpt-4.1-mini",
+        "billing": "metered",
+        "currency": "USD",
+        "costBasis": "published_tariff_not_invoice",
+        "priceDate": "2026-10-16",
+        "actualMicros": 6008,
+        "currencyUnit": "configured_currency_micros",
+        "providerProfile": "openai_brave",
+        "unknownUsageCalls": 1,
+        "conservativeMicros": 6808
+      },
+      "versions": {
+        "ruleVersion": "audio-reviewed-numeric-v5",
+        "speechModel": "whisper-1",
+        "modalVersion": "modal-record-review-v1",
+        "languageModel": "gpt-4.1-mini",
+        "visualVersion": "visual-sampled-v1",
+        "summaryVersion": "claim-summary-v1",
+        "providerProfile": "openai_brave",
+        "tableCueVersion": "table-cue-audit-v1",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "claimPromptVersion": "claim-structured-v1",
+        "sourceParserVersion": "static-text-v3",
+        "sourceReviewVersion": "source-review-v1",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "tableContextVersion": "table-context-v1",
+        "meaningReviewVersion": "reviewed-meaning-v1",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "sourceRegistryVersion": "source-registry-2026-10-21",
+        "tableReferenceVersion": "table-reference-audit-v1"
+      },
+      "summary": {
+        "version": "claim-summary-v1",
+        "scope": "claim_summary",
+        "overall": "supported_claims",
+        "counts": {
+          "CONFIRMED": 1,
+          "REFUTED": 0,
+          "INSUFFICIENT": 0,
+          "REVIEW_REQUIRED": 0,
+          "EXCLUDED": 0
+        },
+        "strength": "not_assessed",
+        "independenceVerified": false,
+        "crossModalReviewRequired": false,
+        "reviewedEvidence": {
+          "version": "reviewed-summary-v1",
+          "documentCount": 2,
+          "originGroupCount": 1,
+          "strength": "moderate",
+          "reasons": [
+            "DIRECT_REVIEWED_EVIDENCE",
+            "INDEPENDENCE_UNVERIFIED",
+            "SHARED_OR_DUPLICATE_ORIGIN"
+          ]
+        }
+      }
+    },
+    {
+      "status": "completed",
+      "demo": false,
+      "claims": [
+        {
+          "text": "2024년 한국의 실업률은 2.9%입니다.",
+          "verdict": "REFUTED",
+          "evidence": [
+            {
+              "url": "https://mods.go.kr/board.es?act=view&bid=10820&list_no=435687&mid=a10301060500",
+              "usable": true,
+              "relation": "REFUTED",
+              "policyId": "mods-2024-social-unemployment-2026-10-21",
+              "reasons": []
+            },
+            {
+              "url": "https://www.index.go.kr/unity/potal/eNara/sub/showStblGams3.do?freq=Y&idx_cd=1063&period=N&stts_cd=106301",
+              "usable": true,
+              "relation": "REFUTED",
+              "policyId": "index-2024-unemployment-table-2026-10-21",
+              "reasons": []
+            },
+            {
+              "url": "https://www.index.go.kr/unity/potal/main/EachDtlPageDetail.do?idx_cd=1063",
+              "usable": false,
+              "relation": "INSUFFICIENT",
+              "policyId": null,
+              "reasons": [
+                "CLAIM_CONTEXT_REVIEW_REQUIRED",
+                "FACT_STRUCTURE_REVIEW_REQUIRED",
+                "PUBLICATION_METADATA_MISSING",
+                "SUBJECT_NOT_IN_QUOTE",
+                "PERIOD_NOT_IN_QUOTE",
+                "PERIOD_MISMATCH",
+                "CONTEXT_REVIEW_REQUIRED",
+                "SOURCE_AUTHENTICITY_UNVERIFIED",
+                "PUBLICATION_METADATA_UNVERIFIED"
+              ]
+            }
+          ]
+        }
+      ],
+      "usage": {
+        "calls": 4,
+        "model": "gpt-4.1-mini",
+        "billing": "metered",
+        "currency": "USD",
+        "costBasis": "published_tariff_not_invoice",
+        "priceDate": "2026-10-16",
+        "actualMicros": 7181,
+        "currencyUnit": "configured_currency_micros",
+        "providerProfile": "openai_brave",
+        "unknownUsageCalls": 1,
+        "conservativeMicros": 7981
+      },
+      "versions": {
+        "ruleVersion": "audio-reviewed-numeric-v5",
+        "speechModel": "whisper-1",
+        "modalVersion": "modal-record-review-v1",
+        "languageModel": "gpt-4.1-mini",
+        "visualVersion": "visual-sampled-v1",
+        "summaryVersion": "claim-summary-v1",
+        "providerProfile": "openai_brave",
+        "tableCueVersion": "table-cue-audit-v1",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "claimPromptVersion": "claim-structured-v1",
+        "sourceParserVersion": "static-text-v3",
+        "sourceReviewVersion": "source-review-v1",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "tableContextVersion": "table-context-v1",
+        "meaningReviewVersion": "reviewed-meaning-v1",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "sourceRegistryVersion": "source-registry-2026-10-21",
+        "tableReferenceVersion": "table-reference-audit-v1"
+      },
+      "summary": {
+        "version": "claim-summary-v1",
+        "scope": "claim_summary",
+        "overall": "refuted_claims",
+        "counts": {
+          "CONFIRMED": 0,
+          "REFUTED": 1,
+          "INSUFFICIENT": 0,
+          "REVIEW_REQUIRED": 0,
+          "EXCLUDED": 0
+        },
+        "strength": "not_assessed",
+        "independenceVerified": false,
+        "crossModalReviewRequired": false,
+        "reviewedEvidence": {
+          "version": "reviewed-summary-v1",
+          "documentCount": 2,
+          "originGroupCount": 1,
+          "strength": "moderate",
+          "reasons": [
+            "DIRECT_REVIEWED_EVIDENCE",
+            "INDEPENDENCE_UNVERIFIED",
+            "SHARED_OR_DUPLICATE_ORIGIN"
+          ]
+        }
+      }
+    }
+  ],
+  "qa": {
+    "signup": true,
+    "logoutAndLogin": true,
+    "browserUploadConsentAndQueue": true,
+    "reportReopen": true,
+    "reportClaimsTimelineMediaBeforeDelete": 200,
+    "reportClaimsTimelineMediaAfterDelete": 404,
+    "historyAfterDelete": 0,
+    "physicalMediaRemoved": true,
+    "accountClosed": true,
+    "sessionUserAfterClosure": null,
+    "loginAfterClosure": "rejected",
+    "usageRowsRetained": true
+  },
+  "usage": {
+    "publicConservativeMicros": 14789,
+    "thisTaskIncludingDiagnosticsConservativeMicros": 60058,
+    "allControlledAndPublicConservativeMicros": 70241,
+    "currency": "USD",
+    "costBasis": "published_tariff_not_invoice"
+  },
+  "localRegression": {
+    "passed": 151,
+    "skipped": 2
+  },
+  "linuxCI": {
+    "apiPassed": 97,
+    "workerPassed": 393,
+    "runId": 39469544527,
+    "conclusion": "success"
+  }
+}
