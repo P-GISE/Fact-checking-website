@@ -1,0 +1,1658 @@
+{
+  "date": "2026-10-21",
+  "authorization": {
+    "comparisonModel": "gpt-transcribe",
+    "capMicros": 200000,
+    "keepProductionModel": true,
+    "findNewsDirectly": true
+  },
+  "scope": "diagnostic_comparison_not_representative_accuracy_or_model_migration",
+  "productionSource": "1da60d67f225607acbc3acf9c474fae0a291ede8",
+  "request": {
+    "response_format": "json",
+    "extra_body": {
+      "languages": [
+        "ko"
+      ]
+    },
+    "prompt": "경제활동인구조사, 취업자, 실업자, 실업률, 고용률, 경제활동인구",
+    "promptNoneControls": true,
+    "newModelProvidesClaimTimestamps": false
+  },
+  "rights": {
+    "priorManifest": "../../evaluation/smoke/real-korean-media-2026-10-21.json",
+    "speech": {
+      "license": "CC-BY-4.0",
+      "source": "https://www.openslr.org/40/",
+      "attribution": "Zeroth-Korean corpus; Lucas Jo, Atlas Guide Inc., Wonkyum Lee, Gridspace Inc.",
+      "mirror": "https://huggingface.co/datasets/kresnik/zeroth_korean",
+      "revision": "1fe937899f828af822293d05e086200946088bdf",
+      "modifications": "Selected utterances decoded from FLAC to mono PCM WAV; no speech synthesis or transcript conditioning"
+    },
+    "governmentVideos": {
+      "license": "KOGL-1",
+      "source": "https://www.kogl.or.kr/open/info/license.do",
+      "attribution": "성평등가족부; 전북특별자치도소방본부",
+      "externalProcessingBasis": "Per-item KOGL-1 reuse/adaptation permission; no OpenAI-specific separate grant claimed",
+      "modifications": "Bounded excerpts, scale640, reencode H264/AAC; speech and source frames preserved"
+    },
+    "archivalNews": {
+      "rights": {
+        "license": "public-domain-file",
+        "source": "https://commons.wikimedia.org/wiki/File%3A%EB%8C%80%ED%95%9C%EB%89%B4%EC%8A%A4_%EC%A0%9C_23%ED%98%B8_-_%ED%9C%B4%EC%A0%84%ED%98%91%EC%A0%95%EC%B2%B4%EA%B2%B0%EA%B3%BC_%ED%8F%AC%EB%A1%9C%EA%B5%90%ED%99%98_%281953%EB%85%84_7%EC%9B%94_20%EC%9D%BC%29.webm",
+        "revision": 1260287052,
+        "attribution": "대한뉴스 제23호 / KTV 아카이브; Wikimedia Commons mirror",
+        "basis": "File-specific Commons licensing states public domain in South Korea and US; no restriction bypass",
+        "modifications": "30–90 second excerpt transcoded to H264/AAC at width640"
+      },
+      "externalProcessingAuthorized": true,
+      "cases": [
+        {
+          "id": "news-1953-30-90",
+          "file": "news-1953-30-90.mp4",
+          "referenceText": "No aligned verbatim reference; Commons description concerns Korean armistice and prisoner exchange. File date label says1953-07-20 while description says July27; do not treat metadata as truth labels."
+        }
+      ]
+    },
+    "modernNews": {
+      "externalProcessingAuthorized": true,
+      "rights": {
+        "license": "KOGL-1",
+        "source": "https://gnews.gg.go.kr/news/news_detail_m.do?number=202412110741593811C048&s_code=C500",
+        "attribution": "경기도청 방송국 GTV; 김세은; 균형발전의 첫걸음 ‘경기북부 미래 비전 포럼’; 2024-12-11",
+        "basis": "Item-specific license states 위 기사는 공공누리 제1유형 출처표시; own GTV video news embedded in same item. No text-only restriction observed. Applied to in-item self-produced report; no separate video download button/grant found.",
+        "access": "Aside verified public playback11seconds without login; official public iframe; expiring media URL excluded from published evidence",
+        "modifications": "First60seconds recorded via observed public HLS, H264/AAC scale640"
+      },
+      "cases": [
+        {
+          "id": "gtv-20241211-0-60",
+          "file": "gtv-20241211-0-60.mp4",
+          "referenceText": "9일 고양시 아람누리 새라새극장. 경기북부 균형발전 공동선언과 올해 두번째 경기북부 미래비전 포럼이 진행됐습니다. 경기도와 경기북부 시장군수협의회, 각 분야 전문가 등이 공동선언을 통해 경기북부의 발전이 지체된 현 상황을 타개하고, 균형 있는 발전을 이루기 위해 노력할 것을 다짐했습니다.",
+          "referenceScope": "Official full script context; no word-aligned gold reference"
+        }
+      ]
+    }
+  },
+  "pairedInputHashes": [
+    {
+      "file": "104_003_0664.wav",
+      "sha256": "17c71d2fc8a677a4ec6dff1cd19bc8cad98e0771fd59fe7ef21161a00f62b718",
+      "bytes": 377846,
+      "identicalToPrior": true
+    },
+    {
+      "file": "105_003_0478.wav",
+      "sha256": "ae8dc4f22cad437e51179c1e2dd282a577e8574252bf2c5a34c7490f76092185",
+      "bytes": 654606,
+      "identicalToPrior": true
+    },
+    {
+      "file": "112_003_0108.wav",
+      "sha256": "a3dd0facffe95902c79be0054193c33b32a75b33e66c687cd7b6b800eabfc9ac",
+      "bytes": 297142,
+      "identicalToPrior": true
+    },
+    {
+      "file": "118_003_0251.wav",
+      "sha256": "5bb1708a8bde90a874fec4e1d363e912a6725dfbc11b0975572c147dfc6cd045",
+      "bytes": 391056,
+      "identicalToPrior": true
+    },
+    {
+      "file": "126_003_0681.wav",
+      "sha256": "884e3cb1ad05b177f6a0cd323dce8dc025c1771fd2719a6b6736764d6d8d8223",
+      "bytes": 274552,
+      "identicalToPrior": true
+    },
+    {
+      "file": "132_003_2339.wav",
+      "sha256": "093858064aa4cd82724127d2017c01a16b83a2e48fba0f34e5825ba9c838b9f6",
+      "bytes": 426032,
+      "identicalToPrior": true
+    },
+    {
+      "file": "137_003_1848.wav",
+      "sha256": "bfe3b38d20a63612d6fc1a6afc73d7d9f893ee35bed013958b1fd7ca9a1f5a3a",
+      "bytes": 327250,
+      "identicalToPrior": true
+    },
+    {
+      "file": "149_003_0995.wav",
+      "sha256": "7cc2303b49dd3a3f2d723b8864c3adc4d47d00ae4409c5806c78a18bc29d2797",
+      "bytes": 252404,
+      "identicalToPrior": true
+    },
+    {
+      "file": "briefing-30-75.mp4",
+      "sha256": "f468a0c9f5f7414e93fafda35ff5d2f118eff28716711be8a612b5524f577a76",
+      "bytes": 2720303,
+      "identicalToPrior": true
+    },
+    {
+      "file": "briefing-original.mp4",
+      "sha256": "8b03a53aa1829945a6de41e4e1e7f487be55f9047985d262c0fe165adb61d626",
+      "bytes": 164299965,
+      "identicalToPrior": true
+    },
+    {
+      "file": "safety-20-60.mp4",
+      "sha256": "34196e3960f22f2011cda0a7750c11039342e1951026db1c16afc9981bba18a7",
+      "bytes": 6794427,
+      "identicalToPrior": true
+    },
+    {
+      "file": "safety-original.mp4",
+      "sha256": "7e4803ddd1d66d48978b1130e0fe8183b20e5d6134b81b33a2493962c4989964",
+      "bytes": 29693728,
+      "identicalToPrior": true
+    }
+  ],
+  "newInputs": {
+    "historicalOriginalSha256": "25cd54a615e3a2185662edeedd7ed61629ed90788212d8538161895dc7f46fc3",
+    "historical": {
+      "file": "news-1953-30-90.mp4",
+      "bytes": 6691186,
+      "sha256": "05022c9667ebdf217724c8e3d4d7004c1506307469db3c1ac41396a533eeea91",
+      "sourceSha1Matched": true
+    },
+    "modern": {
+      "exitCode": 0,
+      "bytes": 5290825,
+      "sha256": "0ab477dee36dbd92c0a954b7a20831e7d735d242f776b95ec4585ccb997d405c",
+      "error": null
+    }
+  },
+  "reusedWhisperBaseline": [
+    {
+      "caseId": "105_003_0478",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "실장처럼 얕지 않은 이 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixSpeech",
+      "model": "whisper-1"
+    },
+    {
+      "caseId": "126_003_0681",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "3분기 매출 1조 2,919원 영업이익 618억 원을 올렸다.",
+          "start": 0,
+          "end": 7
+        }
+      ],
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixSpeech",
+      "model": "whisper-1"
+    },
+    {
+      "caseId": "132_003_2339",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "한국은행에 따르면 작년 말 현재 가계 신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스 통장 등 대출로 추산된다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixSpeech",
+      "model": "whisper-1"
+    },
+    {
+      "caseId": "104_003_0664",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+          "start": 0,
+          "end": 10
+        }
+      ],
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixSpeech",
+      "model": "whisper-1"
+    },
+    {
+      "caseId": "137_003_1848",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "해수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixSpeech",
+      "model": "whisper-1"
+    },
+    {
+      "caseId": "149_003_0995",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "조금만 해도 각 우주의 주요연령층은 30대와 40대가 존재의 과반이었지만,",
+          "start": 0,
+          "end": 4.159999847412109
+        },
+        {
+          "id": 1,
+          "text": "올해는 50대와 60대가 절반을 넘었다.",
+          "start": 4.159999847412109,
+          "end": 6.440000057220459
+        }
+      ],
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixSpeech",
+      "model": "whisper-1"
+    },
+    {
+      "caseId": "112_003_0108",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원 감축을 추진했다.",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixSpeech",
+      "model": "whisper-1"
+    },
+    {
+      "caseId": "118_003_0251",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "첫번째는 엘니요로 인해 해수면 온도가 높아 대륙현상이 강하게 발달하는 것이고, 두번째는 상층 고기업이 발달하면서 대륙현상을 더 강화시키는 역할을 하고 있습니다.",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixSpeech",
+      "model": "whisper-1"
+    },
+    {
+      "caseId": "briefing-30-75",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "성평등사회를 국정가제로 추진하고 있습니다.",
+          "start": 0,
+          "end": 4
+        },
+        {
+          "id": 1,
+          "text": "이를 위해 그간 위축되었던 성평등정책채널을 복원 확대하고",
+          "start": 4,
+          "end": 9
+        },
+        {
+          "id": 2,
+          "text": "성평등정책총괄, 조정기능을 활성화하기 위한 방안 등을",
+          "start": 9,
+          "end": 14
+        },
+        {
+          "id": 3,
+          "text": "이번 제19차 양성평등위원회에서 논의할 예정입니다.",
+          "start": 14,
+          "end": 20
+        },
+        {
+          "id": 4,
+          "text": "주요안건에 대해 말씀드리겠습니다.",
+          "start": 20,
+          "end": 23
+        },
+        {
+          "id": 5,
+          "text": "첫째, 제3차 양성평등정책기본계획 26년 시행계획입니다.",
+          "start": 23,
+          "end": 29
+        },
+        {
+          "id": 6,
+          "text": "먼저 공정하고 성평등한 노동환경 조성을 위해",
+          "start": 29,
+          "end": 33
+        },
+        {
+          "id": 7,
+          "text": "기업의 자발적인 성별 격차 해소를 유도할 수 있도록",
+          "start": 33,
+          "end": 37
+        },
+        {
+          "id": 8,
+          "text": "고용평등공시제의 법적 근거를 마련하고 공시시스템을 구축할 예정입니다.",
+          "start": 37,
+          "end": 44
+        }
+      ],
+      "model": "whisper-1",
+      "source": "2026-10-21-real-korean-diagnostics.json/afterClaimFixVideos"
+    },
+    {
+      "caseId": "safety-20-60",
+      "transcript": [
+        {
+          "id": 0,
+          "text": "쓰읍 하아...",
+          "start": 0.7599999904632568,
+          "end": 3.0999999046325684
+        },
+        {
+          "id": 1,
+          "text": "아악.",
+          "start": 20.31999969482422,
+          "end": 20.780000686645508
+        },
+        {
+          "id": 2,
+          "text": "어, 어.",
+          "start": 20.780000686645508,
+          "end": 22
+        },
+        {
+          "id": 3,
+          "text": "발목, 발목 조심하세요.",
+          "start": 22,
+          "end": 25.18000030517578
+        },
+        {
+          "id": 4,
+          "text": "어어...",
+          "start": 25.18000030517578,
+          "end": 26.559999465942383
+        },
+        {
+          "id": 5,
+          "text": "아, 이거.",
+          "start": 26.719999313354492,
+          "end": 27.68000030517578
+        },
+        {
+          "id": 6,
+          "text": "요즘 가을 산행을 즐기는 등산객들이 많아지고 있는데요.",
+          "start": 29.1200008392334,
+          "end": 33.20000076293945
+        },
+        {
+          "id": 7,
+          "text": "그런만큼 산악사고의 위험도 높아지고 있습니다.",
+          "start": 33.20000076293945,
+          "end": 36.880001068115234
+        },
+        {
+          "id": 8,
+          "text": "실제 지난해 산악사고의 25%가 가을...",
+          "start": 36.880001068115234,
+          "end": 40
+        }
+      ],
+      "model": "whisper-1",
+      "source": "2026-10-21-real-korean-diagnostics.json/safetyTimingDiagnostic"
+    }
+  ],
+  "gptSameInputs": [
+    {
+      "caseId": "105_003_0478",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "처럼 얕지 않은 이 두 문 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다. 또 말씀하셔가지고. 아직 익숙치 않아요. 네, 계속 지금 녹음되고 있는 거예요. 왜냐하면.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1650,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 1650
+    },
+    {
+      "caseId": "126_003_0681",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "3분기 매출 1조 2,919억원, 영업이익 618억원을 올렸다.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 750,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 2400
+    },
+    {
+      "caseId": "132_003_2339",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "한국은행에 따르면 작년 말 현재 가계신용 잔액은 1,344조 3천억 원으로 이 가운데 약 13%가 마이너스통장 등 대출로 추산된다.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1125,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 3525
+    },
+    {
+      "caseId": "104_003_0664",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "작년 12월 1,210원대까지 올랐던 원달러 환율은 최근 1,150원대로 5%가량 떨어지면서 외국인 자금 유입에 도움을 주고 있다.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 975,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 4500
+    },
+    {
+      "caseId": "137_003_1848",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "회수 대상은 2016년 10월 1일에서 2016년 11월 19일 내로 유통기한이 표시된 제품들이다.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 900,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 5400
+    },
+    {
+      "caseId": "149_003_0995",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "전망해도 가구주의 주요 연령층은 30대와 40대가 전체의 과반이었지만 올해는 50대와 60대가 절반을 넘었다.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 675,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 6075
+    },
+    {
+      "caseId": "112_003_0108",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "2015년에는 전국 모든 대학을 평가해 5등급으로 나누고 등급에 따라 정원감축을 추진했다.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 825,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 6900
+    },
+    {
+      "caseId": "118_003_0251",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "첫 번째는 엘니뇨로 인해 해수면 온도가 높아 대류 현상이 강하게 발달하는 것이고, 두 번째는 상층 고기압이 발달하면서 대류 현상을 더 강화시키는 역할을 하고 있습니다.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1050,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 7950
+    },
+    {
+      "caseId": "briefing-30-75",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "성평등 사회를 국정과제로 추진하고 있습니다. 이를 위해 그간 위축되었던 성평등 정책 채널을 복원 확대하고 성평등 정책 총괄 조정 기능을 활성화하기 위한 방안 등을 이번 제19차 양성평등위원회에서 논의할 예정입니다. 주요 안건에 대해 말씀드리겠습니다. 첫째, 제3차 양성평등정책 기본계획 26년 시행계획입니다. 먼저 공정하고 성평등한 노동환경 조성을 위해 기업의 자발적인 성별 격차 해소를 유도할 수 있도록 고용평등 공시제의 법적 근거를 마련하고 공시 시스템을 구축할 예정입니다. 아이돌봄 서비스",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 3525,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 11475
+    },
+    {
+      "caseId": "safety-20-60",
+      "model": "gpt-transcribe",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "요즘 가을 산행을 즐기는 등산객들이 많아지고 있는데요. 그런 만큼 산악사고의 위험도 높아지고 있습니다. 실제 지난해 산악사고의 25%가 가을",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 3150,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 14625
+    }
+  ],
+  "historicalGpt": {
+    "caseId": "news-1953-30-90",
+    "model": "gpt-transcribe",
+    "scope": "transcription_only_no_claim_timestamps_or_verdict",
+    "observed": {
+      "text": "일자리 창출과 일자리 창출과 경제활동인구조사, 취업자, 실업자, 실업률, 고용률, 경제활동인구. 이날 유엔군 정전위원회 클라크 장군은 전투기계의 컨팅이 집중된 가운데, 민간에 있는 유엔군 전송본부에 도착해서 조정위원회 검토 전역했습니다. 이로써 3년 동안의 걸쳐서 계속되어온 한국의 동란은 새로운 단계로 처리하게 된 것입니다.",
+      "languages": [
+        {
+          "code": "ko"
+        }
+      ],
+      "wordTimestampsAvailable": false
+    },
+    "run": {
+      "status": "completed",
+      "error": null,
+      "stages": [
+        "transcribing"
+      ],
+      "claimsCount": 0,
+      "verdictCounts": {},
+      "evidenceCount": 0,
+      "usage": {
+        "calls": 1,
+        "actualMicros": 0,
+        "unknownUsageCalls": 1,
+        "conservativeMicros": 4650,
+        "currency": "USD",
+        "costBasis": "published_tariff_not_invoice"
+      },
+      "versions": {
+        "providerProfile": "openai_brave",
+        "speechModel": "gpt-transcribe",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "speechTimingVersion": "bounded-tail-v1",
+        "languageModel": "gpt-4.1-mini",
+        "claimPromptVersion": "claim-structured-v3",
+        "claimValidationVersion": "literal-candidates-v2",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "sourceParserVersion": "static-text-v3",
+        "meaningReviewVersion": "reviewed-meaning-v1"
+      },
+      "runtime": {
+        "mode": "openai_brave",
+        "openaiKeyPresent": true,
+        "braveKeyPresent": true
+      },
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      }
+    },
+    "cumulativeMicros": 4650
+  },
+  "historicalProduction": {
+    "caseId": "news-1953-30-90",
+    "referenceText": "No aligned verbatim reference; Commons description concerns Korean armistice and prisoner exchange. File date label says1953-07-20 while description says July27; do not treat metadata as truth labels.",
+    "speechOnly": false,
+    "hint": "current",
+    "observed": {
+      "transcript": [],
+      "candidates": [],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "rawSpeech": {
+        "duration": 60.0099983215332,
+        "segments": [
+          {
+            "start": 0,
+            "end": 3,
+            "text": " 이를 결사반대를 왔음에도 불구하고",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 3,
+            "end": 6,
+            "text": " 암산방의 숙원인 국신성입을 달성하지 못한 채",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 6,
+            "end": 8,
+            "text": " 드디어 주군 성립이되어",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 8,
+            "end": 11,
+            "text": " 일단 전투가 공지되는 단계로 들어갔습니다.",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 12,
+            "end": 14,
+            "text": " 이날 유엔군 선사령관 클라스 장군은",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 14,
+            "end": 17,
+            "text": " 전투에 대한 관심이 집중된 가운데",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 17,
+            "end": 20,
+            "text": " 논산에 있는 유엔군 전군본부에 도착해서",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 20,
+            "end": 22,
+            "text": " 주군을 위해 전투설명해왔습니다.",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 22,
+            "end": 25,
+            "text": " 이로써 반년 동안의 전투가 계속되어온",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 25,
+            "end": 28,
+            "text": " 한국에 동원하는 새로운 단계로 설립하게 되는 것입니다.",
+            "avg_logprob": -0.4869123101234436,
+            "no_speech_prob": 0.44548067450523376
+          },
+          {
+            "start": 60,
+            "end": 62,
+            "text": " 이 시각 세계였습니다.",
+            "avg_logprob": -0.7540452480316162,
+            "no_speech_prob": 0.9893502593040466
+          }
+        ]
+      }
+    },
+    "run": {
+      "status": "failed",
+      "error": "PROVIDER_RESPONSE_INVALID",
+      "stages": [
+        "transcribing"
+      ],
+      "claimsCount": 0,
+      "verdictCounts": {},
+      "evidenceCount": 0,
+      "usage": {
+        "calls": 1,
+        "actualMicros": 0,
+        "unknownUsageCalls": 1,
+        "conservativeMicros": 6200,
+        "currency": "USD",
+        "costBasis": "published_tariff_not_invoice"
+      },
+      "versions": {
+        "providerProfile": "openai_brave",
+        "speechModel": "whisper-1",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "speechTimingVersion": "bounded-tail-v1",
+        "languageModel": "gpt-4.1-mini",
+        "claimPromptVersion": "claim-structured-v3",
+        "claimValidationVersion": "literal-candidates-v2",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "sourceParserVersion": "static-text-v3",
+        "meaningReviewVersion": "reviewed-meaning-v1"
+      },
+      "runtime": {
+        "mode": "openai_brave",
+        "openaiKeyPresent": true,
+        "braveKeyPresent": true
+      },
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      }
+    }
+  },
+  "noHintControls": [
+    {
+      "caseId": "news-1953-30-90",
+      "model": "gpt-transcribe",
+      "promptMode": "none",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "일산 … 반경에 맞는다고 보고하고, … 독신 …이 발생하지 못한 채 그 뒤에 … 일산 전투가 중지되는 단계에 들어갔습니다. 이날 유엔군 … 클라크 장군은 전투기계 … 멍덩에 있는 유엔군 전선 관부에 도착해서 … 전투 선유했습니다. 이로써 3년 동안에 걸쳐서 계속되어온 한국의 동란은 새로운 단계로 처리되게 된 것입니다.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 4650,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 4650
+    },
+    {
+      "caseId": "105_003_0478",
+      "model": "gpt-transcribe",
+      "promptMode": "none",
+      "scope": "transcription_only_no_claim_timestamps_or_verdict",
+      "observed": {
+        "text": "처럼 얕지 않으니 두 분 두께 20cm를 빼면 실제 승차 여유 공간은 20cm라는 계산이 나옵니다. 또 말씀하셔가지고. 아직 익숙치가 않아요. 네, 계속 지금 녹음되고 있는 거예요. 왜냐하면.",
+        "languages": [
+          {
+            "code": "ko"
+          }
+        ],
+        "wordTimestampsAvailable": false
+      },
+      "run": {
+        "status": "completed",
+        "error": null,
+        "stages": [
+          "transcribing"
+        ],
+        "claimsCount": 0,
+        "verdictCounts": {},
+        "evidenceCount": 0,
+        "usage": {
+          "calls": 1,
+          "actualMicros": 0,
+          "unknownUsageCalls": 1,
+          "conservativeMicros": 1650,
+          "currency": "USD",
+          "costBasis": "published_tariff_not_invoice"
+        },
+        "versions": {
+          "providerProfile": "openai_brave",
+          "speechModel": "gpt-transcribe",
+          "speechPromptVersion": "ko-labour-vocabulary-v1",
+          "speechTimingVersion": "bounded-tail-v1",
+          "languageModel": "gpt-4.1-mini",
+          "claimPromptVersion": "claim-structured-v3",
+          "claimValidationVersion": "literal-candidates-v2",
+          "evidencePromptVersion": "evidence-structured-v1",
+          "retrievalVersion": "brave-reviewed-source-v4",
+          "sourceParserVersion": "static-text-v3",
+          "meaningReviewVersion": "reviewed-meaning-v1"
+        },
+        "runtime": {
+          "mode": "openai_brave",
+          "openaiKeyPresent": true,
+          "braveKeyPresent": true
+        },
+        "cleanup": {
+          "filesRemoved": true,
+          "jobTombstoned": true,
+          "mediaTombstoned": true,
+          "usageRetained": true
+        }
+      },
+      "cumulativeMicros": 6300
+    }
+  ],
+  "modernGpt": {
+    "caseId": "gtv-20241211-0-60",
+    "model": "gpt-transcribe",
+    "promptMode": "current",
+    "scope": "transcription_only_no_claim_timestamps_or_verdict",
+    "observed": {
+      "text": "대한민국 신성장 동력으로 떠오르는 경기북부. 경기북부 특별자치도 설치를 앞두고 관심이 뜨거운 가운데 2024년 제2회 경기북부 미래비전 포럼이 열렸습니다. 김세은 기자가 현장에 다녀왔습니다. 9일 고양시 아람누리 새라새극장. 경기북부 균형발전 공동선언과 올해 두 번째 경기북부 미래비전 포럼이 진행됐습니다. 경기도와 경기북부시장군수협의회, 각 분야 전문가 등이 공동선언을 통해 경기북부의 발전이 지체된 현 상황을 타개하고 균형 있는 발전을 이루기 위해 노력할 것을 다짐했습니다. 특히 자치분권과 균형발전, 신성장 산업벨트 구축, 특구 지정을 위해 협력하겠다는 뜻을 모았습니다. 이후 경기북부 미래비전 포럼이 진행됐습니다. 포럼은 대한민국의 신성장 동력 경기북부, 함께 그리다라는 주제로 열렸습니다. 경기북부의 경제 도약과 영상산업…",
+      "languages": [
+        {
+          "code": "ko"
+        }
+      ],
+      "wordTimestampsAvailable": false
+    },
+    "run": {
+      "status": "completed",
+      "error": null,
+      "stages": [
+        "transcribing"
+      ],
+      "claimsCount": 0,
+      "verdictCounts": {},
+      "evidenceCount": 0,
+      "usage": {
+        "calls": 1,
+        "actualMicros": 0,
+        "unknownUsageCalls": 1,
+        "conservativeMicros": 4650,
+        "currency": "USD",
+        "costBasis": "published_tariff_not_invoice"
+      },
+      "versions": {
+        "providerProfile": "openai_brave",
+        "speechModel": "gpt-transcribe",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "speechTimingVersion": "bounded-tail-v1",
+        "languageModel": "gpt-4.1-mini",
+        "claimPromptVersion": "claim-structured-v3",
+        "claimValidationVersion": "literal-candidates-v2",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "sourceParserVersion": "static-text-v3",
+        "meaningReviewVersion": "reviewed-meaning-v1"
+      },
+      "runtime": {
+        "mode": "openai_brave",
+        "openaiKeyPresent": true,
+        "braveKeyPresent": true
+      },
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      }
+    },
+    "cumulativeMicros": 4650
+  },
+  "modernProduction": {
+    "caseId": "gtv-20241211-0-60",
+    "referenceText": "9일 고양시 아람누리 새라새극장. 경기북부 균형발전 공동선언과 올해 두번째 경기북부 미래비전 포럼이 진행됐습니다. 경기도와 경기북부 시장군수협의회, 각 분야 전문가 등이 공동선언을 통해 경기북부의 발전이 지체된 현 상황을 타개하고, 균형 있는 발전을 이루기 위해 노력할 것을 다짐했습니다.",
+    "speechOnly": false,
+    "hint": "current",
+    "observed": {
+      "transcript": [
+        {
+          "id": 0,
+          "text": "대한민국 신성장 동력으로 떠오르는 경기북부.",
+          "start": 1,
+          "end": 4
+        },
+        {
+          "id": 1,
+          "text": "경기북부 특별자치도 설치를 앞두고 관심이 뜨거운 가운데",
+          "start": 4,
+          "end": 8
+        },
+        {
+          "id": 2,
+          "text": "2024년 제2회 경기북부 미래비전 포럼이 열렸습니다.",
+          "start": 8,
+          "end": 12
+        },
+        {
+          "id": 3,
+          "text": "김세은 기자가 현장에 다녀왔습니다.",
+          "start": 12,
+          "end": 15
+        },
+        {
+          "id": 4,
+          "text": "9.1 고양시 아랍누리 세라세 극장.",
+          "start": 16,
+          "end": 19
+        },
+        {
+          "id": 5,
+          "text": "경기북부 균형발전 공동선언과 올해 두 번째 경기북부 미래비전 포럼이 진행됐습니다.",
+          "start": 19,
+          "end": 26
+        },
+        {
+          "id": 6,
+          "text": "경기도와 경기북부 시장군수협의회, 각 분야 전문가 등이",
+          "start": 26,
+          "end": 30
+        },
+        {
+          "id": 7,
+          "text": "공동선언을 통해 경기북부의 발전이 지체된 현 상황을 타개하고",
+          "start": 30,
+          "end": 35
+        },
+        {
+          "id": 8,
+          "text": "균형있는 발전을 이루기 위해 노력할 것을 다짐했습니다.",
+          "start": 35,
+          "end": 39
+        },
+        {
+          "id": 9,
+          "text": "특히 자치분권과 균형발전, 신성장 산업벨트 구축,",
+          "start": 39,
+          "end": 43
+        },
+        {
+          "id": 10,
+          "text": "특구 지정을 위해 협력하겠다는 뜻을 모았습니다.",
+          "start": 43,
+          "end": 47
+        },
+        {
+          "id": 11,
+          "text": "이후 경기북부 미래비전 포럼이 진행됐습니다.",
+          "start": 47,
+          "end": 51
+        },
+        {
+          "id": 12,
+          "text": "포럼은 대한민국의 신성장 동력 경기북부, 함께 그리다라는 주제로 열렸습니다.",
+          "start": 51,
+          "end": 57
+        }
+      ],
+      "candidates": [
+        {
+          "quote": "2024년 제2회 경기북부 미래비전 포럼이 열렸습니다.",
+          "segment_ids": [
+            2
+          ],
+          "subject": "경기북부 미래비전 포럼",
+          "period": "2024년",
+          "metric": "개최 여부",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "경기북부 균형발전 공동선언과 올해 두 번째 경기북부 미래비전 포럼이 진행됐습니다.",
+          "segment_ids": [
+            5
+          ],
+          "subject": "경기북부 미래비전 포럼",
+          "period": "올해",
+          "metric": "진행 여부",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "경기도와 경기북부 시장군수협의회, 각 분야 전문가 등이 공동선언을 통해 경기북부의 발전이 지체된 현 상황을 타개하고 균형있는 발전을 이루기 위해 노력할 것을 다짐했습니다.",
+          "segment_ids": [
+            6,
+            7,
+            8
+          ],
+          "subject": "경기도와 경기북부 시장군수협의회, 각 분야 전문가",
+          "period": null,
+          "metric": "노력 다짐 여부",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "특히 자치분권과 균형발전, 신성장 산업벨트 구축, 특구 지정을 위해 협력하겠다는 뜻을 모았습니다.",
+          "segment_ids": [
+            9,
+            10
+          ],
+          "subject": "경기도와 경기북부 시장군수협의회, 각 분야 전문가",
+          "period": null,
+          "metric": "협력 의사",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        },
+        {
+          "quote": "포럼은 대한민국의 신성장 동력 경기북부, 함께 그리다라는 주제로 열렸습니다.",
+          "segment_ids": [
+            12
+          ],
+          "subject": "경기북부 미래비전 포럼",
+          "period": null,
+          "metric": "주제",
+          "value": null,
+          "unit": null,
+          "eligibility": "checkable"
+        }
+      ],
+      "claims": [],
+      "limitations": [
+        "일반 웹 문맥의 자동 확정은 제한됩니다. 정형 기록이나 검토된 출처 정책에 맞지 않는 원문은 판정을 유보합니다."
+      ],
+      "rawSpeech": {
+        "duration": 60.0099983215332,
+        "segments": [
+          {
+            "start": 1,
+            "end": 4,
+            "text": " 대한민국 신성장 동력으로 떠오르는 경기북부.",
+            "avg_logprob": -0.15968461334705353,
+            "no_speech_prob": 0.3696845769882202
+          },
+          {
+            "start": 4,
+            "end": 8,
+            "text": " 경기북부 특별자치도 설치를 앞두고 관심이 뜨거운 가운데",
+            "avg_logprob": -0.15968461334705353,
+            "no_speech_prob": 0.3696845769882202
+          },
+          {
+            "start": 8,
+            "end": 12,
+            "text": " 2024년 제2회 경기북부 미래비전 포럼이 열렸습니다.",
+            "avg_logprob": -0.15968461334705353,
+            "no_speech_prob": 0.3696845769882202
+          },
+          {
+            "start": 12,
+            "end": 15,
+            "text": " 김세은 기자가 현장에 다녀왔습니다.",
+            "avg_logprob": -0.15968461334705353,
+            "no_speech_prob": 0.3696845769882202
+          },
+          {
+            "start": 16,
+            "end": 19,
+            "text": " 9.1 고양시 아랍누리 세라세 극장.",
+            "avg_logprob": -0.15968461334705353,
+            "no_speech_prob": 0.3696845769882202
+          },
+          {
+            "start": 19,
+            "end": 26,
+            "text": " 경기북부 균형발전 공동선언과 올해 두 번째 경기북부 미래비전 포럼이 진행됐습니다.",
+            "avg_logprob": -0.15968461334705353,
+            "no_speech_prob": 0.3696845769882202
+          },
+          {
+            "start": 26,
+            "end": 30,
+            "text": " 경기도와 경기북부 시장군수협의회, 각 분야 전문가 등이",
+            "avg_logprob": -0.09110726416110992,
+            "no_speech_prob": 0.014279114082455635
+          },
+          {
+            "start": 30,
+            "end": 35,
+            "text": " 공동선언을 통해 경기북부의 발전이 지체된 현 상황을 타개하고",
+            "avg_logprob": -0.09110726416110992,
+            "no_speech_prob": 0.014279114082455635
+          },
+          {
+            "start": 35,
+            "end": 39,
+            "text": " 균형있는 발전을 이루기 위해 노력할 것을 다짐했습니다.",
+            "avg_logprob": -0.09110726416110992,
+            "no_speech_prob": 0.014279114082455635
+          },
+          {
+            "start": 39,
+            "end": 43,
+            "text": " 특히 자치분권과 균형발전, 신성장 산업벨트 구축,",
+            "avg_logprob": -0.09110726416110992,
+            "no_speech_prob": 0.014279114082455635
+          },
+          {
+            "start": 43,
+            "end": 47,
+            "text": " 특구 지정을 위해 협력하겠다는 뜻을 모았습니다.",
+            "avg_logprob": -0.09110726416110992,
+            "no_speech_prob": 0.014279114082455635
+          },
+          {
+            "start": 47,
+            "end": 51,
+            "text": " 이후 경기북부 미래비전 포럼이 진행됐습니다.",
+            "avg_logprob": -0.09110726416110992,
+            "no_speech_prob": 0.014279114082455635
+          },
+          {
+            "start": 51,
+            "end": 57,
+            "text": " 포럼은 대한민국의 신성장 동력 경기북부, 함께 그리다라는 주제로 열렸습니다.",
+            "avg_logprob": -0.15131278336048126,
+            "no_speech_prob": 0.6505569815635681
+          }
+        ]
+      }
+    },
+    "run": {
+      "status": "failed",
+      "error": "PROVIDER_RESPONSE_INVALID",
+      "stages": [
+        "transcribing",
+        "extracting"
+      ],
+      "claimsCount": 0,
+      "verdictCounts": {},
+      "evidenceCount": 0,
+      "usage": {
+        "calls": 2,
+        "actualMicros": 1104,
+        "unknownUsageCalls": 1,
+        "conservativeMicros": 7304,
+        "currency": "USD",
+        "costBasis": "published_tariff_not_invoice"
+      },
+      "versions": {
+        "providerProfile": "openai_brave",
+        "speechModel": "whisper-1",
+        "speechPromptVersion": "ko-labour-vocabulary-v1",
+        "speechTimingVersion": "bounded-tail-v1",
+        "languageModel": "gpt-4.1-mini",
+        "claimPromptVersion": "claim-structured-v3",
+        "claimValidationVersion": "literal-candidates-v2",
+        "evidencePromptVersion": "evidence-structured-v1",
+        "retrievalVersion": "brave-reviewed-source-v4",
+        "sourceParserVersion": "static-text-v3",
+        "meaningReviewVersion": "reviewed-meaning-v1"
+      },
+      "runtime": {
+        "mode": "openai_brave",
+        "openaiKeyPresent": true,
+        "braveKeyPresent": true
+      },
+      "cleanup": {
+        "filesRemoved": true,
+        "jobTombstoned": true,
+        "mediaTombstoned": true,
+        "usageRetained": true
+      }
+    }
+  },
+  "totals": {
+    "jobs": 16,
+    "calls": 17,
+    "conservativeMicros": 43729,
+    "unknownUsageCalls": 16,
+    "allCleanup": true
+  },
+  "stagingCleanup": {
+    "filesRemoved": 29,
+    "stagingAbsent": true
+  },
+  "limitations": [
+    "Transcription-only completed status is not accuracy or verdict success",
+    "Inherited unused provider versions do not mean timing/LLM stages ran",
+    "No-prompt controls use actual promptMode none despite inherited prompt version",
+    "105 additional dialogue unverified by independent listening; do not assert hallucination",
+    "GTV item-level KOGL1 applied to in-item self-produced video; no separate download button or OpenAI-specific grant",
+    "No signed CDN URLs, media, credentials or unrelated member data committed"
+  ]
+}
