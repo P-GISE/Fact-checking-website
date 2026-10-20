@@ -36,7 +36,9 @@ GTV 유효 quote는 “2024년 제2회 경기북부 미래비전 포럼이 열�
 - 원래5개 무효 후보가 계속 실패하는 고정 재생 회귀, null metric 사건의 quote/시간/인접 정정 문맥 보존 회귀를 추가했다. 이 경계 테스트는 기존 구현에서도 통과하며 실제 v3 실패 재현과 구분한다.
 - 관련 Worker4개 파일:187 passed,2 skipped. 독립 리뷰:32 passed,29 deselected,발견 사항 없음/APPROVE.
 - Iron Laws 해당 파일 check:6개 기존 REVIEW(타입/예외 처리/URL/HTTP클라이언트), 새 차단 결함 없음. 별도 보안 침투 테스트나 verify_patch를 실행했다고 하지 않는다.
-- 전체 Linux CI/자동 배포: 코드 게시 후 확정 결과를 이 절에 추가한다. 로컬 전체 CI를 통과했다고 하지 않는다.
+- 전체 Linux [Actions39488460762](https://github.com/P-GISE/Fact-checking-website/actions/runs/39488460762): API97/Worker421·타입/빌드·배포 스크립트 회귀 통과, verify/deploy 모두 success. work 코드 커밋9b771e0dd3f65a378e35346d28bb98ee83ebf19f를 AWS에 자동 배포했다. main은 변경하지 않았다.
+- 배포 후 서버 git HEAD와 실행 Worker 모듈의 LF SHA256(2b2630d39ad40c13ede1ecccab1bd2406113fbcd593505381364486251c55390)이 해당 코드와 일치한다. 환경 파일0600, 실제 worker openai_brave/200000micros/건·20000000micros/월을 확인했다. 내부 loopback과 외부 HTTPS curl health는 ready다. 컨테이너 urllib 기본 요청은403으로 실패했고 외부 curl 및 배포 health 성공과 구분해 기록한다.
+- 문서 후속 커밋은 실행 JSON에서 수집 원문 전체 대신 출처 URL/관계/유효성/사유/원출처 감사 요약만 유지한다. 동작 코드는 변경하지 않으며 문서 전용 [skip ci] 게시로 불필요한 재배포를 생략한다.
 - 운영 모델 whisper-1/gpt-4.1-mini/Brave와 openai_brave 유지. providerConfigured:false는 고정 health 응답으로 AI 비활성 증거가 아니다.
 
 ## 남은 작업
