@@ -131,10 +131,17 @@ class LiveProviders:
             source=raw['segments']
             if not source or len(source)>1000:raise ValueError()
             result=[]
+            adjusted=False
             for i,s in enumerate(source):
                 segment=TranscriptSegment(id=i,text=s['text'].strip(),start=s['start'],end=s['end'])
-                if segment.end<segment.start or segment.end>self.duration:raise ValueError()
+                if segment.end>self.duration:
+                    # Whisper can place the last endpoint just beyond the decoded audio boundary.
+                    if i!=len(source)-1 or segment.start>=self.duration or segment.end-self.duration>0.25:raise ValueError()
+                    segment.end=self.duration
+                    adjusted=True
+                if segment.end<segment.start:raise ValueError()
                 result.append(segment.model_dump())
+            if adjusted:self.limitations.append('전사 마지막 구간의 시간이 미디어 길이를 0.25초 이내로 초과해 끝 시간을 조정했습니다. 시간 정밀도는 제한됩니다.')
             return result
         except (KeyError,TypeError,ValueError) as exc:raise ProviderUnavailable('PROVIDER_RESPONSE_INVALID') from exc
 
@@ -242,7 +249,7 @@ class LiveProviders:
         return documents
 
     def versions(self):
-        return {'providerProfile':'openai_brave','speechModel':'whisper-1','speechPromptVersion':'ko-labour-vocabulary-v1','languageModel':MODEL,
+        return {'providerProfile':'openai_brave','speechModel':'whisper-1','speechPromptVersion':'ko-labour-vocabulary-v1','speechTimingVersion':'bounded-tail-v1','languageModel':MODEL,
                 'claimPromptVersion':'claim-structured-v2','claimValidationVersion':'literal-candidates-v2','evidencePromptVersion':'evidence-structured-v1',
                 'retrievalVersion':'brave-reviewed-source-v4','sourceParserVersion':PARSER_VERSION,'meaningReviewVersion':'reviewed-meaning-v1'}
 

@@ -71,6 +71,32 @@ def test_whisper_uses_real_segments_and_timestamp_options(tmp_path):
     assert sdk.requests[0]['timestamp_granularities']==['segment']
     assert p.usage()['unknownUsageCalls']==1
 
+@pytest.mark.parametrize('end',[3.0000001,3.119998931884766,3.25])
+def test_transcription_clips_only_small_tail_overshoot_and_reports_it(tmp_path,end):
+    sdk=SDK(transcript={'segments':[{'start':0,'end':1,'text':'앞 구간'},{'start':1,'end':end,'text':'실제 마지막 발화'}]})
+    p,_=make(sdk);audio=tmp_path/'a.wav';audio.write_bytes(b'wave')
+    segments=p.transcribe(audio)
+    assert segments==[{'id':0,'start':0.0,'end':1.0,'text':'앞 구간'},{'id':1,'start':1.0,'end':3.0,'text':'실제 마지막 발화'}]
+    assert any('시간' in item and '조정' in item for item in p.limitations)
+    assert p.usage()['calls']==1 and p.usage()['unknownUsageCalls']==1
+
+
+@pytest.mark.parametrize('start,end',[(0,3.250001),(3,3.12),(3.01,3.12),(2,1),(-.1,1),(0,float('nan')),(0,float('inf'))])
+def test_transcription_rejects_large_or_invalid_time_bounds(tmp_path,start,end):
+    sdk=SDK(transcript={'segments':[{'start':start,'end':end,'text':'원문'}]})
+    p,_=make(sdk);audio=tmp_path/'a.wav';audio.write_bytes(b'wave')
+    with pytest.raises(ProviderUnavailable,match='PROVIDER_RESPONSE_INVALID'):p.transcribe(audio)
+    assert p.usage()['calls']==1
+
+
+def test_transcription_does_not_clip_an_intermediate_out_of_range_segment(tmp_path):
+    sdk=SDK(transcript={'segments':[{'start':0,'end':3.12,'text':'잘못된 중간 시간'},{'start':2,'end':3,'text':'마지막 구간'}]})
+    p,_=make(sdk);audio=tmp_path/'a.wav';audio.write_bytes(b'wave')
+    before=p.limitations[:]
+    with pytest.raises(ProviderUnavailable,match='PROVIDER_RESPONSE_INVALID'):p.transcribe(audio)
+    assert p.limitations==before and p.usage()['calls']==1
+
+
 def test_extract_validates_quote_and_owns_ids():
     candidate={'quote':'2025년 한국 고용률 50%','segment_ids':[0],'subject':'한국','period':'2025년','metric':'고용률','value':'50','unit':'%','eligibility':'checkable'}
     sdk=SDK(completion=response({'claims':[candidate]}));p,a=make(sdk)
