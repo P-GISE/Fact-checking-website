@@ -1,5 +1,8 @@
 # 프로젝트 가이드 — 공통 지침 (AGENTS.md)
 
+> **Aside 인증 API 접근·기기 승인 대기 · 2026-10-21:** 새 환경에서 공식 CLI 1.26.1020.1855 설치와 별도 MCP initialize/tools/list(repl/memory_search/exec)를 재검증했다. api.aside.com은 HTTP200이며, 기본 로그인은 fetch failed지만 NODE_USE_ENV_PROXY=1을 지정한 기기 로그인은 승인 코드 발급·대기까지 성공했다. 사용자 승인이 필요하며 로그인 성공/인증 저장·원격 호스트/탭 읽기·현재 채팅 도구 활성화·공개 UI 검증은 아직 미완료다. 직접 공개 사이트 curl은 HTTP000/exit22다. [최신 연결 기록](reports/2026-10-21-aside-connection.md#인증-api-허용-후-재시도)을 따른다. 분석 개선은 계속 보류한다.
+
+
 > **Aside Linux 설치·MCP 확인 · 2026-10-21:** 새 환경에서 공식 배포 호스트 허용과 다운로드가 확인됐다. 공식 스크립트의 Linux x64 지원·설치 동작 검토 후 CLI 1.26.1020.1855 설치/실행 성공. 전역 MCP 등록 및 별도 stdio 초기화·tools/list(repl/memory_search/exec) 성공. 사용자 제공 이메일로 기기 코드 로그인을 실제 시도했으나 fetch failed, 인증 API api.aside.com의 프록시 CONNECT403으로 차단됐다. 승인 코드 미발급이며 계정 인증·원격 호스트·실제 탭 읽기·현재 채팅 도구 활성화는 미검증이다. 공개 사이트 직접 curl은 CONNECT403/HTTP000. 아래 다운로드 차단은 이전 환경 이력이며 [최신 연결 기록](reports/2026-10-21-aside-connection.md#linux-설치와-mcp-검증-후속)을 우선한다. 분석 개선은 보류한다.
 
 

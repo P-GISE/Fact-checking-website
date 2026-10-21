@@ -37,3 +37,15 @@
 네트워크 진단은 요청 대상 호스트 이름만 확인했다(NODE_DEBUG=net, 인증 헤더/본문 출력 없음). 대상은 api.aside.com이며 기본 실행과 NODE_USE_ENV_PROXY=1 실행 모두 fetch failed였다. 상속 프록시를 사용한 curl https://api.aside.com 역시 CONNECT403/HTTP000/exit56이었다. 인증 파일 생성 여부는 파일 내용 없이 확인한다.
 
 다음은 기존 규칙을 유지하면서 api.aside.com을 네트워크 허용 목록에 추가·적용 → 로그인 재시도 → 공식 기기 승인 → 로그인 성공/인증 저장 확인 → host list/프로필 확인 → 실제 탭 읽기 → 새 UI 공개 회원 흐름이다. 실제 모바일/스크린리더는 별도 미완료다. 제품 코드·모델·예산은 유지했으며 새 AI 호출/제품 테스트/운영 배포는 하지 않았다. 문서 변경은 링크와 diff를 검증해 work에 게시한다.
+
+## 인증 API 허용 후 재시도
+
+2026-10-21 새 환경에서 원격 work의 4c57551을 확인했다. 시작 체크아웃 a986eef는 preserved-cloud-work-20261021에 보존하고 깨끗한 work를 FETCH_HEAD로 맞췄다. main과 보존 예약 커밋은 변경·병합하지 않았다.
+
+- 네트워크 상태 API의 설정 목록에는 releases.aside.com/api.aside.com이 있으나 policy state는 unknown이다. 정책 적용 완료로 단정하지 않고 실제 요청을 검증했다. 공식 install.sh 다운로드와 검토 후 Linux CLI 설치·도움말 실행 성공(1.26.1020.1855), 인증 API 루트 curl HTTP200.
+- 사용자 제공 이메일로 기본 기기 로그인은 fetch failed. 상속 프록시를 유지한 NODE_USE_ENV_PROXY=1 재시도에서 기기 승인 코드가 발급됐고 CLI가 승인을 기다리고 있다. 이메일·일회용 코드는 저장하지 않는다. 승인 요청을 사용자에게 안내했으며 로그인 성공이나 인증 저장 완료는 아직 아니다.
+- /workspace/.aside-private는0700이며 인증 파일 내용은 읽지 않았다. 대기 시점 auth.json 미생성 확인. 로그인 후에는 존재·권한·CLI 성공만 확인한다.
+- 전역 Codex MCP는 실제 command -v 결과인 /home/agent/.local/bin/aside, ASIDE_CLI_AUTH_PATH와 NODE_USE_ENV_PROXY=1로 등록했다. 처음 잘못 지정한 /root 경로는 별도 프로세스 PermissionError를 확인하고 즉시 정정했다. 정정한 실제 실행 파일로 별도 stdio initialize 및 tools/list 성공, repl/memory_search/exec 확인 후 프로세스 종료. 등록만으로 현재 채팅 도구 활성화나 브라우저 연결 성공으로 해석하지 않는다.
+- 공개 사이트 직접 curl은 HTTP000/exit22로 실패했다. 공개 UI·회원 흐름/실제 단말/스크린리더 검증은 아직 수행하지 않았다. 제품 코드·모델·예산·운영 배포 변경 및 새 유료 AI 호출은 없다. 문서만 검증·게시하며 제품 테스트는 재실행하지 않는다.
+
+다음 순서는 사용자 기기 승인 → CLI 로그인 완료/인증 파일 권한 확인 → host list/프로필 확인 → 실제 탭 읽기 → 공개 새 UI와 임시 회원 흐름 검증·정리다. 인증 승인 전에는 이 후속을 완료 처리하지 않는다.
