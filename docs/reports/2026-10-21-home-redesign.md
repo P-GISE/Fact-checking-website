@@ -30,4 +30,12 @@ work에 게시 후 기존 자동 CI/배포 결과를 확인한다. 게시 전 �
 
 ## 남은 작업
 
-공개 배포 후 새 UI 확인, 실제 모바일 장치/전체 키보드·스크린리더 감사는 별도다. 사용자 요청으로 일반 뉴스/안전 대담 추출·ASR/잡음·모델 정렬/실자료 평가 개선은 잠시 미룬다. 계정 복구/추가 권한/운영 정책 변경은 이번 디자인 범위에 포함하지 않았다.
+자동 배포/health 성공과 공개 브라우저 화면 확인을 구분한다. 공개 브라우저의 새 UI 확인, 실제 모바일 장치/전체 키보드·스크린리더 감사는 별도다. 사용자 요청으로 일반 뉴스/안전 대담 추출·ASR/잡음·모델 정렬/실자료 평가 개선은 잠시 미룬다. 계정 복구/추가 권한/운영 정책 변경은 이번 디자인 범위에 포함하지 않았다.
+
+## 최종 GitHub·AWS 확인
+
+- 코드b219d7933a060e4ae4b03f15dd9a30d9b694b69f를work에 게시했다. [Actions39557087562](https://github.com/P-GISE/Fact-checking-website/actions/runs/39557087562)의 verify/deploy 성공. API97/Worker427·전체 타입/빌드·배포 스크립트 회귀 통과.
+- 배포 로그2026-10-21 06:47:16 UTC(15:47:16 KST): `Deployed b219d7933a060e4ae4b03f15dd9a30d9b694b69f; loopback and public health are ready.` 기존 전용AWS에 자동 반영됐음을 로그에서 확인했다. 별도 SSH로 서버HEAD를 다시 읽은 것은 아니다.
+- 이 환경의 공개 사이트curl은 CONNECT403으로 차단됐다(HTTP000). GitHub CLI의 API 조회도 Forbidden이어서 GitHub 플러그인으로 Actions를 확인했다. 네트워크 우회나 키 변경은 하지 않았다. 공개 브라우저 새UI/회원 전체 회귀를 수행했다고 하지 않는다.
+- 로컬 시험API/웹 프로세스를 종료하고 이번에 생성한 PostgreSQL/Redis 컨테이너와 익명 볼륨을 제거했다. 운영 자료는 사용하지 않았다. `/workspace/FactLens-preview/home-desktop.png`와 `home-mobile.png`에 확인용 로컬 캡처를 보존했다. Git에는 미디어/테스트 계정/비밀값을 넣지 않았다.
+- 최종 문서 보완은[skip ci]로work에 게시해 동작 변경 없는 재배포를 생략한다. 운영 소스는b219d79이며 main은 변경하지 않았다.
