@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref,computed,onMounted,onUnmounted} from 'vue';
+import {ref,computed,nextTick,onMounted,onUnmounted} from 'vue';
 import AccountSettings from './components/AccountSettings.vue';
 import AccountPanel from './components/AccountPanel.vue';
 import {getSession,logout,type Session} from './api';
@@ -16,20 +16,23 @@ const accountBusy=ref(false),signingOut=ref(false);
 const navigationBusy=computed(()=>busy.value||accountBusy.value||signingOut.value);
 const authorized=computed(()=>session.value?.mode==='local'||Boolean(session.value?.user));
 const accountTrigger=ref<HTMLButtonElement|null>(null),mobileTrigger=ref<HTMLButtonElement|null>(null);
+const mainContent=ref<HTMLElement|null>(null);
+function focusMain(){void nextTick(()=>mainContent.value?.focus());}
 function navigate(target:Page){
  if(navigationBusy.value)return;
  clearPoll();analysis.value=null;error.value='';notice.value='';
  page.value=!authorized.value&&['new','history','settings'].includes(target)?'login':target;
  mobileMenu.value=false;accountMenu.value=false;
  if(target==='history'&&authorized.value)void refreshHistory();
+ focusMain();
 }
 const accountMessage=ref('');
 function accountClosed(pending:boolean){accountUpdated();accountMessage.value=pending?'회원 탈퇴가 처리됐습니다. 파일 정리를 재시도 중이며 계정 접근은 차단됐습니다.':'회원 탈퇴가 완료됐습니다.';}
-function accountUpdated(){accountBusy.value=false;page.value='login';accountMenu.value=false;clearPoll();analysis.value=null;history.value=[];error.value='';notice.value='';session.value={mode:'accounts',user:null};accountMessage.value='계정이 변경됐습니다. 변경한 정보로 다시 로그인하세요.';}
+function accountUpdated(){accountBusy.value=false;page.value='login';accountMenu.value=false;clearPoll();analysis.value=null;history.value=[];error.value='';notice.value='';session.value={mode:'accounts',user:null};accountMessage.value='계정이 변경됐습니다. 변경한 정보로 다시 로그인하세요.';focusMain();}
 const session=ref<Session|null>(null),sessionError=ref(false);
 async function initialize(){sessionError.value=false;try{session.value=await getSession();if(authorized.value){await refreshHistory();if(session.value.mode==='local')page.value='new';}}catch{sessionError.value=true;}}
-async function authenticated(value:Session){accountBusy.value=false;accountMessage.value='';session.value=value;page.value='new';await refreshHistory();}
-async function signOut(){if(navigationBusy.value)return;signingOut.value=true;try{await logout();clearPoll();analysis.value=null;history.value=[];error.value='';notice.value='';session.value={mode:'accounts',user:null};page.value='home';accountMenu.value=false;mobileMenu.value=false;}catch{error.value='로그아웃을 완료하지 못했습니다. 다시 시도해 주세요.';}finally{signingOut.value=false;}}
+async function authenticated(value:Session){accountBusy.value=false;accountMessage.value='';session.value=value;page.value='new';focusMain();await refreshHistory();}
+async function signOut(){if(navigationBusy.value)return;signingOut.value=true;try{await logout();clearPoll();analysis.value=null;history.value=[];error.value='';notice.value='';session.value={mode:'accounts',user:null};page.value='home';accountMenu.value=false;mobileMenu.value=false;focusMain();}catch{error.value='로그아웃을 완료하지 못했습니다. 다시 시도해 주세요.';}finally{signingOut.value=false;}}
 let timer:ReturnType<typeof setTimeout>|undefined;
 let generation=0;
 const messages:Record<string,string>={BUDGET_EXCEEDED:'분석 1건 또는 월 예산 한도에 도달했습니다.',BILLING_REVIEW_REQUIRED:'사용량 정산을 확인해야 합니다. 추가 유료 호출을 중단했습니다.',PROVIDER_AUTH_FAILED:'AI 또는 검색 API 인증 정보를 확인해 주세요.',PROVIDER_RATE_LIMITED:'제공자 호출 제한에 도달했습니다. 자동으로 재시도하지 않습니다.',PROVIDER_MODEL_UNAVAILABLE:'선택한 모델을 이 계정에서 사용할 수 없습니다.',PROVIDER_INPUT_LIMIT:'제공자 입력 제한을 초과해 추가 전송을 중단했습니다.',PROVIDER_RESPONSE_INVALID:'제공자 응답을 검증하지 못해 판정을 만들지 않았습니다.',PROVIDER_REQUEST_FAILED:'제공자 연결에 실패했습니다. 네트워크 허용 정책과 연결 상태를 확인해 주세요.',PROVIDER_SEARCH_LIMIT:'분석당 검색 횟수 제한에 도달했습니다.',PROVIDER_NOT_CONFIGURED:'AI 제공자 연결이 필요합니다.',SIZE_LIMIT:'100 MiB 이하 파일을 선택해 주세요.',DURATION_LIMIT:'3분 이하 파일을 선택해 주세요.',INVALID_MEDIA:'파일이 손상됐거나 지원하지 않는 미디어입니다.',FORMAT_MISMATCH:'파일 확장자와 실제 형식이 다릅니다.',NO_AUDIO:'분석할 음성 트랙이 없습니다.',TIMEOUT:'작업 제한 시간을 초과했습니다.',NETWORK_ERROR:'연결을 확인한 뒤 다시 시도해 주세요.'};
@@ -37,13 +40,13 @@ messages.PROVIDER_QUOTA_EXCEEDED='OpenAI API 사용 가능 잔액 또는 프로�
 function message(code:string){return messages[code]??'처리를 완료하지 못했습니다. 파일과 연결 상태를 확인해 주세요.';}
 async function refreshHistory(){const token=generation;try{const result=await listAnalyses();if(token===generation)history.value=result;}catch{if(token===generation)error.value='분석 이력에 연결할 수 없습니다. 서버 실행 상태를 확인해 주세요.';}}
 function clearPoll(){generation++;if(timer)clearTimeout(timer);}
-async function open(id:string){
+async function open(id:string,userInitiated=true){
  clearPoll();const token=generation;error.value='';
  try{
   const result=await getAnalysis(id);
   if(token!==generation)return;
-  analysis.value=result;page.value='new';
-  if(!['completed','failed','cancelled','deleted'].includes(result.status))timer=setTimeout(()=>open(id),1200);
+  analysis.value=result;page.value='new';if(userInitiated)focusMain();
+  if(!['completed','failed','cancelled','deleted'].includes(result.status))timer=setTimeout(()=>open(id,false),1200);
  }catch(e){if(token===generation)error.value=message((e as Error).message);}
 }
 async function start(file:File,consent:boolean){
@@ -52,7 +55,7 @@ async function start(file:File,consent:boolean){
  catch(e){if(token===generation)error.value=message((e as Error).message);}
  finally{busy.value=false;}
 }
-function showExample(){if(navigationBusy.value)return;clearPoll();analysis.value=example;error.value='';notice.value='';}
+function showExample(){if(navigationBusy.value)return;clearPoll();analysis.value=example;error.value='';notice.value='';focusMain();}
 async function remove(){
  if(!analysis.value||analysis.value.demo)return;
  const id=analysis.value.id;clearPoll();const token=generation;
@@ -65,16 +68,17 @@ onMounted(()=>{initialize();document.addEventListener('keydown',closeMenus);});o
 </script>
 <template>
  <div class="site-shell" @click="accountMenu=false">
+  <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
   <header class="site-header">
    <div class="header-inner">
-    <button class="brand" aria-label="FactLens 홈" :disabled="navigationBusy" @click="home"><span class="brand-icon" aria-hidden="true">◉</span>FactLens<span class="ai-tag">AI</span></button>
+    <button class="brand" aria-label="FactLens AI 홈" :disabled="navigationBusy" @click="home"><span class="brand-icon" aria-hidden="true">◉</span>FactLens <span class="ai-tag">AI</span></button>
     <button ref="mobileTrigger" class="mobile-toggle" aria-label="메뉴 열기" :aria-expanded="mobileMenu" aria-controls="primary-navigation" :disabled="navigationBusy" @click="mobileMenu=!mobileMenu">☰</button>
     <nav id="primary-navigation" class="primary-navigation" :class="{expanded:mobileMenu}" aria-label="주 메뉴">
      <button v-for="item in [{id:'home',label:'홈'},{id:'new',label:'새 분석'},{id:'history',label:'분석 이력'}]" :key="item.id" :aria-current="page===item.id?'page':undefined" :disabled="navigationBusy||!session||sessionError" @click="navigate(item.id as Page)">{{item.label}}</button>
     </nav>
     <div class="header-account">
      <template v-if="session?.user">
-      <button ref="accountTrigger" class="profile-trigger" aria-label="계정 메뉴" :aria-expanded="accountMenu" aria-controls="account-dropdown" :disabled="navigationBusy" @click.stop="accountMenu=!accountMenu"><span class="avatar">{{session.user.username.slice(0,1).toUpperCase()}}</span><span class="profile-name">{{session.user.username}}</span><span aria-hidden="true">⌄</span></button>
+      <button ref="accountTrigger" class="profile-trigger"  :aria-expanded="accountMenu" aria-controls="account-dropdown" :disabled="navigationBusy" @click.stop="accountMenu=!accountMenu"><span class="avatar" aria-hidden="true">{{session.user.username.slice(0,1).toUpperCase()}}</span><span class="profile-name">{{session.user.username}}</span><span aria-hidden="true">⌄</span><span class="sr-only"> 계정 메뉴</span></button>
       <div v-if="accountMenu" id="account-dropdown" class="account-dropdown" @click.stop>
        <p>내 계정<strong>{{session.user.username}}</strong></p>
        <button @click="navigate('settings')">계정 설정 <span aria-hidden="true">↗</span></button>
@@ -90,7 +94,7 @@ onMounted(()=>{initialize();document.addEventListener('keydown',closeMenus);});o
     </div>
    </div>
   </header>
-  <main class="site-main" :class="{'landing-main':page==='home'&&!analysis}">
+  <main id="main-content" ref="mainContent" tabindex="-1" class="site-main" :class="{'landing-main':page==='home'&&!analysis}">
    <p v-if="accountMessage" class="success-note" role="status">{{accountMessage}}</p>
    <div v-if="sessionError" class="error-note" role="alert">로그인 상태를 확인할 수 없습니다. <button @click="initialize">다시 연결</button></div>
    <p v-else-if="!session" class="loading-note" role="status">로그인 상태 확인 중</p>

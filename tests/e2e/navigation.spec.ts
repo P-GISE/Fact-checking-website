@@ -74,7 +74,7 @@ test('pending login cannot lose its completion through home navigation',async({p
  await page.getByLabel('비밀번호',{exact:true}).fill('fixture-password-123!');
  await page.locator('.account-panel').getByRole('button',{name:'로그인',exact:true}).click();
  await expect(page.getByRole('button',{name:'홈',exact:true})).toBeDisabled();
- await expect(page.getByRole('button',{name:'FactLens 홈',exact:true})).toBeDisabled();
+ await expect(page.getByRole('button',{name:'FactLens AI 홈',exact:true})).toBeDisabled();
  finish();
  await expect(page.getByLabel('분석할 파일')).toBeVisible();
  await expect(page.getByRole('button',{name:'홈',exact:true})).toBeEnabled();
