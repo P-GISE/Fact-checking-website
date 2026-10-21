@@ -104,6 +104,48 @@ def test_saved_gtv_all_invalid_response_still_fails_closed():
         p.extract(fixture['transcript'])
 
 
+@pytest.mark.parametrize('group', ['extractionOnly', 'searchReports'])
+def test_saved_gtv_v4_keeps_only_literal_events_without_repairing_candidates(group):
+    reports=Path(__file__).parents[3]/'docs/reports'
+    saved=json.loads((reports/'2026-10-21-gtv-extraction.json').read_text(encoding='utf-8'))
+    transcript=json.loads((reports/'2026-10-21-transcription-model-comparison.json').read_text(encoding='utf-8'))['modernProduction']['observed']['transcript']
+    observed=next(case for case in saved[group] if case['caseId']=='gtv')['observed']
+    sdk=SDK(completion=response({'claims':observed['candidates']}))
+    p,_=make(sdk)
+    p.duration=60.01
+    claims=p.extract(transcript)
+    assert [c.text for c in claims]==[
+        '2024년 제2회 경기북부 미래비전 포럼이 열렸습니다.',
+        '포럼은 대한민국의 신성장 동력 경기북부, 함께 그리다라는 주제로 열렸습니다.',
+    ]
+    assert [(c.subject,c.period,c.metric,c.value,c.unit) for c in claims]==[
+        ('경기북부 미래비전 포럼','2024년',None,None,None),
+        ('포럼',None,'주제',None,None),
+    ]
+    assert [(c.startSeconds,c.endSeconds) for c in claims]==[(8,12),(51,57)]
+    assert all(c.contextText==' '.join(s['text'] for s in transcript) for c in claims)
+    assert any('제외' in item for item in p.limitations)
+    assert len(sdk.requests)==1  # Stored-response replay; no hidden repair/retry call.
+    # Each discarded response must also fail alone. Keeping two valid events must
+    # not hide a regression that accepts an invented metric or borrowed subject.
+    for index in (1,2,3):
+        rejected,_=make(SDK(completion=response({'claims':[observed['candidates'][index]]})))
+        with pytest.raises(ProviderUnavailable,match='^PROVIDER_RESPONSE_INVALID$'):
+            rejected.extract(transcript)
+
+
+@pytest.mark.parametrize('indices', [(0,), (1,), (2,), (0,1,2)])
+def test_saved_safety_v4_nonliteral_candidates_still_fail_closed(indices):
+    reports=Path(__file__).parents[3]/'docs/reports'
+    saved=json.loads((reports/'2026-10-21-gtv-extraction.json').read_text(encoding='utf-8'))
+    candidates=next(case for case in saved['extractionOnly'] if case['caseId']=='safety')['observed']['candidates']
+    transcript=json.loads((reports/'2026-10-21-real-korean-regression.json').read_text(encoding='utf-8'))['focusedActualV3'][1]['transcript']
+    p,_=make(SDK(completion=response({'claims':[candidates[i] for i in indices]})))
+    p.duration=40.007
+    with pytest.raises(ProviderUnavailable,match='^PROVIDER_RESPONSE_INVALID$'):
+        p.extract(transcript)
+
+
 def test_literal_event_with_null_metric_keeps_quote_timing_and_correction_context():
     text='도서관은 어제 문을 열었습니다.'
     segments=[{'id':0,'start':0,'end':2,'text':text},{'id':1,'start':2,'end':3,'text':'정정합니다. 아직 개관하지 않았습니다.'}]
