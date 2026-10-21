@@ -20,3 +20,20 @@
 ## 상태
 
 설치시도진행:다운로드에서차단. 설치완료아님, 계정인증완료아님, Windows MCP활성화/공개브라우저검증완료아님. 제품코드·모델·예산·운영배포는변경하지않았다. 이번은문서정정이며제품테스트는재실행하지않는다.
+
+## Linux 설치와 MCP 검증 후속
+
+2026-10-21 새 클라우드 환경에서 재시도했다. 시작 체크아웃은 a986eef였고 원격 FETCH_HEAD는 df42b37이었다. 깨끗한 작업 트리를 확인하고 기존 이력을 preserved-cloud-work-20261021에 보존한 뒤 work를 최신 원격으로 맞췄다. 예약 커밋 세 개를 제품 이력에 병합하지 않았고 main은 변경하지 않았다.
+
+- 네트워크 정책의 releases.aside.com 허용 확인 후 공식 install.sh 다운로드 성공. 스크립트는 Linux arm64/x64를 지원하며 공식 호스트의 아카이브를 사용자 설치 경로로 풀고 실행 링크를 만든다. 읽고 검토한 뒤 실행했다. 프록시·TLS 검증은 유지했다.
+- CLI 설치 성공, `aside --version`/`--help` 실행 가능: 1.26.1020.1855. 설치 프로그램은 libatomic 안내를 출력했으나 CLI 실행은 성공했다. 이것은 브라우저 앱 설치 또는 연결 성공이 아니다.
+- CLI guide와 login/mcp 도움말 확인. 사설 디렉터리 `/workspace/.aside-private`를 0700으로 만들고 ASIDE_CLI_AUTH_PATH를 그 안의 auth.json으로 지정했다. 인증 파일은 읽거나 Git에 넣지 않았다.
+- `aside login --device-code`의 Email 입력 후 fetch failed로 종료됐다. 사용자 제공 이메일로 --email 재시도도 실패했다. 비밀번호는 요구하지 않았다. 승인 코드 미발급·로그인 성공/인증 저장 미확인이다.
+- `codex mcp add aside --env ASIDE_CLI_AUTH_PATH=/workspace/.aside-private/auth.json -- <사용자 설치 aside 경로> mcp` 성공. 현재 클라우드의 전역 Codex 설정이며 사용자 Windows 설정이나 저장소 설정을 변경한 것은 아니다.
+- 별도 stdio 프로세스에서 initialize(version 2024-11-05)와 tools/list 성공: server aside 1.26.1020.1855, repl/memory_search/exec. 검증 프로세스는 종료했다. 현재 채팅 도구 목록 활성화·인증·실제 도구 브라우저 실행 성공은 별개다.
+- 인증 전 `aside host list`는 로컬 daemon 127.0.0.1:21420 ECONNREFUSED 및 CLI login 필요를 반환했다. 원격 호스트나 탭을 읽지 못했다.
+- 공개 https://factlens.pigs0516.com 직접 curl 재시도는 CONNECT403/HTTP000/exit56. 설치 호스트 허용이 공개 사이트 또는 Aside 인증 서비스 접근도 허용한다는 의미는 아니다.
+
+네트워크 진단은 요청 대상 호스트 이름만 확인했다(NODE_DEBUG=net, 인증 헤더/본문 출력 없음). 대상은 api.aside.com이며 기본 실행과 NODE_USE_ENV_PROXY=1 실행 모두 fetch failed였다. 상속 프록시를 사용한 curl https://api.aside.com 역시 CONNECT403/HTTP000/exit56이었다. 인증 파일 생성 여부는 파일 내용 없이 확인한다.
+
+다음은 기존 규칙을 유지하면서 api.aside.com을 네트워크 허용 목록에 추가·적용 → 로그인 재시도 → 공식 기기 승인 → 로그인 성공/인증 저장 확인 → host list/프로필 확인 → 실제 탭 읽기 → 새 UI 공개 회원 흐름이다. 실제 모바일/스크린리더는 별도 미완료다. 제품 코드·모델·예산은 유지했으며 새 AI 호출/제품 테스트/운영 배포는 하지 않았다. 문서 변경은 링크와 diff를 검증해 work에 게시한다.

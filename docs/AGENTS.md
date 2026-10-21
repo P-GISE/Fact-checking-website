@@ -1,5 +1,8 @@
 # 프로젝트 가이드 — 공통 지침 (AGENTS.md)
 
+> **Aside Linux 설치·MCP 확인 · 2026-10-21:** 새 환경에서 공식 배포 호스트 허용과 다운로드가 확인됐다. 공식 스크립트의 Linux x64 지원·설치 동작 검토 후 CLI 1.26.1020.1855 설치/실행 성공. 전역 MCP 등록 및 별도 stdio 초기화·tools/list(repl/memory_search/exec) 성공. 사용자 제공 이메일로 기기 코드 로그인을 실제 시도했으나 fetch failed, 인증 API api.aside.com의 프록시 CONNECT403으로 차단됐다. 승인 코드 미발급이며 계정 인증·원격 호스트·실제 탭 읽기·현재 채팅 도구 활성화는 미검증이다. 공개 사이트 직접 curl은 CONNECT403/HTTP000. 아래 다운로드 차단은 이전 환경 이력이며 [최신 연결 기록](reports/2026-10-21-aside-connection.md#linux-설치와-mcp-검증-후속)을 우선한다. 분석 개선은 보류한다.
+
+
 > **Aside 연결 조사 정정 · 2026-10-21:** Windows 전환만 가능하다는 이전 단정은 철회한다. 공식 문서는 호스팅 환경의 CLI 로그인도 안내한다. 현재 공식 설치 스크립트 releases.aside.com/install.sh 다운로드를 실제 시도했으나 HTTP403/exit22로 차단돼 설치·현재 OS 호환성·인증·MCP 연결은 미검증이다. 필요한 선행 조건은 공식 배포 호스트의 네트워크 허용이며 [연결 조사 보고서](reports/2026-10-21-aside-connection.md)를 따른다.
 
 
