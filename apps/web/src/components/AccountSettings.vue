@@ -2,27 +2,27 @@
 import {ref} from 'vue';
 import {closeAccount,updateAccount,type Session} from '../api';
 const props=defineProps<{user:NonNullable<Session['user']>}>();
-const emit=defineEmits<{changed:[];closed:[pending:boolean]}>();
+const emit=defineEmits<{pending:[value:boolean];changed:[];closed:[pending:boolean]}>();
 const username=ref(props.user.username),currentPassword=ref(''),newPassword=ref(''),confirmation=ref('');
 const busy=ref(false),error=ref(''),closePassword=ref(''),consent=ref(false);
 async function remove(){
- if(busy.value||!consent.value)return;busy.value=true;error.value='';
+ if(busy.value||!consent.value)return;busy.value=true;emit('pending',true);error.value='';
  try{const result=await closeAccount(closePassword.value);emit('closed',Boolean(result?.cleanupPending));}
  catch(cause){const code=(cause as Error).message;error.value=code==='ACCOUNT_BUSY'?'진행 중인 분석이나 업로드가 있습니다. 완료 후 다시 시도해 주세요.':code==='ADMIN_CLOSURE_BLOCKED'?'관리자 계정은 여기서 탈퇴할 수 없습니다.':code==='AUTH_FAILED'||code==='AUTH_REQUIRED'?'현재 비밀번호 또는 로그인 상태를 확인해 주세요.':'탈퇴를 완료하지 못했습니다. 잠시 후 다시 시도해 주세요.';}
- finally{closePassword.value='';busy.value=false;}
+ finally{closePassword.value='';busy.value=false;emit('pending',false);}
 }
 async function save(){
  if(busy.value)return;error.value='';
  if(newPassword.value!==confirmation.value){error.value='새 비밀번호 확인이 일치하지 않습니다.';return;}
- busy.value=true;
+ busy.value=true;emit('pending',true);
  try{await updateAccount(username.value,currentPassword.value,newPassword.value||undefined);emit('changed');}
  catch(cause){const code=(cause as Error).message;error.value=code==='USERNAME_UNAVAILABLE'?'이미 사용 중인 사용자 이름입니다.':code==='AUTH_FAILED'||code==='AUTH_REQUIRED'?'현재 비밀번호 또는 로그인 상태를 확인해 주세요.':code==='AUTH_RATE_LIMITED'?'시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.':'변경하지 못했습니다. 연결 상태와 입력 내용을 확인해 주세요.';}
- finally{currentPassword.value='';newPassword.value='';confirmation.value='';busy.value=false;}
+ finally{currentPassword.value='';newPassword.value='';confirmation.value='';busy.value=false;emit('pending',false);}
 }
 </script>
 <template>
- <details class="account-settings">
-  <summary>내 계정 관리</summary>
+ <section class="account-settings">
+  <h2>내 계정 관리</h2>
   <p>사용자 이름: {{user.username}} · {{user.role==='admin'?'관리자':'일반 회원'}}</p>
   <p>변경하면 모든 기기에서 로그아웃됩니다. 변경한 정보로 다시 로그인하세요.</p>
   <form @submit.prevent="save" :aria-busy="busy">
@@ -42,8 +42,8 @@ async function save(){
     <button type="submit" :disabled="busy||!consent">{{busy?'처리 중…':'회원 탈퇴 확정'}}</button>
    </form>
   </details>
- </details>
+ </section>
 </template>
 <style scoped>
-.account-settings{padding:1rem;margin-bottom:1.5rem;border:1px solid #cbd5e1;border-radius:10px;background:white}.closure{margin-top:1.5rem;border-top:1px solid #ddd;padding-top:1rem}.account-settings input[type=checkbox]{display:inline;width:auto}.account-settings summary{cursor:pointer;font-weight:600}.account-settings form{max-width:440px;display:grid;gap:.5rem}.account-settings input{box-sizing:border-box;width:100%;padding:.7rem;font:inherit;border:1px solid #8b9bae;border-radius:6px}.account-settings label{margin-top:.5rem}.account-settings button{padding:.75rem;cursor:pointer}.account-settings small{color:#526477}.account-settings :focus-visible{outline:3px solid #3276cc;outline-offset:3px}
+.account-settings{padding:32px;margin-bottom:1.5rem;border:1px solid #e2e8f0;border-radius:16px;background:white}.account-settings h2{font-size:20px}.account-settings>p{color:#64748b}.account-settings button{border-radius:8px;background:#2563eb;color:white;font-weight:600}.account-settings .closure button{background:#fff1f2;color:#b42338}.account-settings label{font-size:13px;font-weight:500}.account-settings form{max-width:560px}.account-settings input{background:#f8fafc}.closure summary{color:#b42338}.closure{margin-top:1.5rem;border-top:1px solid #ddd;padding-top:1rem}.account-settings input[type=checkbox]{display:inline;width:auto}.account-settings summary{cursor:pointer;font-weight:600}.account-settings form{max-width:440px;display:grid;gap:.5rem}.account-settings input{box-sizing:border-box;width:100%;padding:.7rem;font:inherit;border:1px solid #8b9bae;border-radius:6px}.account-settings label{margin-top:.5rem}.account-settings button{padding:.75rem;cursor:pointer}.account-settings small{color:#526477}.account-settings :focus-visible{outline:3px solid #3276cc;outline-offset:3px}
 </style>

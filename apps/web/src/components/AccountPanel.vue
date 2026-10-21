@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import {authenticate,type Session} from '../api';
-const emit=defineEmits<{authenticated:[session:Session]}>();
-const mode=ref<'login'|'register'>('login');
+const props=defineProps<{initialMode?:'login'|'register'}>();
+const emit=defineEmits<{pending:[value:boolean];authenticated:[session:Session]}>();
+const mode=ref<'login'|'register'>(props.initialMode??'login');
 const username=ref(''),password=ref(''),confirmation=ref('');
 const busy=ref(false),visible=ref(false),error=ref('');
 function switchMode(){
@@ -13,7 +14,7 @@ async function submit(){
  if(busy.value)return;
  error.value='';
  if(mode.value==='register'&&password.value!==confirmation.value){error.value='비밀번호 확인이 일치하지 않습니다.';return;}
- busy.value=true;
+ busy.value=true;emit('pending',true);
  try{const session=await authenticate(mode.value,username.value,password.value);emit('authenticated',session);}
  catch(e){
   const code=(e as Error).message;
@@ -22,7 +23,7 @@ async function submit(){
    code==='AUTH_FAILED'?'사용자 이름 또는 비밀번호가 올바르지 않습니다.':
    '요청을 완료하지 못했습니다. 연결 상태와 입력 내용을 확인하고 다시 시도해 주세요.';
  }
- finally{password.value='';confirmation.value='';busy.value=false;}
+ finally{password.value='';confirmation.value='';busy.value=false;emit('pending',false);}
 }
 </script>
 <template>

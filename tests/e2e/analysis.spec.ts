@@ -48,7 +48,7 @@ test('persisted report links claim time to player and renders evidence as text',
   const result={scope:'audio_only',demo:false,claims:[{id:randomUUID(),text:'테스트 자료의 주장',contextText:'전사 원문 <img src=x onerror=window.contextInjected=true> 끝',startSeconds:12,endSeconds:18,subject:null,period:null,metric:null,value:null,unit:null,eligibility:'checkable',verdict:'INSUFFICIENT',evidence:[{url:'javascript:alert(1)',title:'테스트 자료',quote:'<img src=x onerror="window.injected=true">',position:0,publisher:null,publishedAt:null,relation:'INSUFFICIENT',usable:false,reasons:['QUOTE_NOT_VERIFIED'],lineage:'test',sourceTrace,sourceReview}]}],limitations:['테스트 전용 고정 출력. 실제 AI 추론 아님.'],usage:{}};
   await pool.query("INSERT INTO jobs(id,media_id,consent,status,result) VALUES($1,$2,true,'completed',$3)",[id,mediaId,JSON.stringify(result)]);
   await page.goto('/');
-  await page.locator('.history-item').first().click();
+  await page.getByRole('button',{name:'분석 이력',exact:true}).click();await page.locator('.history-item').first().click();
   const player=page.locator('video');
   await expect(player).toBeVisible();
   await expect.poll(()=>player.evaluate((v:HTMLVideoElement)=>v.readyState)).toBeGreaterThan(0);
@@ -83,7 +83,7 @@ test('late polling response cannot replace a newly selected example',async({page
  await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
  let pending:import('@playwright/test').Route|undefined;
  await page.route('**/api/analyses/late',async route=>{pending=route;});
- await page.goto('/');await page.locator('.history-item').first().click();
+ await page.goto('/');await page.getByRole('button',{name:'분석 이력',exact:true}).click();await page.locator('.history-item').first().click();
  await expect.poll(()=>Boolean(pending)).toBe(true);
  await page.getByRole('button',{name:'예시 보고서 보기'}).click();
  const response=page.waitForResponse(r=>r.url().endsWith('/api/analyses/late'));
@@ -96,7 +96,7 @@ test('budget rejection is explained without suggesting successful analysis',asyn
  const item={id:'budget',status:'failed',stage:'failed',createdAt:'2026-10-16T00:00:00Z',expiresAt:'',scope:'audio_only',demo:false,error:{code:'BUDGET_EXCEEDED',message:'BUDGET_EXCEEDED'},claims:[],limitations:[],usage:{}};
  await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
  await page.route('**/api/analyses/budget',route=>route.fulfill({json:item}));
- await page.goto('/');await page.locator('.history-item').first().click();
+ await page.goto('/');await page.getByRole('button',{name:'분석 이력',exact:true}).click();await page.locator('.history-item').first().click();
  await expect(page.getByRole('heading',{name:'분석 1건 또는 월 예산 한도에 도달했습니다.'})).toBeVisible();
  await expect(page.getByText('이 작업의 실제 AI 분석은 완료되지 않았습니다.')).toBeVisible();
 });
@@ -121,7 +121,7 @@ test('table quote displays physical source location without claiming verified me
   const sourceTrace={parserVersion:'static-text-v3',requestedUrl:'https://example.org/table',finalUrl:'https://example.org/table',retrievedAt:'2026-10-19T00:00:00Z',contentType:'text/html',bodySha256:'a'.repeat(64),textSha256:'b'.repeat(64),textLength:header.length+1+quote.length,blocks:[{kind:'table_header',position:0,length:header.length,tableLocation:{tableIndex:0,rowIndex:0,cellIndex:0,rowSpan:1,columnSpan:1}},{kind:'table_cell',position:header.length+1,length:quote.length,tableLocation:{tableIndex:0,rowIndex:1,cellIndex:0,rowSpan:1,columnSpan:2}}],structureComplete:true,publication:{publisher:missing,publishedAt:missing,modifiedAt:missing},quoteOccurrences:1,quoteBlockIndexes:[1],extractionTruncated:false,tableReferenceAudit:{version:'table-reference-audit-v1',meaningVerified:false,complete:true,references:[{cellBlockIndex:1,declaredId:'rate',status:'resolved_same_table_header',headerBlockIndex:0}]},tableContext:{version:'table-context-v1',tableIndex:0,association:'same_table_only',meaningVerified:false,complete:true,fragments:[{blockIndex:0,kind:'table_header',text:header,truncated:false}],cueAudit:{version:'table-cue-audit-v1',meaningVerified:false,complete:true,cues:[{blockIndex:0,kind:'denominator',offset:0,text:'15세 이상'}]}}};
   const result={scope:'audio_only',demo:false,claims:[{id:randomUUID(),text:'표 위치 추적 테스트',startSeconds:0,endSeconds:1,verdict:'INSUFFICIENT',evidence:[{url:sourceTrace.finalUrl,title:'합성 표',quote,position:header.length+1,publisher:null,publishedAt:null,relation:'INSUFFICIENT',usable:false,reasons:['TABLE_CONTEXT_UNVERIFIED'],lineage:'example.org',sourceTrace}]}],limitations:['합성 고정 출력이며 실제 AI 분석이 아닙니다.'],usage:{}};
   await pool.query("INSERT INTO jobs(id,media_id,consent,status,result) VALUES($1,$2,true,'completed',$3)",[id,mediaId,JSON.stringify(result)]);
-  await page.goto('/');await page.locator('.history-item').first().click();
+  await page.goto('/');await page.getByRole('button',{name:'분석 이력',exact:true}).click();await page.locator('.history-item').first().click();
   await page.getByText('원문 수집·발행 정보',{exact:true}).click();
   await expect(page.getByText('표 1 · 행 2 · 셀 1 (원문 순서)',{exact:true})).toBeVisible();
   await expect(page.getByText('행 병합 표기: 1 · 열 병합 표기: 2',{exact:true})).toBeVisible();
@@ -141,7 +141,7 @@ test('visual observations remain separate from external verdicts and escape OCR 
  const item={id:'visual',status:'completed',stage:'completed',createdAt:'2026-10-19T00:00:00Z',expiresAt:'',scope:'audio_visual',demo:false,error:null,claims:[{id:'claim',text:'음성 50%',startSeconds:0,endSeconds:1,verdict:'INSUFFICIENT',evidence:[]}],limitations:['15초 간격 표본 추출'],usage:{},visual:{version:'visual-sampled-v1',status:'partial',durationSeconds:2,subtitleStatus:'not_present',ocrStatus:'partial',frames:[{frameId:'frame',timeSeconds:0}],records:[{source:'ocr',startSeconds:0,endSeconds:2,text,frameId:'frame'}],limitations:['OCR 오인식 가능']},modalChecks:[{claimId:'claim',source:'ocr',startSeconds:0,endSeconds:2,observedText:text,status:'possible_mismatch',reasons:['OCR_UNCERTAIN'],frameId:'frame'}],summary:{overall:'review_required',counts:{CONFIRMED:0,REFUTED:0,INSUFFICIENT:1,REVIEW_REQUIRED:0,EXCLUDED:0},strength:'not_assessed',independenceVerified:false,crossModalReviewRequired:true}};
  await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
  await page.route('**/api/analyses/visual',route=>route.fulfill({json:item}));
- await page.goto('/');await page.locator('.history-item').first().click();
+ await page.goto('/');await page.getByRole('button',{name:'분석 이력',exact:true}).click();await page.locator('.history-item').first().click();
  await expect(page.getByRole('heading',{name:'자막·화면 관측'})).toBeVisible();
  await expect(page.getByText('불일치 후보 · 검토 필요',{exact:true})).toBeVisible();
  await expect(page.getByText(text,{exact:true}).first()).toBeVisible();
@@ -162,7 +162,7 @@ for(const reviewed of [false,true])test(`reviewed report audit and legacy summar
  await page.route('**/api/auth/session',route=>route.fulfill({json:{mode:'local',user:null}}));
  await page.route('**/api/analyses',route=>route.fulfill({json:[item]}));
  await page.route('**/api/analyses/reviewed-report',route=>route.fulfill({json:item}));
- await page.goto('/');await page.locator('.history-item').first().click();
+ await page.goto('/');await page.getByRole('button',{name:'분석 이력',exact:true}).click();await page.locator('.history-item').first().click();
  await expect(page.getByText('집계 결과: 검증 불충분',{exact:true})).toBeVisible();
  if(reviewed){
   await expect(page.getByText('선택한 주장 2개를 집계했습니다.',{exact:true})).toBeVisible();
