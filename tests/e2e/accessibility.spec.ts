@@ -87,13 +87,14 @@ test('opening history moves focus once and polling preserves user focus',async({
  await page.route('**/api/auth/session',r=>r.fulfill({json:{mode:'accounts',user:{id:'fixture',username:'a11y_user',role:'user'}}}));
  await page.route('**/api/analyses',r=>r.fulfill({json:[{id:'fixture',createdAt:'2026-10-21T00:00:00Z',status:'transcribing'}]}));
  let requests=0;
- await page.route('**/api/analyses/fixture',r=>{requests++;return r.fulfill({json:{id:'fixture',createdAt:'2026-10-21T00:00:00Z',status:'transcribing',stage:'transcribing',demo:false,claims:[],limitations:[],usage:{}}});});
+ await page.route('**/api/analyses/fixture',r=>{requests++;return r.fulfill({json:{id:'fixture',createdAt:'2026-10-21T00:00:00Z',status:requests===1?'transcribing':'extracting',stage:requests===1?'transcribing':'extracting',demo:false,claims:[],limitations:[],usage:{}}});});
  await page.goto('/');
  await page.getByRole('button',{name:'분석 이력',exact:true}).click();
  await page.locator('.history-item').focus();await page.keyboard.press('Enter');
  await expect(page.getByRole('main')).toBeFocused();
  const profile=page.getByRole('button',{name:'계정 메뉴'});
  await profile.focus();
- await expect.poll(()=>requests).toBeGreaterThan(1);
+ await expect(page.locator('.steps .current')).toContainText('주장 추출');
+ expect(requests).toBeGreaterThan(1);
  await expect(profile).toBeFocused();
 });

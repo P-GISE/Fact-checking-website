@@ -1,5 +1,8 @@
 # Windows 개발 도구 설정 — 2026-10-20
 
+> **2026-10-21 클라우드 재개 시 연결 구분:** 현재 채팅은 Linux /workspace에서 실행되며 Aside CLI/MCP 도구가 노출되지 않는다. 사용자 연결 요청 후 도구·CLI·플러그인 검색에서도 활성화 수단을 찾지 못했다. 아래 Windows 설치/로그인 기록은 현재 연결 증거가 아니다. Windows 설정을 원격 변경하지 않았고 공개 검증에는 Aside가 활성화된 로컬 실행 환경이 필요하다. [UI 후속 보고서](../docs/reports/2026-10-21-ui-accessibility.md).
+
+
 후속 확인: Aside 앱이 설치됐고 CLI account status에서 로그인 상태를 확인했다. 다만 Work 브라우저 도구는 사용자 활성화 답변 후에도 disabled로 응답했으며 메모리 검색 unavailable/remote hosts403이므로 AWS 콘솔 접근은 미검증이다. 아래 앱 설치 대기 항목은 최초 설치 시점의 기록이다. 자동 배포 후속은 docs/08 상단 절을 따른다.
 
 대상은 `P-GISE/Fact-checking-website`의 `work` 브랜치다. 로컬 저장소는 `C:/코덱스/졸업프로젝트 중간고사 V2/Fact-checking-website`이며 기준 커밋은 `671f737`이다. 다른 EventOps 저장소와 `lostark-party-vps`는 이 프로젝트 배포 대상이 아니다. 기존 README의 `/workspace/.devtools` 설치·검증은 이전 클라우드 환경 기록이며 아래 Windows 관측과 구분한다.
