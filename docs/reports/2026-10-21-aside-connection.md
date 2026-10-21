@@ -49,3 +49,14 @@
 - 공개 사이트 직접 curl은 HTTP000/exit22로 실패했다. 공개 UI·회원 흐름/실제 단말/스크린리더 검증은 아직 수행하지 않았다. 제품 코드·모델·예산·운영 배포 변경 및 새 유료 AI 호출은 없다. 문서만 검증·게시하며 제품 테스트는 재실행하지 않는다.
 
 다음 순서는 사용자 기기 승인 → CLI 로그인 완료/인증 파일 권한 확인 → host list/프로필 확인 → 실제 탭 읽기 → 공개 새 UI와 임시 회원 흐름 검증·정리다. 인증 승인 전에는 이 후속을 완료 처리하지 않는다.
+
+## 기기 승인 완료와 원격 제어 권한 차단
+
+사용자가 기기 승인을 완료했다고 알렸고, 대기 CLI의 exit0 및 Signed in 출력을 확인했다. 인증 파일은 존재하며0600이다. 내용은 읽거나 출력하지 않았다. 계정 이메일과 승인 코드는 문서에 저장하지 않는다.
+
+- NODE_USE_ENV_PROXY=1과 사설 인증 경로를 유지한 aside host list는 Remote hosts lookup failed:403을 반환했다. 네트워크 메타데이터 진단은 프록시 경유 요청을 확인했다. 로컬21420 daemon 부재는 클라우드에서 예상되는 상태이며, CLI 인증 저장 실패로 해석하지 않는다.
+- 배포 CLI에 포함된 fetchRemoteHosts는 https://api.aside.com/remote/hosts를 요청한다. 해당 경로의 비인증 curl은 실제 HTTP401/ACCESS_TOKEN_INVALID로 응답해 프록시 CONNECT 차단과 구분했다.
+- 임시 Node preload로 CLI의 정상 인증 요청 응답에서 status와 허용된 오류 코드, 결제 관련 오류 여부 boolean만 관측했다. 인증 헤더/토큰/원문 응답은 출력하지 않았다. 결과 status403/code PAYMENT_REQUIRED/paymentRequired true. CLI 내 HOST_ERROR_HINTS도 PAYMENT_REQUIRED를 Remote Control requires the Pro plan으로 설명한다. 인증 파일을 직접 읽거나 CLI를 변조하지 않았다. 진단 파일은 제거한다.
+- 따라서 현재 차단은 Aside 원격 제어의 요금제 권한이다. Pro 가입/결제나 사용자 요금제 변경은 실행하지 않았다. 로컬 브라우저 앱과 같은 환경에서 실행하는 경로는 별도 선택지이며, 현재 클라우드가 그 환경으로 전환된 것은 아니다.
+
+CLI 로그인 완료와 원격 브라우저 연결 완료는 별개다. host/profile/실제 탭 읽기·새 UI 공개 회원 흐름·실제 단말/스크린리더 검증은 미완료다. 사용자에게 확인된 요금제 요구를 안내하고 경로 선택을 기다린다. 제품 코드/운영 배포/AI 모델·예산 변경·유료 AI 호출은 없다. 문서 diff/추가 참조 검증 후 work에 게시하며 main은 변경하지 않는다.
