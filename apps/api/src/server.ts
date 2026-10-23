@@ -5,7 +5,7 @@ import {authConfiguration} from './auth-config.js';
 import {config} from './config.js';
 import {cleanup} from './cleanup.js';
 const auth=authConfiguration(process.env);
-await migrate();
+if(process.env.FACTLENS_AUTO_MIGRATE!=='false')await migrate();
 const redis=createClient({url:process.env.REDIS_URL??'redis://127.0.0.1:6379'});
 redis.on('error',()=>console.error('Redis connection unavailable; queued jobs remain durable.'));
 await redis.connect();

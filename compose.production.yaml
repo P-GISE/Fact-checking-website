@@ -32,9 +32,12 @@ services:
     command: sh -c 'mkdir -p /data/media && chown 1000:1000 /data/media && chmod 700 /data/media'
     volumes: [media:/data]
   api:
+    image: factlens-api:${FACTLENS_DEPLOY_SHA:-local}
     build:
       context: .
       dockerfile: docker/api.Dockerfile
+      args:
+        FACTLENS_SOURCE_REVISION: ${FACTLENS_DEPLOY_SHA:-unknown}
       secrets: [proxy_ca]
     restart: unless-stopped
     user: '1000:1000'
@@ -48,6 +51,7 @@ services:
       DATABASE_URL: postgresql://factlens:${FACTLENS_DB_PASSWORD:?required}@postgres:5432/factlens
       REDIS_URL: redis://redis:6379
       FACTLENS_LOCAL_ONLY: 'false'
+      FACTLENS_AUTO_MIGRATE: 'false'
       FACTLENS_AUTH_MODE: accounts
       FACTLENS_TRUST_PROXY: 'true'
       ALLOWED_ORIGINS: https://factlens.pigs0516.com
@@ -64,6 +68,7 @@ services:
       timeout: 3s
       retries: 30
   worker:
+    image: factlens-worker:${FACTLENS_DEPLOY_SHA:-local}
     build:
       context: .
       dockerfile: docker/worker.Dockerfile
@@ -92,6 +97,7 @@ services:
     depends_on:
       api: {condition: service_healthy}
   web:
+    image: factlens-web:${FACTLENS_DEPLOY_SHA:-local}
     build:
       context: .
       dockerfile: docker/web.Dockerfile
