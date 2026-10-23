@@ -3,6 +3,8 @@ name: Verify and deploy FactLens
 on:
   push:
     branches: [work]
+  pull_request:
+    branches: [work]
   workflow_dispatch:
 
 permissions:
