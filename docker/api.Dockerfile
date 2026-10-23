@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM node:24-bookworm-slim
+ARG FACTLENS_SOURCE_REVISION=unknown
+ARG FACTLENS_BRIDGE_BASE=none
+LABEL io.factlens.migration-control="v1" org.opencontainers.image.revision=$FACTLENS_SOURCE_REVISION io.factlens.bridge-base=$FACTLENS_BRIDGE_BASE
 WORKDIR /app
 COPY package*.json ./
 COPY apps/api/package.json apps/api/package.json
