@@ -275,5 +275,9 @@ for SCENARIO in stdin-consumer success bridge; do
   [[ $(<"$MOCK_HOME/.factlens-deployed-sha") == "$SHA" && ! -e $MOCK_HOME/.factlens-recovery-required ]]
 done
 assert_absent 'reset|checkout|prune|down|restore'
+success_matcher=$(grep -F 'grep -Fx "Deployed $DEPLOY_SHA;' "$(dirname "$script")/../.github/workflows/deploy.yml" | cut -d '"' -f2)
+[[ -n $success_matcher ]]
+success_matcher=${success_matcher/\$DEPLOY_SHA/$SHA}
+grep -Fx "$success_matcher" "$evidence/success.output.log"
 printf 'PASS: %s mock scenarios; app-only rollout, rollback, schema and recovery gates verified.\n' "$case_count"
 printf 'Artifacts: %s\n' "$evidence"
