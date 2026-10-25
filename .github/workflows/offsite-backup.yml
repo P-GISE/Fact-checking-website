@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: factlens-offsite-backup
@@ -15,6 +14,9 @@ concurrency:
 
 jobs:
   backup:
+    permissions:
+      contents: read
+      id-token: write
     if: vars.FACTLENS_OFFSITE_ENABLED == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
