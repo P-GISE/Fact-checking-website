@@ -1,12 +1,12 @@
 # Project-local MCP servers. Restart Codex and trust this project to discover them.
 [mcp_servers.codegraph]
-command = "/workspace/.devtools/node/node_modules/.bin/codegraph"
-args = ["serve", "--mcp"]
+command = "bash"
+args = ["devtools/run.sh", "codegraph", "serve", "--mcp"]
 
 [mcp_servers.iron_laws]
-command = "/workspace/.devtools/python/bin/iron-laws"
-args = ["mcp", "--root", "/workspace/Fact-checking-website"]
+command = "bash"
+args = ["devtools/run.sh", "iron-laws", "mcp", "--root", "."]
 
 [mcp_servers.headroom]
-command = "/workspace/.devtools/python/bin/headroom"
-args = ["mcp", "serve"]
+command = "bash"
+args = ["devtools/run.sh", "headroom", "mcp", "serve"]

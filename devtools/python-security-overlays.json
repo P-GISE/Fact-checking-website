@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "supported_hosts": [
+    "windows-x86_64",
+    "linux-glibc>=2.28-x86_64"
+  ],
+  "packages": {
+    "litellm": {
+      "upstream_version": "1.106.4",
+      "artifacts": [
+        {
+          "filename": "litellm-1.106.4-cp310-abi3-manylinux_2_28_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/06/db/0e42dc7945e27f0633eb00a10e8ff6ecdb93d6fd2798a1ca15e63fc7c54c/litellm-1.106.4-cp310-abi3-manylinux_2_28_x86_64.whl",
+          "sha256": "d4cd1c1cab5c1e7f32d6a06a74e88176575fcbf427e8a4b6a434207aca007fb4"
+        },
+        {
+          "filename": "litellm-1.106.4-cp310-abi3-win_amd64.whl",
+          "url": "https://files.pythonhosted.org/packages/0c/11/eb49387741c030a181eb5ba5240d813c641b636d93ea22b9099d8e38c9c2/litellm-1.106.4-cp310-abi3-win_amd64.whl",
+          "sha256": "1dc78af5a710715b1807a73d1b378d4d1fd82a4f4a13e45179b76287cbbabba9"
+        }
+      ]
+    },
+    "strix-agent": {
+      "upstream_version": "1.7.0",
+      "artifacts": [
+        {
+          "filename": "strix_agent-1.7.0-py3-none-manylinux_2_17_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/b5/2f/a77feba0112fc0ff32d30ed77a28aea97ade45c4241e29093fedc5145bbb/strix_agent-1.7.0-py3-none-manylinux_2_17_x86_64.whl",
+          "sha256": "854f2aea63768a3e6280ef17e609542fdb85917bbcfccf0ed89238a1411ebf82"
+        },
+        {
+          "filename": "strix_agent-1.7.0-py3-none-win_amd64.whl",
+          "url": "https://files.pythonhosted.org/packages/b2/f5/de315e034b95fc609114094c168af6a4b9ce464bcd531b820e56d49e2183/strix_agent-1.7.0-py3-none-win_amd64.whl",
+          "sha256": "d9086c3266b46f5cdfa502f0843f162ffc58393130143bd3634ee53873c40999"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "fact-lazycodex-installer-build-deps",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=24.20.0 <25"
+  },
+  "dependencies": {
+    "zod": "4.6.6",
+    "posthog-node": "5.52.4",
+    "jsonc-parser": "3.3.1",
+    "js-yaml": "5.4.2"
+  }
+}
