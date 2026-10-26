@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import zipfile
-from prebuilt_gate import validate_artifact,validate_artifact_zip,validate_archive,GateError
+from prebuilt_gate import validate_artifact,validate_artifact_zip,validate_archive,normalize_action_digest,GateError
 
 
 def api(path):
@@ -16,7 +16,7 @@ def api(path):
 def main():
     os.umask(0o077)
     sha=os.environ['GITHUB_SHA'];run=int(os.environ['GITHUB_RUN_ID']);attempt=int(os.environ['GITHUB_RUN_ATTEMPT'])
-    artifact_id=int(os.environ['ARTIFACT_ID']);digest=os.environ['ARTIFACT_DIGEST']
+    artifact_id=int(os.environ['ARTIFACT_ID']);digest=normalize_action_digest(os.environ['ARTIFACT_DIGEST'])
     prefix='repos/P-GISE/Fact-checking-website/'
     meta=api(prefix+f'actions/artifacts/{artifact_id}')
     validate_artifact(meta,artifact_id,run,sha,attempt,digest)

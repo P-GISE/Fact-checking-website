@@ -11,7 +11,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from prebuilt_gate import validate_run, validate_resources, validate_archive, validate_artifact, validate_artifact_zip, GateError
+from prebuilt_gate import validate_run, validate_resources, validate_archive, validate_artifact, validate_artifact_zip, normalize_action_digest, GateError
 
 
 SHA = 'a' * 40
@@ -142,6 +142,12 @@ class ArchiveGateTests(unittest.TestCase):
 
 
 class ArtifactGateTests(unittest.TestCase):
+    def test_action_hex_and_api_prefixed_digest_match_without_accepting_other_algorithms(self):
+        self.assertEqual(normalize_action_digest('c'*64),'sha256:'+'c'*64)
+        self.assertEqual(normalize_action_digest('sha256:'+'c'*64),'sha256:'+'c'*64)
+        for invalid in ('sha1:'+'c'*40,'sha256:sha256:'+'c'*64,'c'*63,'C'*64):
+            with self.assertRaises(GateError):normalize_action_digest(invalid)
+
     def metadata(self):
         return {'id':34,'name':f'factlens-images-{SHA}-12-2','expired':False,
                 'digest':'sha256:'+'c'*64,'size_in_bytes':100,'workflow_run':{

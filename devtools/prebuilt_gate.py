@@ -22,6 +22,13 @@ def sha256_file(path):
     return hasher.hexdigest()
 
 
+def normalize_action_digest(value):
+    # Pinned upload-artifact outputs hex; the REST artifact API includes the algorithm prefix.
+    if re.fullmatch('[0-9a-f]{64}', value): return 'sha256:' + value
+    require(bool(re.fullmatch('sha256:[0-9a-f]{64}', value)), 'Invalid action digest')
+    return value
+
+
 def validate_archive(archive, sha, expected_ids, expanded_limit):
     """Inspect without extracting Docker save metadata; never print image environment."""
     require(bool(re.fullmatch('[0-9a-f]{40}', sha)), 'Invalid source SHA')
