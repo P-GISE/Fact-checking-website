@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync,unlinkSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { verifySourceInputs } from './source-inputs.mjs';
+import { verifySourceInputs,verifyPristineSource } from './source-inputs.mjs';
+import {captureInstalledLifecycle,verifyInstalledLifecycle,authorizeBuildTransition,captureBuiltLifecycle,authorizeCliTransition,capturePackagedLifecycle,verifyLifecycle,lifecycleAssertionReasons,verifyLocalNodeGyp,offlineBuildEnv} from './lifecycle-inputs.mjs';
 import { resolveNpmEntry, resolveProfile, assertPinnedNode } from './platform-profile.mjs';
 import { installedTreeDigest } from './installed-tree.mjs';
 import { verifyGuardAttestation } from './guard-attestation.mjs';
@@ -21,6 +22,14 @@ const npm = resolveNpmEntry(process.execPath);
 const heapMb = process.env.OMNIROUTE_REBUILD_HEAP_MB || '4096';
 const profile=resolveProfile(process.platform,process.env.OMNIROUTE_REBUILD_PROFILE,heapMb);
 export const buildMode = profile.bundler;
+let contractPhase='contract';
+const assertionReasons=['installed_root_symlink','workspace_path_escape','workspace_realpath_escape','installed_link_outside_pinned_inputs','installed_special_file','unsupported_source_entry_mode','source_path_escape','source_symlink','unexpected_dependency_overlay_bytes','tracked_source_bytes_changed','overlay_target_not_tracked','unexpected_untracked_or_ignored_source_input','installed_dependencies_seal_required','unexpected_install_seal_boundary','invalid_install_seal','unexpected_generated_output_boundary','non_blob_source_entry','installed_input_tree_changed',...lifecycleAssertionReasons];
+export function contractDiagnostic(error,phase='contract'){
+  const stages=['contract','contract-installed-seal','contract-seal-verify','contract-source-inputs'];
+  assert(stages.includes(phase));
+  const reason=error?.code==='ERR_ASSERTION'?assertionReasons.find(value=>error.message===value||error.message?.startsWith(value+'\n')):undefined;
+  return {stage:phase,category:error?.code==='ERR_ASSERTION'?'assertion':'runtime',...(reason?{assertionReason:reason}:{})};
+}
 
 export class RebuildFailure extends Error {
   constructor(stage, category, code = null) { super(`${stage}:${category}`); this.stage = stage; this.category = category; this.code = code; }
@@ -124,6 +133,8 @@ export function verifyReceipt({cacheRoot=buildRoot,sourceRoot=source,requireGuar
   assert.equal(receipt.sourceArchiveSha256, plan.sourceArchiveSha256);
   assert.deepEqual(receipt.dist, treeDigest(confined(cacheRoot, join(sourceRoot, 'dist'))));
   assert.deepEqual(receipt.runtimeInputs,installedTreeDigest(confined(cacheRoot,sourceRoot),sourceRoot,[]),'runtime_execution_inputs_changed');
+  if(requireGuard&&plan.lifecycleSchema===1)assert(receipt.lifecycle,'lifecycle_receipt_required');
+  if(receipt.lifecycle){assert.equal(receipt.lifecycle.phase,'packaged');verifyLifecycle(sourceRoot,receipt.lifecycle,{executionId:receipt.executionId,sourceCommit:receipt.sourceCommit,planSha256:receipt.planSha256});}
   if(requireGuard){const guard=verifyGuardAttestation(cacheRoot,process.platform,receipt);if(receipt.cliAndHttpSmoke==='pass')assert.equal(receipt.guardAttestationSha256,guard.sha256,'guard_attestation_changed');}
   return receipt;
 }
@@ -131,6 +142,7 @@ export function verifyReceipt({cacheRoot=buildRoot,sourceRoot=source,requireGuar
 async function main() {
   assertPinnedNode(process.version);
   assert.equal(plan.schema, 1);
+  assert.equal(plan.lifecycleSchema,1);
   assert.equal(plan.repository, 'https://github.com/cheaper-inference/OmniRoute.git');
   assert.equal(plan.commit, 'ad6f33f66bda34eba98645d3bfdabbde294bc843');
   if (process.argv[2] === '--verify') {
@@ -176,6 +188,9 @@ async function main() {
   }
   assert.equal(readFileSync(join(source, 'package.json'), 'utf8'), patched, 'unexpected_manifest_overlay');
   assert.equal(sha(readFileSync(join(source, 'package-lock.json'))), plan.patchedLockSha256, 'unexpected_lock_overlay');
+  const lifecycleBinding={executionId:process.env.OMNIROUTE_REBUILD_EXECUTION_ID,sourceCommit:plan.commit,planSha256:sha(readFileSync(planPath))};
+  const patches={'package.json':sha(patched),'package-lock.json':plan.patchedLockSha256};
+  if(!resume)verifyPristineSource(source,plan.commit,patches,isolatedEnv());
   if (!resume) await run('install', process.execPath, [npm, 'ci', '--no-audit', '--no-fund']);
   if (!existsSync(join(source, 'node_modules/better-sqlite3/package.json'))) {
     // Upstream's preflight recommendation: explicitly install the locked optional package.
@@ -187,31 +202,49 @@ async function main() {
   const installSealPath = join(buildRoot, 'installed-inputs-seal.json');
   const workspacePaths=['open-sse','packages/browser-pool'];
   const inputDigest=folder=>installedTreeDigest(folder,source,workspacePaths);
+  contractPhase='contract-installed-seal';
   if (!resume) {
     const directories = {};
-    for (const directory of ['node_modules', '.source']) if (existsSync(join(source, directory))) directories[directory] = inputDigest(join(source, directory));
-    writeFileSync(installSealPath, JSON.stringify({ sourceCommit: plan.commit, planSha256: sha(readFileSync(planPath)),platform:process.platform,arch:process.arch,node:process.version,directories }, null, 2) + '\n', { flag: 'wx' });
+    for (const directory of ['node_modules']) if (existsSync(join(source, directory))) directories[directory] = inputDigest(join(source, directory));
+    const lifecycle=captureInstalledLifecycle(source,lifecycleBinding);
+    writeFileSync(installSealPath, JSON.stringify({ sourceCommit: plan.commit, planSha256: sha(readFileSync(planPath)),platform:process.platform,arch:process.arch,node:process.version,directories,lifecycle }, null, 2) + '\n', { flag: 'wx' });
   }
   // A pre-seal old cache is deliberately ineligible for resume. Re-clone/reinstall is required.
+  contractPhase='contract-seal-verify';
   const installSeal = JSON.parse(readFileSync(installSealPath, 'utf8'));
   assert.equal(installSeal.sourceCommit, plan.commit);
   assert.equal(installSeal.planSha256, sha(readFileSync(planPath)));
   assert.equal(installSeal.platform,process.platform);assert.equal(installSeal.arch,process.arch);assert.equal(installSeal.node,process.version);
-  const sourceInputs = verifySourceInputs(source, plan.commit, { 'package.json': sha(patched), 'package-lock.json': plan.patchedLockSha256 }, installSeal.directories, inputDigest, isolatedEnv());
+  verifyInstalledLifecycle(source,installSeal.lifecycle,lifecycleBinding);
+  contractPhase='contract-source-inputs';
+  const lifecycleInputs={seal:installSeal.lifecycle,binding:lifecycleBinding};
+  const sourceInputs = verifySourceInputs(source, plan.commit, patches, installSeal.directories, inputDigest, isolatedEnv(),['dist'],lifecycleInputs);
+  contractPhase='contract';
   const audit = JSON.parse(await run('runtime-audit', process.execPath, [npm, 'audit', '--omit=dev', '--json']));
   assert.equal(audit.metadata.vulnerabilities.total, 0, 'runtime_advisories_remain');
-  await run(`full-${buildMode}-build`, process.execPath, [npm, 'run', 'build']);
+  verifyLocalNodeGyp(source,plan.buildNodeGyp);
+  const buildAuthorization=authorizeBuildTransition(source,installSeal.lifecycle,lifecycleBinding);
+  await run(`full-${buildMode}-build`, process.execPath, [npm, 'run', 'build'],{env:offlineBuildEnv(isolatedEnv())});
   await run('postbuild-workers', process.execPath, ['scripts/build/colocate-standalone.mjs']);
+  const builtLifecycle=captureBuiltLifecycle(source,installSeal.lifecycle,lifecycleBinding,buildAuthorization);
+  verifySourceInputs(source,plan.commit,patches,installSeal.directories,inputDigest,isolatedEnv(),['.build','dist'],{seal:builtLifecycle,binding:lifecycleBinding});
+  const cliAuthorization=authorizeCliTransition(source,builtLifecycle,lifecycleBinding);
+  const originalCli=readFileSync(join(source,'bin/omniroute.mjs'));assert.equal(sha(originalCli),cliAuthorization.originalCliSha256);
+  writeFileSync(join(buildRoot,'pristine-cli.mjs'),originalCli,{flag:'wx',mode:0o600});
+  // Upstream catches CLI bundler failures. Require a newly produced file, never an old fallback.
+  unlinkSync(join(source,'bin/omniroute.mjs'));
   await run('package-cli', process.execPath, [npm, 'run', 'build:cli']);
+  const lifecycle=capturePackagedLifecycle(source,builtLifecycle,lifecycleBinding,cliAuthorization);
+  const pluginAudit=JSON.parse(await run('plugin-runtime-audit',process.execPath,[npm,'audit','--omit=dev','--json'],{cwd:join(source,'@omniroute/opencode-plugin')}));assert.equal(pluginAudit.metadata.vulnerabilities.total,0,'plugin_runtime_advisories_remain');
   const dist = confined(buildRoot, join(source, 'dist'));
   assert(existsSync(join(dist, 'server.js')), 'missing_standalone_server');
   const standaloneNext = JSON.parse(readFileSync(join(dist, 'node_modules/next/package.json'), 'utf8'));
   assert.equal(standaloneNext.version, plan.dependencies.next);
   // Recheck source/dependency inputs after trusted build scripts, before sealing what the CLI executes.
-  const finalSourceInputs=verifySourceInputs(source,plan.commit,{ 'package.json':sha(patched),'package-lock.json':plan.patchedLockSha256 },installSeal.directories,inputDigest,isolatedEnv(),['.build','dist']);
+  const finalSourceInputs=verifySourceInputs(source,plan.commit,patches,installSeal.directories,inputDigest,isolatedEnv(),['.build','dist'],{seal:lifecycle,binding:lifecycleBinding});
   const receipt = { schema: 1, overlay: plan.overlay, sourceCommit: plan.commit, sourceRepository: plan.repository,
     attempt:process.env.OMNIROUTE_REBUILD_ATTEMPT??'unattested-direct-build',executionId:process.env.OMNIROUTE_REBUILD_EXECUTION_ID??null,profile:profile.name,
-    sourceArchiveSha256: archiveHash, sourceInputs,finalSourceInputs,runtimeInputs:installedTreeDigest(source,source,[]),
+    sourceArchiveSha256: archiveHash, sourceInputs,finalSourceInputs,lifecycle,runtimeInputs:installedTreeDigest(source,source,[]),
     sourceManifestSha256: sha(original), patchedManifestSha256: sha(patched), patchedLockSha256: sha(readFileSync(join(source, 'package-lock.json'))),
     planSha256: sha(readFileSync(planPath)), nextVersion: standaloneNext.version, build: `full upstream build; ${buildMode}; no contributor/backend profile`,
     node: process.version, platform:process.platform,arch:process.arch,dist: treeDigest(dist), cliAndHttpSmoke: 'pending; not inferred from build', rawOutputSaved: false };
@@ -223,7 +256,7 @@ async function main() {
 function diagnosticExecutionId(){const id=process.env.OMNIROUTE_REBUILD_EXECUTION_ID;return typeof id==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id)?id:null;}
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   main().catch((error) => {
-    const result = error instanceof RebuildFailure ? { stage: error.stage, category: error.category, code: error.code } : { stage: 'contract', category: error.code === 'ERR_ASSERTION' ? 'assertion' : 'runtime' };
+    const result = error instanceof RebuildFailure ? { stage: error.stage, category: error.category, code: error.code } : contractDiagnostic(error,contractPhase);
     process.stderr.write(JSON.stringify({ omniroute_security_build: 'fail', ...result, executionId:diagnosticExecutionId(),rawOutputSaved: false }) + '\n');
     process.exitCode = 1;
   });

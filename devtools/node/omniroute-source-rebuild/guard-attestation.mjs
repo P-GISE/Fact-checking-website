@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { linuxProfile } from './platform-profile.mjs';
 export function receiptBinding(receipt) {
   const keys=['attempt','executionId','profile','platform','arch','node','sourceCommit','planSha256','dist','runtimeInputs'];
-  return Object.fromEntries(keys.map(key=>{assert(receipt[key]!==undefined,`missing_receipt_binding_${key}`);return[key,receipt[key]];}));
+  return {...Object.fromEntries(keys.map(key=>{assert(receipt[key]!==undefined,`missing_receipt_binding_${key}`);return[key,receipt[key]];})),lifecycleSha256:receipt.lifecycle?createHash('sha256').update(JSON.stringify(receipt.lifecycle)).digest('hex'):null};
 }
 export function verifyGuardAttestation(cache,platform,receipt) {
   const name=platform==='linux'?linuxProfile:'turbo-4096-20261026';

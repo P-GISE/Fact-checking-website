@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
+import {verifyLifecycle} from './lifecycle-inputs.mjs';
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 export const gitBlob = (bytes) => createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex');
 
@@ -21,8 +22,8 @@ export function verifyTrackedFiles(root, entries, patches) {
   return {files:checked.length,sha256:sha(JSON.stringify(checked))};
 }
 
-export function verifyUntrackedPaths(paths, sealedDirectories) {
-  for(const path of paths) assert(Object.keys(sealedDirectories).some((dir)=>path===`${dir}/`||path.startsWith(`${dir}/`)),'unexpected_untracked_or_ignored_source_input');
+export function verifyUntrackedPaths(paths, sealedDirectories,exactFiles={}) {
+  for(const path of paths) assert(Object.hasOwn(exactFiles,path)||Object.keys(sealedDirectories).some((dir)=>path===`${dir}/`||path.startsWith(`${dir}/`)),'unexpected_untracked_or_ignored_source_input');
 }
 
 export function verifySealBoundaries(seals) {
@@ -33,16 +34,22 @@ export function verifySealBoundaries(seals) {
   }
 }
 
-export function verifySourceInputs(root, commit, patches, seals, treeDigest, env,generatedOutputs=[]) {
-  assert(generatedOutputs.every(path=>['.build','dist'].includes(path)),'unexpected_generated_output_boundary');
-  verifySealBoundaries(seals);
+function gitInputs(root,commit,env){
   const git=(args)=>execFileSync('git',['--no-replace-objects',...args],{cwd:root,env,windowsHide:true,maxBuffer:16*1024*1024});
   const entries=git(['ls-tree','-rz','--full-tree',commit]).toString('utf8').split('\0').filter(Boolean).map((line)=>{
     const tab=line.indexOf('\t');const [mode,type,blob]=line.slice(0,tab).split(' ');assert.equal(type,'blob','non_blob_source_entry');return{mode,blob,path:line.slice(tab+1)};
   });
-  const tracked=verifyTrackedFiles(root,entries,patches);
   const paths=[...git(['ls-files','--others','--exclude-standard','--directory','-z']).toString('utf8').split('\0'),...git(['ls-files','--others','--ignored','--exclude-standard','--directory','-z']).toString('utf8').split('\0')].filter(Boolean);
-  verifyUntrackedPaths(paths,{...seals,...Object.fromEntries(generatedOutputs.map(path=>[path,true]))});
-  for(const [directory,expected]of Object.entries(seals)) assert.deepEqual(treeDigest(join(root,directory)),expected,'installed_input_tree_changed');
+  return {entries,paths};
+}
+export function verifyPristineSource(root,commit,patches,env){const {entries,paths}=gitInputs(root,commit,env);const tracked=verifyTrackedFiles(root,entries,patches);verifyUntrackedPaths(paths,{});return tracked;}
+export function verifySourceInputs(root, commit, patches, seals, treeDigest, env,generatedOutputs=[],lifecycle=null) {
+  assert(generatedOutputs.every(path=>['.build','dist'].includes(path)),'unexpected_generated_output_boundary');
+  verifySealBoundaries(seals);
+  const allowed=lifecycle?verifyLifecycle(root,lifecycle.seal,lifecycle.binding):{exactFiles:{},directories:{},patches:{}};
+  const {entries,paths}=gitInputs(root,commit,env);
+  const tracked=verifyTrackedFiles(root,entries,{...patches,...allowed.patches});
+  verifyUntrackedPaths(paths,{...seals,...allowed.directories,...Object.fromEntries(generatedOutputs.map(path=>[path,true]))},allowed.exactFiles);
+  for(const [directory,expected]of Object.entries(seals))assert.deepEqual(treeDigest(join(root,directory)),expected,'installed_input_tree_changed');
   return {tracked,untrackedBoundaries:Object.keys(seals),strictRawGitBlobBytes:true};
 }

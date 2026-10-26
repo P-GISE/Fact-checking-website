@@ -10,15 +10,19 @@ import { assertPinnedNode,linuxProfile,resolveProfile } from './platform-profile
 import { linuxSnapshot,ownedLinuxAdapter,confirmReaped } from './linux-processes.mjs';
 import { guardProcess } from './process-guard.mjs';
 import { receiptBinding } from './guard-attestation.mjs';
+import {lifecycleAssertionReasons} from './lifecycle-inputs.mjs';
 const here=dirname(fileURLToPath(import.meta.url));const root=resolve(here,'../../..');
 const cache=join(root,'.tools/omniroute-security-build');const attemptPath=join(cache,`attempt-${linuxProfile}.json`);
 const GiB=1024**3;
-const stages=new Set(['git-init','git-origin','git-fetch','git-checkout','source-pin','source-tree','source-archive','source-manifest','source-clean','source-lock','locked-patch-check','locked-patch','install','native-hydration','native-sqlite','runtime-audit','full-webpack-build','full-turbopack-build','postbuild-workers','package-cli','contract']);
+const stages=new Set(['git-init','git-origin','git-fetch','git-checkout','source-pin','source-tree','source-archive','source-manifest','source-clean','source-lock','locked-patch-check','locked-patch','install','native-hydration','native-sqlite','runtime-audit','plugin-runtime-audit','full-webpack-build','full-turbopack-build','postbuild-workers','package-cli','contract','contract-installed-seal','contract-seal-verify','contract-source-inputs']);
+const assertionReasons=new Set(['installed_root_symlink','workspace_path_escape','workspace_realpath_escape','installed_link_outside_pinned_inputs','installed_special_file','unsupported_source_entry_mode','source_path_escape','source_symlink','unexpected_dependency_overlay_bytes','tracked_source_bytes_changed','overlay_target_not_tracked','unexpected_untracked_or_ignored_source_input','installed_dependencies_seal_required','unexpected_install_seal_boundary','invalid_install_seal','unexpected_generated_output_boundary','non_blob_source_entry','installed_input_tree_changed']);
+for(const reason of lifecycleAssertionReasons)assertionReasons.add(reason);
 const categories=new Set(['deadline','spawn','output_limit','terminated','module_resolution','dependency_resolution','heap_limit','command_failed','archive','assertion','runtime']);
 export function diagnosticSummary(value) {
   if(value?.omniroute_security_build!=='fail'||!stages.has(value.stage)||!categories.has(value.category))return null;
   if(value.code!==undefined&&value.code!==null&&(!Number.isInteger(value.code)||value.code<0||value.code>255))return null;
-  return {stage:value.stage,category:value.category,code:value.code??null};
+  if(value.assertionReason!==undefined&&!assertionReasons.has(value.assertionReason))return null;
+  return {stage:value.stage,category:value.category,code:value.code??null,...(value.assertionReason?{assertionReason:value.assertionReason}:{})};
 }
 export function diagnosticCollector(executionId){
   assert.match(executionId,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
@@ -40,7 +44,7 @@ async function main() {
   assert(!existsSync(join(cache,'source')),'fresh_linux_source_required');
   const env=isolatedEnv();verifyLinuxEnv(env);const initial=linuxSnapshot();assert(initial.freeBytes>=12*GiB,'fresh_effective_free_below_12GiB');
   mkdirSync(cache,{recursive:true});
-  const names=['rebuild.mjs','archive-policy.mjs','guarded-linux-build.mjs','source-inputs.mjs','installed-tree.mjs','platform-profile.mjs','linux-processes.mjs','process-guard.mjs','guard-attestation.mjs','smoke.mjs','tcp-refusal.mjs','plan.json','source-lock.patch'];
+  const names=['rebuild.mjs','archive-policy.mjs','lifecycle-inputs.mjs','guarded-linux-build.mjs','source-inputs.mjs','installed-tree.mjs','platform-profile.mjs','linux-processes.mjs','process-guard.mjs','guard-attestation.mjs','smoke.mjs','tcp-refusal.mjs','plan.json','source-lock.patch'];
   const hashes=Object.fromEntries(names.map(name=>[name,createHash('sha256').update(readFileSync(join(here,name))).digest('hex')]));
   const record={attempt:linuxProfile,executionId:randomUUID(),profile:linuxProfile,platform:'linux',arch:process.arch,node:process.version,bundler:'webpack',heapMb:8192,startedAt:new Date().toISOString(),initialFreeBytes:initial.freeBytes,totalEffectiveBytes:initial.totalBytes,cgroupBudgetsChecked:initial.memoryBudgetsChecked,floorBytes:3*GiB,timeoutMinutes:30,hashes,status:'running',rawOutputSaved:false};
   writeFileSync(attemptPath,JSON.stringify(record,null,2)+'\n',{flag:'wx'});

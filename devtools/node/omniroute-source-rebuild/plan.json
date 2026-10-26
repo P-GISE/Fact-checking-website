@@ -1,5 +1,10 @@
 {
   "schema": 1,
+  "lifecycleSchema": 1,
+  "buildNodeGyp": {
+    "version": "12.4.0",
+    "integrity": "sha512-OMcPNvqTCFUnNaBlmdgq+lfNqY7gTiSmNRDjY3uAXRyudeKZEZxu3CLtjMQrx4zZxCX2b/mpNqTtwuCJgXhHkw=="
+  },
   "repository": "https://github.com/cheaper-inference/OmniRoute.git",
   "commit": "ad6f33f66bda34eba98645d3bfdabbde294bc843",
   "upstreamVersion": "3.8.52",

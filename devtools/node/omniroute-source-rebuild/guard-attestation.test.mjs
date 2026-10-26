@@ -6,5 +6,5 @@ test('unresolved guard or late group candidate blocks smoke eligibility',()=>{
   writeFileSync(path,JSON.stringify(value));assert.equal(verifyGuardAttestation(cache,'linux',receipt).attempt,receipt.attempt);
   for(const change of [{status:'cleanup_unresolved'},{cleanupUnresolved:true},{remainingOwnedProcesses:1},{childReaped:false},{initialUnrelatedNodeProcessesStillPresent:false}]){writeFileSync(path,JSON.stringify({...value,...change}));assert.throws(()=>verifyGuardAttestation(cache,'linux',receipt));}
   writeFileSync(path,JSON.stringify(value));
-  for(const change of [{executionId:'ffffffff-1234-1234-1234-123456789abc'},{profile:'different'},{planSha256:'e'.repeat(64)},{dist:{files:1,sha256:'f'.repeat(64)}},{runtimeInputs:{files:2,sha256:'f'.repeat(64)}}])assert.throws(()=>verifyGuardAttestation(cache,'linux',{...receipt,...change}));
+  for(const change of [{executionId:'ffffffff-1234-1234-1234-123456789abc'},{profile:'different'},{planSha256:'e'.repeat(64)},{dist:{files:1,sha256:'f'.repeat(64)}},{runtimeInputs:{files:2,sha256:'f'.repeat(64)}},{lifecycle:{phase:'packaged',generatedCliSha256:'f'.repeat(64)}}])assert.throws(()=>verifyGuardAttestation(cache,'linux',{...receipt,...change}));
 });

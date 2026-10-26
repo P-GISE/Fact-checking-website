@@ -1,5 +1,7 @@
 # OmniRoute 공식 소스 보안 재빌드 검증 후보
 
+최신 후보의 단계별 원본·생성물·검증 범위는 [LIFECYCLE.md](LIFECYCLE.md)를 따른다. 이전 실행 기록은 당시 이력이며 현재 성공을 의미하지 않는다.
+
 이 폴더는 공개 upstream OmniRoute v3.8.52의 고정 commit, lock patch와 일반 빌드·프로세스·receipt 검증 코드만 포함한다. FactLens 제품 코드나 비공개 프로젝트 자료를 가져오지 않았다. 기존 설치기·MCP·라우팅·운영 배포와 연결하지 않는다.
 
 현재 상태는 **검토 대기**다. Windows full Webpack 4096/6144는 heap 부족, full Turbopack 4096은 메모리 하한에서 중단됐다. 다른 Node 종료와의 인과관계는 미확정이다. Linux 실제 빌드와 CLI 검증은 아직 실행하지 않았다. 기존 도구의 미완료 차단은 유지한다.
@@ -37,3 +39,9 @@ Windows 전용 과거 adapter와 시험은 재현·회귀용으로 포함하지�
 독립 Python 표준 tarfile streaming 감사 `audit-archive-content.py SOURCE`는 canonical tar의 원본26001개 파일을 fixed Git tree의 mode/path/blob 원문과 모두 비교했다. 활성 export-ignore/export-subst는0, 추출/원문 출력0이다. canonical tar SHA는53b014bcf694e1d8416b792d0304f3411598141dcd60f51fdb0f7d891fe0e4ec, raw-content manifest SHA는7bb6c2bed545b7b844854a382b6825cebdbe32b8c5a2957fa1a10f6a2ae15098이다.
 
 새 후보는 command-local core.autocrlf=false/core.eol=lf/tar.umask=0002와 replacement objects 금지를 강제하고 고정 commit/tree b2f3332f645ad60de52f12a4a484eb288693f0ea를 확인한 뒤 canonical SHA 하나만 허용한다. 이전 Windows SHA는 plan의 historical 필드와 이전 commit/evidence에 보존한다. 기존 tracked raw bytes·허용2개 overlay·설치 seal·plan/receipt/attempt 연결은 그대로다. 다양한 ambient autocrlf/eol/umask에서도 synthetic canonical archive 동일, commit/tree 변조 거절과 기존 파일1byte변조·stale plan/receipt 거절을 포함한45/45 회귀가 Windows에서 통과했다. 실제 source build·추가 Linux CI는 실행하지 않았으며 root 검토 대기다.
+
+## 세 번째 Linux CI 결과와 source 경계 진단 후보
+
+CI40347550728은 canonical archive·설치·실제 native SQLite 검사를 지나 마지막 native-sqlite 통과 뒤 contract assertion에서 실패했다(소유 Node잔류0). full compile 진입은 확인되지 않았다. 이후 seal 생성·seal 검증·source 입력 검증 중 어느 실패인지는 기존 진단으로 구분되지 않는다. 이를 source 변조나 메모리 부족으로 단정하지 않는다.
+
+후속 후보는 위 세 구간에 고정 contract-installed-seal/contract-seal-verify/contract-source-inputs phase를 추가하고 기존 명시 assertion 식별자만 allowlist로 내보낸다. 실제 error의 임의 message/경로/값은 출력하지 않는다. 실제 raw-input 및 untracked 검사 함수의 합성 실패에서 고정 reason만 남고 비밀 marker·임의 reason·임의 phase를 거절하는 회귀를 포함하여 Windows47/47 통과했다. source/링크 허용범위·heap·메모리·timeout·seal/receipt 경계는 변경하지 않았다. 추가 CI/build·commit/push는 없으며 root 검토 대기다.
