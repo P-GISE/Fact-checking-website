@@ -15,7 +15,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  security:
+    uses: ./.github/workflows/security-gate.yml
   verify:
+    needs: ["security"]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
@@ -69,8 +72,8 @@ jobs:
       - run: bash devtools/test-deploy-production.sh
 
   deploy:
-    needs: verify
-    if: github.ref == 'refs/heads/work' && vars.FACTLENS_DEPLOY_ENABLED == 'true'
+    needs: ["security", "verify"]
+    if: "${{ needs.security.result == 'success' && (github.ref == 'refs/heads/work' && vars.FACTLENS_DEPLOY_ENABLED == 'true') }}"
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment:
