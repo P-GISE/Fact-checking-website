@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: factlens-production
+  group: ${{ github.event_name == 'pull_request' && format('factlens-pr-{0}', github.event.pull_request.number) || 'factlens-production' }}
   cancel-in-progress: false
 
 jobs:

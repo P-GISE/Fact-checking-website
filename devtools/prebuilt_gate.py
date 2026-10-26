@@ -15,6 +15,13 @@ class GateError(ValueError):
     pass
 
 
+def sha256_file(path):
+    hasher = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024**2), b''): hasher.update(block)
+    return hasher.hexdigest()
+
+
 def validate_archive(archive, sha, expected_ids, expanded_limit):
     """Inspect without extracting Docker save metadata; never print image environment."""
     require(bool(re.fullmatch('[0-9a-f]{40}', sha)), 'Invalid source SHA')
@@ -94,9 +101,7 @@ def validate_artifact(metadata, artifact_id, run_id, sha, attempt, expected_dige
 def validate_artifact_zip(path, expected_digest, sha, run_id, attempt):
     require(path.is_file() and not path.is_symlink() and path.stat().st_size <= 451 * 1024**2,
             'Invalid artifact ZIP')
-    with path.open('rb') as stream:
-        require('sha256:' + hashlib.file_digest(stream, 'sha256').hexdigest() == expected_digest,
-                'Downloaded artifact digest mismatch')
+    require('sha256:' + sha256_file(path) == expected_digest, 'Downloaded artifact digest mismatch')
     with zipfile.ZipFile(path) as archive:
         entries = archive.infolist()
         require(len(entries) == 3 and {row.filename for row in entries} ==

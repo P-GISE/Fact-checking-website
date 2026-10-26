@@ -209,6 +209,8 @@ class WorkflowBoundaryTests(unittest.TestCase):
     def test_publisher_and_prebuilt_deployment_require_all_gates_and_explicit_flag(self):
         root=Path(__file__).resolve().parents[1]
         workflow=(root/'.github/workflows/deploy.yml').read_text()
+        self.assertIn("group: ${{ github.event_name == 'pull_request' && format('factlens-pr-{0}', github.event.pull_request.number) || 'factlens-production' }}",workflow)
+        self.assertIn('cancel-in-progress: false',workflow.split('jobs:',1)[0])
         build=workflow.split('\n  build-publish:',1)[1].split('\n  deploy-prebuilt:',1)[0]
         deploy=workflow.split('\n  deploy-prebuilt:',1)[1]
         self.assertIn('needs: [security, verify]',build)

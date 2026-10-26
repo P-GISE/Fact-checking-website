@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-from prebuilt_gate import validate_archive, GateError
+from prebuilt_gate import validate_archive, sha256_file, GateError
 
 
 def command(*args):
@@ -49,7 +49,7 @@ def main():
         if save.wait()!=0 or gzip.returncode:raise GateError('Image archive failed')
     if archive.stat().st_size>450*1024**2:raise GateError('Combined image artifact exceeds reviewed size envelope')
     expanded=validate_archive(archive,sha,ids,8*1024**3)
-    with archive.open('rb') as stream:digest=hashlib.file_digest(stream,'sha256').hexdigest()
+    digest=sha256_file(archive)
     measurement=json.loads(command('bash','devtools/measure-prebuilt-import.sh',str(archive),digest,sha))
     if (measurement.get('status')!='measurement-requires-review' or measurement.get('oom_events')!=0
             or measurement.get('image_archive_sha256')!=digest

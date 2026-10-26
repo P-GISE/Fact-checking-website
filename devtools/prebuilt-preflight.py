@@ -9,7 +9,7 @@ import shutil
 import stat
 import subprocess
 import sys
-from prebuilt_gate import validate_resources, validate_archive, GateError
+from prebuilt_gate import validate_resources, validate_archive, sha256_file, GateError
 
 
 def main():
@@ -33,7 +33,7 @@ def main():
         policy=policy.get('import_policy',policy)
         if manifest.get('sha')!=args.sha or manifest.get('schema')!=1:
             raise GateError('Manifest source/schema mismatch')
-        with args.archive.open('rb') as stream: digest=hashlib.file_digest(stream,'sha256').hexdigest()
+        digest=sha256_file(args.archive)
         if digest!=manifest['archive_sha256']: raise GateError('Archive checksum mismatch')
         expanded=validate_archive(args.archive,args.sha,manifest['image_ids'],manifest['expanded_limit_bytes'])
         memory={line.split(':')[0]:int(line.split()[1])*1024
