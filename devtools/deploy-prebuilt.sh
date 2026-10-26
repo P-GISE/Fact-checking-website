@@ -93,6 +93,11 @@ clear_recovery() {
 finish() {
   local rc=$? restored=1
   trap - EXIT
+  if [[ -f $scratch/private-env ]] && ! cmp -s .env.production "$scratch/private-env"; then
+    rc=1
+    stage=private-environment
+    cp -p "$scratch/private-env" .env.production || restored=0
+  fi
   if ((rc != 0 && switched)); then
     docker compose --project-name factlens --project-directory "$ROOT" --env-file "$ROOT/.env.production" \
       -f "$scratch/previous.yaml" -f "$scratch/rollback.yaml" \
@@ -108,10 +113,12 @@ finish() {
   if ((rc != 0 && git_switched)); then
     git reset --hard "$previous_sha" >/dev/null 2>&1 || restored=0
     [[ $(git rev-parse HEAD) == "$previous_sha" ]] || restored=0
-    if ((!restored)); then printf '%s\n' "$sha" > "$recovery"; sync "$recovery" "$HOME"; fi
+    if ((!restored)); then
+      printf '%s\n' "$sha" > "$recovery"; sync "$recovery" "$HOME"
+      printf 'Recovery required: deployment state was not fully restored.\n' >&2
+    fi
   fi
   if [[ -f $scratch/private-env ]]; then cmp -s .env.production "$scratch/private-env" || {
-    cp -p "$scratch/private-env" .env.production
     printf '%s\n' "$sha" > "$recovery"
     rc=1
   }; fi

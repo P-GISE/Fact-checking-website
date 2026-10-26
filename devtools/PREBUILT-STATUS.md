@@ -37,6 +37,8 @@ Implemented and tested:
 Source integration now includes build-publish needs security+verify, one retention-one-day
 artifact, exact API/ZIP/download verification before remote transfer, and a separate
 app-only import transaction preserving schema/bridge/active-work/health/recovery gates.
+Each built image additionally passes a fixed-SHA Trivy OS/library gate, rejecting
+unrecognized OS packages, missing API/worker libraries, findings or tool errors.
 It records DB/Redis mount identities, compares private environment in memory and restores
 Git state/environment on failure. It never builds on the server, prunes images, changes
 DB/Redis services, migrates data, or alters tunnel/cron/backup configuration.
@@ -52,8 +54,9 @@ Still required before publication or production activation:
    real server available memory/disk and migration-free rollback bridge readiness.
 4. Explicit activation approval. No variables are modified by this PR. The original
    1.5 GiB no-cache build preflight remains unchanged and is not a shortcut import gate.
-5. Built image OS/runtime SCA coverage remains unverified beyond the existing source
-   dependency gate; do not claim all image packages or production import are proven safe.
+5. The image OS/library gate is implemented but has not actually run while the new
+   path is disabled. Its real findings remain unverified; do not claim image packages
+   or production import are proven safe.
 
 Local validation includes meaningful initial RED and adversarial provenance/resource/
 archive/artifact/workflow tests plus reused app-only transaction rollback scenarios.

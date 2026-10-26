@@ -73,7 +73,7 @@ jobs:
       - name: Verify prebuilt provenance and resource rejection contracts
         run: |
           python -m unittest discover -s devtools -p test_prebuilt_gate.py -v
-          bash -n devtools/measure-prebuilt-import.sh devtools/deploy-prebuilt.sh
+          bash -n devtools/measure-prebuilt-import.sh devtools/deploy-prebuilt.sh devtools/scan-prebuilt-images.sh
           python -m unittest discover -s devtools -p test_deploy_prebuilt.py -v
 
   deploy:

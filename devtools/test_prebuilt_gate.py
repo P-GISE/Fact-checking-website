@@ -179,6 +179,23 @@ class ArtifactGateTests(unittest.TestCase):
 
 
 class WorkflowBoundaryTests(unittest.TestCase):
+    def test_image_sca_zero_coverage_findings_and_tool_errors_fail_closed(self):
+        root=Path(__file__).resolve().parents[1]
+        script=(root/'devtools/scan-prebuilt-images.sh').read_text()
+        checker=script.split("<<'PY'\n",1)[1].split('\nPY\n',1)[0]
+        good={'Results':[{'Class':'os-pkgs','Packages':[{'Name':'synthetic-os'}]},
+                         {'Class':'lang-pkgs','Packages':[{'Name':'synthetic-library'}]}]}
+        for attack in (None,'os-missing','library-missing','critical','error'):
+            with self.subTest(attack=attack),tempfile.TemporaryDirectory() as directory:
+                data=copy.deepcopy(good)
+                if attack=='os-missing':data['Results'].pop(0)
+                if attack=='library-missing':data['Results'].pop(1)
+                if attack=='critical':data['Results'][0]['Vulnerabilities']=[{'Severity':'CRITICAL'}]
+                report=Path(directory)/'report.json';report.write_text(json.dumps(data))
+                status='2' if attack=='error' else '1' if attack=='critical' else '0'
+                result=subprocess.run([sys.executable,'-c',checker,str(report),status,'api'],capture_output=True)
+                self.assertEqual(result.returncode==0,attack is None)
+
     def test_unmeasured_source_cannot_even_prepare_publication(self):
         root=Path(__file__).resolve().parents[1]
         sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()

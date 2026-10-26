@@ -16,6 +16,9 @@ def command(*args):
 
 def main():
     os.umask(0o077)
+    for key in ('DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH'):
+        os.environ.pop(key,None)
+    os.environ['DOCKER_HOST']='unix:///var/run/docker.sock'
     sha=os.environ['GITHUB_SHA'];run=int(os.environ['GITHUB_RUN_ID']);attempt=int(os.environ['GITHUB_RUN_ATTEMPT'])
     if not re.fullmatch('[0-9a-f]{40}',sha) or command('git','rev-parse','HEAD')!=sha:
         raise GateError('Source checkout mismatch')
@@ -37,6 +40,7 @@ def main():
         if component=='web':args+=['--build-arg','NGINX_CONFIG=nginx.production.conf']
         subprocess.run(args+['.'],check=True)
         ids[component]=command('docker','image','inspect','--format','{{.Id}}',tag)
+    subprocess.run(['bash','devtools/scan-prebuilt-images.sh',sha],check=True)
     archive=output/'images.tar.gz'
     with archive.open('wb') as stream:
         save=subprocess.Popen(['docker','save',*tags],stdout=subprocess.PIPE)

@@ -21,13 +21,29 @@ class PrebuiltTransactionTests(unittest.TestCase):
         source=source.replace('[[ "$1 $2 $3" == "-c %u:%a $MOCK_HOME/factlens-backups" ]]',
             '''if [[ "$*" == "-c %u:%a $MOCK_HOME/.factlens-incoming/12-2" ]]; then printf '%s:700\\n' "$(id -u)"; exit 0; fi
 [[ "$1 $2 $3" == "-c %u:%a $MOCK_HOME/factlens-backups" ]]''')
-        source=source.replace("  'diff --quiet '*)", '''  "reset --hard $OLD_SHA") rm -f "$MOCK_HOME/merged" ;;
+        source=source.replace("  'diff --quiet '*)", '''  "reset --hard $OLD_SHA") [[ $SCENARIO != git-reset-failure ]] || exit 1; rm -f "$MOCK_HOME/merged" ;;
   "show $SHA:devtools/"*) echo '# synthetic helper' ;;
   'diff --quiet '*)''')
         source=source.replace('if [[ $1 == inspect ]]; then', '''if [[ $1 == load ]]; then cat >/dev/null; [[ $SCENARIO != build-failure ]]; exit; fi
-if [[ $1 == inspect && $3 == '{{json .Mounts}}' ]]; then echo '[{"Name":"synthetic-volume"}]'; exit 0; fi
+if [[ $1 == inspect && $3 == '{{json .Mounts}}' ]]; then
+  if [[ $SCENARIO == volume-changed && -f $MOCK_HOME/switched ]]; then echo '[{"Name":"changed-volume"}]'
+  else echo '[{"Name":"synthetic-volume"}]'; fi; exit 0
+fi
 if [[ $1 == inspect ]]; then''')
         source=source.replace('  devtools/production-preflight.py)', '  */prebuilt-preflight.py)')
+        source=source.replace('else touch "$MOCK_HOME/switched"; [[ $SCENARIO != up-failure ]]',
+            '''else touch "$MOCK_HOME/switched"; if [[ $SCENARIO == environment-mutated ]]; then printf 'synthetic changed environment\\n' > "$MOCK_HOME/factlens/.env.production"; fi; [[ $SCENARIO != up-failure ]]''')
+        source=source.replace('for SCENARIO in up-failure loopback-failure',
+                              'for SCENARIO in environment-mutated up-failure loopback-failure')
+        source=source.replace('for SCENARIO in rollback-failure rollback-health',
+                              'for SCENARIO in git-reset-failure volume-changed rollback-failure rollback-health')
+        source=source.replace('$SCENARIO != public-failure && $SCENARIO != rollback-failure',
+                              '$SCENARIO != git-reset-failure && $SCENARIO != public-failure && $SCENARIO != rollback-failure')
+        source=source.replace('  case_count=$((case_count + 1))', '''  if [[ $expected == fail && $SCENARIO != git-reset-failure && -f $MOCK_HOME/merged ]]; then
+    echo "Git state was not restored" >&2; exit 1
+  fi
+  grep -qx 'synthetic environment' "$MOCK_HOME/factlens/.env.production"
+  case_count=$((case_count + 1))''')
         source=source.replace('chmod +x "$fixture/bin/"*', '''cat > "$fixture/bin/gzip" <<'MOCK_GZIP'
 #!/usr/bin/env bash
 printf 'synthetic image stream'
