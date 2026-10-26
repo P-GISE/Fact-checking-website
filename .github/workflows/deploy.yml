@@ -70,6 +70,8 @@ jobs:
           docker exec factlens-postgres-1 createdb -U factlens -T factlens factlens_table_context_test
       - run: python -m pytest apps/worker/tests -q
       - run: bash devtools/test-deploy-production.sh
+      - name: Verify prebuilt provenance and resource rejection contracts
+        run: python -m unittest discover -s devtools -p test_prebuilt_gate.py -v
 
   deploy:
     needs: ["security", "verify"]
