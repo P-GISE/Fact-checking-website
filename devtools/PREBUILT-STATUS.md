@@ -1,9 +1,11 @@
-# FactLens prebuilt source: first verification boundary
+# FactLens prebuilt source: source integration, default off
 
-This branch is not an operational prebuilt deployment implementation yet. Existing
-`deploy-production.sh`, `production-preflight.py`, schema checks and production
-deployment behavior are unchanged. The new helpers never import images or modify
-services. No artifact publication step has been added.
+This branch contains an unactivated prebuilt delivery source path. Existing
+`deploy-production.sh`, `production-preflight.py` and their schema/build resource
+guards remain unchanged. The original path runs while the prebuilt flag is off.
+New build/publication/deploy jobs require an explicit prebuilt flag; the unmeasured
+policy additionally rejects build/publication even if that flag is accidentally enabled.
+No production flag, artifact publication or remote execution has been performed.
 
 Implemented and tested:
 
@@ -19,7 +21,7 @@ Implemented and tested:
 - Artifact API identity and ZIP validators reject wrong repository/work/SHA/run/
   attempt/name/ID, expired artifacts, mismatched outer digest, extra ZIP entries,
   links/encryption/oversized files, wrong inner manifest and archive checksum. These
-  are validation helpers only: no artifact download/publication is wired yet.
+  are wired before pinned SSH preparation in the disabled deploy-prebuilt job.
 - Import preflight validates checksum, archive and private environment ownership;
   observes available memory and both scratch/Docker disk free space. An exact-bundle
   measured policy with no OOM and reserve is mandatory. Disk floor remains 10 GiB,
@@ -30,22 +32,29 @@ Implemented and tested:
   daemon inside a bounded cgroup. Copy, decompressor, client, daemon and its child
   containerd share accounting. It inspects the three imported image tags and records
   peak/OOM metadata. A measured result is still `measurement-requires-review`, not
-  an automatically trusted policy. This helper is not connected to a CI run yet.
+  an automatically trusted policy. The disabled build-publish path calls it for every exact bundle, subject to a source-reviewed measured envelope. It has not actually been executed.
+
+Source integration now includes build-publish needs security+verify, one retention-one-day
+artifact, exact API/ZIP/download verification before remote transfer, and a separate
+app-only import transaction preserving schema/bridge/active-work/health/recovery gates.
+It records DB/Redis mount identities, compares private environment in memory and restores
+Git state/environment on failure. It never builds on the server, prunes images, changes
+DB/Redis services, migrates data, or alters tunnel/cron/backup configuration.
 
 Still required before publication or production activation:
 
-1. Isolated daemon+containerd+client+decompressor measured peak-memory/OOM benchmark;
-   explicit baseline/evidence/margin review. The 358.99 MiB size pilot is not this.
-2. Confirm account artifact quota and overage protection, then implement single
-   retention-one-day artifact publication with inner/outer digest validation.
-3. Wire exact prerequisite API validation into the existing push/work deploy job.
-   Preserve security/verify/build-publish dependencies and reject partial reruns.
-4. Implement app-only transactional import/rollout and test rollback, Git state,
-   environment, DB/Redis container+volume identity, migration-free bridge and active
-   work gates. Do not reuse the build entrypoint by weakening its memory threshold.
-5. Independent review and explicit activation approval. Existing approved services,
-   cron, tunnel and DB remain outside this source change.
+1. Execute and independently review the isolated import measurement and a conservative
+   envelope/margin on an approved standard runner; source policy remains unmeasured.
+   Each future exact bundle is measured again within that reviewed envelope.
+2. Confirm account artifact quota and overage protection before setting the storage
+   approval variable. Public runner free usage is not artifact storage proof.
+3. Complete independent source review and Linux transaction regressions, then verify
+   real server available memory/disk and migration-free rollback bridge readiness.
+4. Explicit activation approval. No variables are modified by this PR. The original
+   1.5 GiB no-cache build preflight remains unchanged and is not a shortcut import gate.
+5. Built image OS/runtime SCA coverage remains unverified beyond the existing source
+   dependency gate; do not claim all image packages or production import are proven safe.
 
-Local validation: meaningful initial RED (missing implementation), then thirteen tests
-with adversarial subcases GREEN; syntax compilation and diff whitespace checks.
-Linux execution is supplied by the existing verify job, not claimed until observed.
+Local validation includes meaningful initial RED and adversarial provenance/resource/
+archive/artifact/workflow tests plus reused app-only transaction rollback scenarios.
+Actual Linux results and unmeasured constraints must be reported separately.

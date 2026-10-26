@@ -30,6 +30,7 @@ def main():
         if (not env.is_file() or env.is_symlink() or stat.S_IMODE(env.stat().st_mode)!=0o600
                 or env.stat().st_uid!=os.getuid()): raise GateError('Private environment owner/mode required')
         manifest=json.loads(args.manifest.read_text());policy=json.loads(args.policy.read_text())
+        policy=policy.get('import_policy',policy)
         if manifest.get('sha')!=args.sha or manifest.get('schema')!=1:
             raise GateError('Manifest source/schema mismatch')
         with args.archive.open('rb') as stream: digest=hashlib.file_digest(stream,'sha256').hexdigest()

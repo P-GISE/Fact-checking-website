@@ -73,11 +73,12 @@ jobs:
       - name: Verify prebuilt provenance and resource rejection contracts
         run: |
           python -m unittest discover -s devtools -p test_prebuilt_gate.py -v
-          bash -n devtools/measure-prebuilt-import.sh
+          bash -n devtools/measure-prebuilt-import.sh devtools/deploy-prebuilt.sh
+          python -m unittest discover -s devtools -p test_deploy_prebuilt.py -v
 
   deploy:
     needs: ["security", "verify"]
-    if: "${{ needs.security.result == 'success' && (github.ref == 'refs/heads/work' && vars.FACTLENS_DEPLOY_ENABLED == 'true') }}"
+    if: "${{ needs.security.result == 'success' && (github.ref == 'refs/heads/work' && vars.FACTLENS_DEPLOY_ENABLED == 'true' && vars.FACTLENS_PREBUILT_ENABLED != 'true') }}"
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment:
@@ -123,4 +124,90 @@ jobs:
       - name: Remove temporary SSH credentials
         if: always()
         shell: bash
+        run: rm -f "$RUNNER_TEMP/factlens-ssh/key" "$RUNNER_TEMP/factlens-ssh/known_hosts"
+
+
+  build-publish:
+    needs: [security, verify]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work' && vars.FACTLENS_PREBUILT_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      artifact-id: ${{ steps.publish.outputs.artifact-id }}
+      artifact-digest: ${{ steps.publish.outputs.artifact-digest }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Build and measure within reviewed import and storage envelope
+        env:
+          ARTIFACT_STORAGE_APPROVED: ${{ vars.FACTLENS_ARTIFACT_STORAGE_APPROVED }}
+        run: python3 devtools/build-prebuilt.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        id: publish
+        with:
+          name: factlens-images-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/factlens-release/
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  deploy-prebuilt:
+    needs: [security, verify, build-publish]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work' && vars.FACTLENS_DEPLOY_ENABLED == 'true' && vars.FACTLENS_PREBUILT_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    environment:
+      name: production
+      url: https://factlens.pigs0516.com
+    env:
+      DEPLOY_SHA: ${{ github.sha }}
+      DEPLOY_HOST: ${{ vars.FACTLENS_SSH_HOST }}
+      DEPLOY_USER: ${{ vars.FACTLENS_SSH_USER }}
+      DEPLOY_PORT: ${{ vars.FACTLENS_SSH_PORT || '22' }}
+      DEPLOY_KEY: ${{ secrets.FACTLENS_SSH_PRIVATE_KEY }}
+      DEPLOY_KNOWN_HOSTS: ${{ secrets.FACTLENS_SSH_KNOWN_HOSTS }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validate exact successful prerequisite jobs and artifact integrity
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ needs.build-publish.outputs.artifact-id }}
+          ARTIFACT_DIGEST: ${{ needs.build-publish.outputs.artifact-digest }}
+        run: |
+          python3 devtools/fetch-prebuilt-run-evidence.py --sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT"
+          python3 devtools/download-prebuilt.py
+      - name: Prepare pinned SSH connection
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$DEPLOY_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]]
+          [[ "$DEPLOY_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$DEPLOY_PORT" =~ ^[0-9]{1,5}$ ]]
+          (( 10#$DEPLOY_PORT >= 1 && 10#$DEPLOY_PORT <= 65535 ))
+          [[ -n "$DEPLOY_KEY" && -n "$DEPLOY_KNOWN_HOSTS" ]]
+          umask 077
+          mkdir -p "$RUNNER_TEMP/factlens-ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$RUNNER_TEMP/factlens-ssh/key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$RUNNER_TEMP/factlens-ssh/known_hosts"
+      - name: Transfer verified private bundle and replace only applications
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
+          connection=(-i "$RUNNER_TEMP/factlens-ssh/key" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/factlens-ssh/known_hosts" -o ConnectTimeout=15)
+          incoming=".factlens-incoming/$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          ssh "${connection[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "umask 077; test ! -L .factlens-incoming; mkdir -p -m 700 .factlens-incoming; mkdir -m 700 '$incoming'"
+          scp "${connection[@]}" -P "$DEPLOY_PORT" "$RUNNER_TEMP/factlens-download/images.tar.gz" "$RUNNER_TEMP/factlens-download/manifest.json" "$DEPLOY_USER@$DEPLOY_HOST:$incoming/"
+          ssh "${connection[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "cd factlens && bash -s -- '$DEPLOY_SHA' '$GITHUB_RUN_ID' '$GITHUB_RUN_ATTEMPT'" < devtools/deploy-prebuilt.sh | tee "$RUNNER_TEMP/factlens-prebuilt.log"
+          grep -Fx "Deployed ${DEPLOY_SHA}; loopback and public health ready; database and Redis containers preserved." "$RUNNER_TEMP/factlens-prebuilt.log" || grep -Fx 'Stale deployment skipped: requested SHA is not origin/work HEAD.' "$RUNNER_TEMP/factlens-prebuilt.log"
+      - name: Remove temporary local SSH credentials
+        if: always()
         run: rm -f "$RUNNER_TEMP/factlens-ssh/key" "$RUNNER_TEMP/factlens-ssh/known_hosts"

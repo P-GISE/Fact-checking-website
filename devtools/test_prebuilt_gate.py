@@ -7,6 +7,9 @@ import io
 import json
 import hashlib
 import zipfile
+import os
+import subprocess
+import sys
 from pathlib import Path
 from prebuilt_gate import validate_run, validate_resources, validate_archive, validate_artifact, validate_artifact_zip, GateError
 
@@ -173,6 +176,34 @@ class ArtifactGateTests(unittest.TestCase):
                 if attack:
                     with self.assertRaises(GateError):validate_artifact_zip(path,outer,SHA,12,2)
                 else:self.assertEqual(validate_artifact_zip(path,outer,SHA,12,2),manifest)
+
+
+class WorkflowBoundaryTests(unittest.TestCase):
+    def test_unmeasured_source_cannot_even_prepare_publication(self):
+        root=Path(__file__).resolve().parents[1]
+        sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+        with tempfile.TemporaryDirectory() as directory:
+            result=subprocess.run([sys.executable,'devtools/build-prebuilt.py'],cwd=root,capture_output=True,text=True,
+                env={**os.environ,'GITHUB_SHA':sha,'GITHUB_RUN_ID':'12','GITHUB_RUN_ATTEMPT':'2',
+                     'RUNNER_TEMP':directory,'ARTIFACT_STORAGE_APPROVED':'true'})
+            self.assertNotEqual(result.returncode,0)
+            self.assertFalse((Path(directory)/'factlens-release').exists())
+
+    def test_publisher_and_prebuilt_deployment_require_all_gates_and_explicit_flag(self):
+        root=Path(__file__).resolve().parents[1]
+        workflow=(root/'.github/workflows/deploy.yml').read_text()
+        build=workflow.split('\n  build-publish:',1)[1].split('\n  deploy-prebuilt:',1)[0]
+        deploy=workflow.split('\n  deploy-prebuilt:',1)[1]
+        self.assertIn('needs: [security, verify]',build)
+        self.assertIn('needs: [security, verify, build-publish]',deploy)
+        for job in (build,deploy):
+            self.assertIn("vars.FACTLENS_PREBUILT_ENABLED == 'true'",job)
+            self.assertIn("github.event_name == 'push'",job)
+            self.assertIn("github.ref == 'refs/heads/work'",job)
+        self.assertLess(build.index('python3 devtools/build-prebuilt.py'),build.index('actions/upload-artifact@'))
+        self.assertLess(deploy.index('fetch-prebuilt-run-evidence.py'),deploy.index('Prepare pinned SSH'))
+        self.assertIn('retention-days: 1',build)
+        self.assertIn('compression-level: 0',build)
 
 
 if __name__ == '__main__': unittest.main()
