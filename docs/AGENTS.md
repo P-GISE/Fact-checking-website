@@ -1,3 +1,4 @@
+> **768MiB import 후보 준비 — 2026-10-26:** 운영/CI 실행 전 후보다. private Docker/containerd의 fresh-copy→stream-load→create/unpack 측정을768MiB·swap0·600초로 한정하고 실제 cgroup 전후·OOM·swap peak를 검증한다. 로컬 회귀는 통과했으나 CI 실제 import·운영 자원 적합·전체 앱 전환은 미확인이다. 기존1.5GiB build guard·unmeasured 정책·활성화 OFF와 기존 앱/DB는 유지한다. [후보와 검증 경계](reports/2026-10-26-bounded-import-candidate.md).
 # 프로젝트 가이드 — 공통 지침 (AGENTS.md)
 
 > **최신 브리핑·디자인 재검토 · 2026-10-21:** 로컬 Aside 연결과 공개 회원 흐름 검증 완료. 홈은 기울어진 모형 카드·파란 그라데이션·영어 라벨·3열 카드로 범용 AI SaaS 인상이 남는다. 이번은 평가이며 디자인 수정 완료가 아니다. 모바일/스크린리더·디자인 개선안 결정, 보류 중 ASR/추출·실자료 평가, 일반 의미/출처 독립성, 추가 권한/운영 복구 정책은 남는다. [디자인 평가·잔여 작업](reports/2026-10-21-design-review-status.md)을 우선한다.
