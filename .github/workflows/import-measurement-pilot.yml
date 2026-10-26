@@ -1,0 +1,35 @@
+name: FactLens import measurement and image SCA pilot (no publication)
+on:
+  pull_request:
+    branches: [work]
+    paths:
+      - .github/workflows/import-measurement-pilot.yml
+      - scripts/security/factlens-image-pilot.sh
+      - devtools/measure-prebuilt-import.sh
+      - devtools/scan-prebuilt-images.sh
+      - devtools/summarize-import-pilot.py
+      - devtools/test_import_measurement_pilot.py
+permissions:
+  contents: read
+concurrency:
+  group: factlens-import-measurement-pilot-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  security:
+    uses: ./.github/workflows/security-gate.yml
+  measurement-only:
+    needs: security
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify pilot isolation and classification contracts
+        run: python3 -m unittest discover -s devtools -p test_import_measurement_pilot.py -v
+      - name: Build three local images, measure isolated load, and summarize image SCA
+        env:
+          PILOT_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PILOT_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PILOT_MEASURE_IMPORT: 'true'
+        run: bash scripts/security/factlens-image-pilot.sh

@@ -44,6 +44,7 @@ for _ in {1..90}; do
   sleep 1
 done
 docker --host="$socket" info >/dev/null 2>&1
+docker --host="$socket" info --format '{"server_version":"{{.ServerVersion}}","driver":"{{.Driver}}","driver_status":{{json .DriverStatus}}}' > "$benchmark/runtime.json"
 # gzip, client, daemon and daemon-owned containerd share this measured cgroup.
 gzip -dc "$benchmark/images.tar.gz" | docker --host="$socket" load >/dev/null
 for component in api worker web; do
@@ -53,15 +54,19 @@ cgroup=$(awk -F: '$1=="0" {print $3}' /proc/self/cgroup)
 [[ $cgroup == /* && -f /sys/fs/cgroup$cgroup/memory.peak ]]
 python3 - "$benchmark/measurement.json" "$digest" "$run_url" \
   "/sys/fs/cgroup$cgroup" <<'PY'
-import json,sys
+import json,sys,os
 from pathlib import Path
 out,digest,url,folder=sys.argv[1:]; group=Path(folder)
 events=dict(line.split() for line in (group/'memory.events').read_text().splitlines())
 peak=int((group/'memory.peak').read_text())
+runtime=json.loads((Path(out).parent/'runtime.json').read_text())
 if int(events.get('oom',0)) or int(events.get('oom_kill',0)) or peak<=0:
     raise SystemExit('Import measurement failed: OOM or invalid accounting')
 Path(out).write_text(json.dumps({'schema':1,'status':'measurement-requires-review',
     'method':'isolated-daemon-stream-load-v1','platform':'linux/amd64',
     'image_archive_sha256':digest,'peak_total_bytes':peak,'oom_events':0,
-    'measurement_run_url':url,'disk_reserve_bytes':10*1024**3},sort_keys=True)+'\n')
+    'measurement_run_url':url,'disk_reserve_bytes':10*1024**3,
+    'docker_server_version':runtime['server_version'],'docker_driver':runtime['driver'],
+    'docker_driver_status':runtime['driver_status'],
+    'kernel_release':os.uname().release,'kernel_architecture':os.uname().machine},sort_keys=True)+'\n')
 PY
