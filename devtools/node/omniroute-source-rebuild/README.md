@@ -21,3 +21,11 @@
 합성 회귀는 H1 orphan/late child/PID 재사용·불확실 ownership 차단, H2 CLI/import/dependency 변조와 stale receipt/attestation 거절, TCP ECONNREFUSED 확인을 포함한다. 전체 tree seal 검사 시간은 실제 큰 트리에서 미측정이며 source 내부 정상 쓰기도 보수적으로 거절한다. 동일 OS 관리자에 대한 불변 서명은 아니다. ONNX 추가 CUDA/TensorRT 다운로드는 공식 skip 정책 범위로 제한되며 모델 추론은 검증하지 않는다.
 
 Windows 전용 과거 adapter와 시험은 재현·회귀용으로 포함하지만 추가 로컬 full build 실행 승인이 아니다. plan의 overlay 식별자는 기존 고정 공개 dependency patch 식별자이며 제품 설정을 담지 않는다.
+
+## 첫 실제 Linux CI 결과와 진단 보완 후보
+
+2026-10-26 PR16의 run40341107075는 Linux 합성 회귀40/40을 통과했지만 실제 build step26초 후 `build_failed`, 소유 Node잔류0, exit1로 실패했다. smoke는 실행되지 않았다. 원래 guard는 child 출력을 폐기하고 stage/category를 ephemeral 파일에만 보관했으므로 이 실행의 구체 실패 지점은 확인할 수 없다. 이를 heap/전체 compile 실패로 추정하지 않는다. 보안 gate run40341106954 성공은 OmniRoute build 성공과 별개다.
+
+후속 후보는 guard의 원문 미보존 정책을 유지하면서 고정 allowlist의 마지막 통과 stage와 실패 stage/category/0~255 exitcode만 출력한다. 줄4096자를 넘거나 파싱/enum 검증에 실패한 내용은 버리고 독립 stdout/stderr 경계를 유지한다. 기존 메모리·heap·timeout·소유권·완료 검증 경계는 바꾸지 않았다. 추가 빌드/CI 재실행은 없으며 workflow/수정본 검토를 기다린다. 진단 합성3개를 추가한 Windows 회귀43/43 통과는 Linux 실제 빌드 성공을 의미하지 않는다.
+
+진단은 builder가 출력한 UUIDv4 executionId가 현재 guard attempt nonce와 일치할 때만 채택한다. stale/missing/partial/악성 enum JSON과 비밀 marker가 요약에 들어오지 않는 회귀를 포함하며 기존 failure.json을 출력하지 않는다. nonce는 진단 연결용이며 악의적인 동일 프로세스에 대한 암호학적 신뢰 경계는 아니다.

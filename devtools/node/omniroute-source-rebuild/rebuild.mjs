@@ -92,7 +92,7 @@ async function run(stage, command, args, options = {}) {
         const modules = [...output.matchAll(/(?:Cannot find module|Can't resolve) ['"]([@a-zA-Z0-9_.\/-]{1,160})['"]/g)].map((match) => match[1]);
         writeFileSync(join(buildRoot, 'failure.json'), JSON.stringify({ stage, category, code, signal, modules: [...new Set(modules)].slice(0, 20), rawOutputSaved: false }, null, 2));
         reject(new RebuildFailure(stage, category, code));
-      } else { process.stdout.write(JSON.stringify({ stage, result: 'pass' }) + '\n'); accept(stdout); }
+      } else { process.stdout.write(JSON.stringify({ stage, result: 'pass',executionId:diagnosticExecutionId() }) + '\n'); accept(stdout); }
     });
   });
 }
@@ -217,10 +217,11 @@ async function main() {
   process.stdout.write(JSON.stringify({ omniroute_security_build: 'pass', distFiles: receipt.dist.files, next: receipt.nextVersion, smoke: 'pending' }) + '\n');
 }
 
+function diagnosticExecutionId(){const id=process.env.OMNIROUTE_REBUILD_EXECUTION_ID;return typeof id==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id)?id:null;}
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   main().catch((error) => {
     const result = error instanceof RebuildFailure ? { stage: error.stage, category: error.category, code: error.code } : { stage: 'contract', category: error.code === 'ERR_ASSERTION' ? 'assertion' : 'runtime' };
-    process.stderr.write(JSON.stringify({ omniroute_security_build: 'fail', ...result, rawOutputSaved: false }) + '\n');
+    process.stderr.write(JSON.stringify({ omniroute_security_build: 'fail', ...result, executionId:diagnosticExecutionId(),rawOutputSaved: false }) + '\n');
     process.exitCode = 1;
   });
 }
