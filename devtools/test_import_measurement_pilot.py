@@ -11,6 +11,14 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class ImportPilotTests(unittest.TestCase):
+    def test_private_daemon_cannot_inherit_host_configuration(self):
+        script=(ROOT/'devtools/measure-prebuilt-import.sh').read_text()
+        self.assertIn("printf '{}\\n' > \"$benchmark/daemon-config.json\"",script)
+        self.assertIn('dockerd --config-file="$benchmark/daemon-config.json"',script)
+        self.assertLess(script.index('umask 077'),script.index('daemon-config.json'))
+        self.assertNotIn('/etc/docker/daemon.json',script)
+        self.assertNotIn('--feature',script)
+
     @unittest.skipIf(os.name=='nt','actual shell scanner aggregation executes on standard Linux CI')
     def test_image_failure_collects_all_three_images_and_still_fails(self):
         scanner=(ROOT/'devtools/scan-prebuilt-images.sh').read_text()

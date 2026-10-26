@@ -34,7 +34,8 @@ cleanup() {
   if [[ -n $daemon_pid ]]; then kill "$daemon_pid" 2>/dev/null || true; wait "$daemon_pid" 2>/dev/null || true; fi
 }
 trap cleanup EXIT
-dockerd --host="$socket" --data-root="$benchmark/data" --exec-root="$benchmark/exec" \
+printf '{}\n' > "$benchmark/daemon-config.json"
+dockerd --config-file="$benchmark/daemon-config.json" --host="$socket" --data-root="$benchmark/data" --exec-root="$benchmark/exec" \
   --pidfile="$benchmark/docker.pid" --bridge=none --iptables=false \
   --ip-forward=false --ip-masq=false > "$benchmark/daemon.log" 2>&1 &
 daemon_pid=$!
