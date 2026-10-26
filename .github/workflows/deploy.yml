@@ -71,7 +71,9 @@ jobs:
       - run: python -m pytest apps/worker/tests -q
       - run: bash devtools/test-deploy-production.sh
       - name: Verify prebuilt provenance and resource rejection contracts
-        run: python -m unittest discover -s devtools -p test_prebuilt_gate.py -v
+        run: |
+          python -m unittest discover -s devtools -p test_prebuilt_gate.py -v
+          bash -n devtools/measure-prebuilt-import.sh
 
   deploy:
     needs: ["security", "verify"]

@@ -22,6 +22,11 @@ Implemented and tested:
   additionally reserving compressed/new/rollback image space.
 - `import-resource-policy.json` deliberately remains **unmeasured** and rejects
   import. The existing 1.5 GiB server-build guard remains unchanged.
+- A source-only isolated benchmark helper starts a private socket/data-root Docker
+  daemon inside a bounded cgroup. Copy, decompressor, client, daemon and its child
+  containerd share accounting. It inspects the three imported image tags and records
+  peak/OOM metadata. A measured result is still `measurement-requires-review`, not
+  an automatically trusted policy. This helper is not connected to a CI run yet.
 
 Still required before publication or production activation:
 
