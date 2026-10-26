@@ -4,10 +4,18 @@
 set -Eeuo pipefail
 umask 077
 if [[ ${1:-} != --inside ]]; then
-  [[ $# == 3 && $2 =~ ^[0-9a-f]{64}$ && $3 =~ ^[0-9a-f]{40}$ ]] || exit 64
+  [[ ($# == 3 || $# == 4) && $2 =~ ^[0-9a-f]{64}$ && $3 =~ ^[0-9a-f]{40}$ ]] || exit 64
   [[ -n ${RUNNER_TEMP:-} && ${GITHUB_ACTIONS:-} == true && ${GITHUB_REPOSITORY:-} == P-GISE/Fact-checking-website ]]
   [[ ${GITHUB_RUN_ID:-} =~ ^[0-9]+$ && ${GITHUB_RUN_ATTEMPT:-} =~ ^[0-9]+$ ]]
   [[ -f $1 && ! -L $1 ]]
+  tool_dir=${4:-}; verifier=''; profile=''
+  if [[ -n $tool_dir ]]; then
+    [[ ! -L $tool_dir && $(realpath "$tool_dir") == "$RUNNER_TEMP"/factlens-docker29.* ]]
+    tool_dir=$(realpath "$tool_dir")
+    verifier=$(realpath devtools/verify-pilot-docker29.py)
+    profile=$(realpath devtools/docker29-pilot-profile.json)
+    python3 "$verifier" "$tool_dir" "$profile"
+  fi
   benchmark=$(mktemp -d "$RUNNER_TEMP/factlens-import-measure.XXXXXXXX")
   trap 'sudo rm -rf -- "$benchmark"' EXIT
   [[ $(sha256sum "$1" | cut -d' ' -f1) == "$2" ]]
@@ -16,16 +24,22 @@ if [[ ${1:-} != --inside ]]; then
     --property=MemoryAccounting=yes --property=MemoryMax=3G \
     --property=TasksMax=1024 --property=KillMode=control-group \
     bash "$(realpath "${BASH_SOURCE[0]}")" --inside "$benchmark" "$2" "$3" \
-    "https://github.com/P-GISE/Fact-checking-website/actions/runs/$GITHUB_RUN_ID" "$(realpath "$1")"
+    "https://github.com/P-GISE/Fact-checking-website/actions/runs/$GITHUB_RUN_ID" "$(realpath "$1")" "$tool_dir" "$verifier" "$profile"
   # No policy is auto-approved or checked in from this measurement.
   sudo cat -- "$benchmark/measurement.json"
   exit 0
 fi
-[[ $# == 6 && $EUID == 0 && $3 =~ ^[0-9a-f]{64}$ && $4 =~ ^[0-9a-f]{40}$ ]] || exit 64
+[[ $# == 9 && $EUID == 0 && $3 =~ ^[0-9a-f]{64}$ && $4 =~ ^[0-9a-f]{40}$ ]] || exit 64
 benchmark=$2; digest=$3; sha=$4; run_url=$5
 [[ $benchmark == /home/runner/work/_temp/factlens-import-measure.* ||
    $benchmark == /home/runner/work/_temp/*/factlens-import-measure.* ]] || exit 64
 socket="unix://$benchmark/docker.sock"
+unset DOCKER_CONTEXT DOCKER_TLS DOCKER_TLS_VERIFY DOCKER_CERT_PATH DOCKER_HOST
+if [[ -n $7 ]]; then
+  [[ ! -L $7 && $7 == /home/runner/work/_temp/factlens-docker29.* ]]
+  python3 "$8" "$7" "$9"
+  export PATH="$7:/usr/sbin:/usr/bin:/sbin:/bin"
+fi
 # Copy inside the measured cgroup: fresh output page cache is included conservatively.
 cp --reflink=never -- "$6" "$benchmark/images.tar.gz"
 [[ $(sha256sum "$benchmark/images.tar.gz" | cut -d' ' -f1) == "$digest" ]]
@@ -46,6 +60,7 @@ for _ in {1..90}; do
 done
 docker --host="$socket" info >/dev/null 2>&1
 docker --host="$socket" info --format '{"server_version":"{{.ServerVersion}}","driver":"{{.Driver}}","driver_status":{{json .DriverStatus}}}' > "$benchmark/runtime.json"
+docker --host="$socket" version --format '{{json .Server.Components}}' > "$benchmark/components.json"
 # gzip, client, daemon and daemon-owned containerd share this measured cgroup.
 gzip -dc "$benchmark/images.tar.gz" | docker --host="$socket" load >/dev/null
 for component in api worker web; do
@@ -69,5 +84,6 @@ Path(out).write_text(json.dumps({'schema':1,'status':'measurement-requires-revie
     'measurement_run_url':url,'disk_reserve_bytes':10*1024**3,
     'docker_server_version':runtime['server_version'],'docker_driver':runtime['driver'],
     'docker_driver_status':runtime['driver_status'],
+    'docker_server_components':json.loads((Path(out).parent/'components.json').read_text()),
     'kernel_release':os.uname().release,'kernel_architecture':os.uname().machine},sort_keys=True)+'\n')
 PY

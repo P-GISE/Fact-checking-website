@@ -14,7 +14,7 @@ def summarize(measurement,measurement_status,sca_status):
                 and measurement.get('docker_driver')=='overlayfs'
                 and ['driver-type','io.containerd.snapshotter.v1'] in measurement.get('docker_driver_status',[]))
     keys=('method','platform','peak_total_bytes','oom_events','docker_server_version','docker_driver',
-          'docker_driver_status','kernel_release','kernel_architecture','image_archive_sha256','measurement_run_url')
+          'docker_driver_status','docker_server_components','kernel_release','kernel_architecture','image_archive_sha256','measurement_run_url')
     result={'measurement_status':'SUCCESS' if valid else 'FAILED_OR_UNASSESSED',
             'image_sca_status':'SUCCESS' if sca_status==0 else 'FAILED_OR_UNASSESSED',
             'runtime_equivalent_to_s2':equivalent,'production_envelope_approved':False,

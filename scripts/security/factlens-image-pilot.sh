@@ -66,7 +66,9 @@ PY
 if [[ $measure == true ]]; then
   digest=$(sha256sum "$pilot_temp/images.tar.gz" | cut -d' ' -f1)
   measurement_status=0
-  bash devtools/measure-prebuilt-import.sh "$pilot_temp/images.tar.gz" "$digest" "$GITHUB_SHA" \
+  measurement_args=("$pilot_temp/images.tar.gz" "$digest" "$GITHUB_SHA")
+  if [[ -n ${PILOT_DOCKER29_TOOL_DIR:-} ]]; then measurement_args+=("$PILOT_DOCKER29_TOOL_DIR"); fi
+  bash devtools/measure-prebuilt-import.sh "${measurement_args[@]}" \
     > "$pilot_temp/measurement.json" || measurement_status=$?
   sca_status=0
   bash devtools/scan-prebuilt-images.sh "$GITHUB_SHA" || sca_status=$?

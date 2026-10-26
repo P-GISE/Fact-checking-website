@@ -12,6 +12,10 @@ on:
       - devtools/verify-runtime-images.sh
       - devtools/test_runtime_image_contracts.py
       - docker/**
+      - devtools/docker29-pilot-profile.json
+      - devtools/prepare-docker29-pilot.sh
+      - devtools/verify-pilot-docker29.py
+      - devtools/test_docker29_pilot.py
 permissions:
   contents: read
 concurrency:
@@ -32,10 +36,15 @@ jobs:
         run: |
           python3 -m unittest discover -s devtools -p test_import_measurement_pilot.py -v
           python3 -m unittest discover -s devtools -p test_runtime_image_contracts.py -v
+          python3 -m unittest discover -s devtools -p test_docker29_pilot.py -v
           bash -n devtools/verify-runtime-images.sh
+      - name: Prepare SHA-verified private Docker29 pilot tools without starting image
+        id: private-docker
+        run: bash devtools/prepare-docker29-pilot.sh
       - name: Build three local images, measure isolated load, and summarize image SCA
         env:
           PILOT_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PILOT_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PILOT_MEASURE_IMPORT: 'true'
+          PILOT_DOCKER29_TOOL_DIR: ${{ steps.private-docker.outputs.tool-dir }}
         run: bash scripts/security/factlens-image-pilot.sh
