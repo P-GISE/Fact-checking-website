@@ -5,3 +5,6 @@ strix_runs/
 .env
 .env.*
 !.env.example
+
+# Generated isolated source-rebuild cache
+/.tools/omniroute-security-build/
