@@ -18,7 +18,7 @@ if [[ ${1:-} != --inside ]]; then
     bash "$(realpath "${BASH_SOURCE[0]}")" --inside "$benchmark" "$2" "$3" \
     "https://github.com/P-GISE/Fact-checking-website/actions/runs/$GITHUB_RUN_ID" "$(realpath "$1")"
   # No policy is auto-approved or checked in from this measurement.
-  cat "$benchmark/measurement.json"
+  sudo cat -- "$benchmark/measurement.json"
   exit 0
 fi
 [[ $# == 6 && $EUID == 0 && $3 =~ ^[0-9a-f]{64}$ && $4 =~ ^[0-9a-f]{40}$ ]] || exit 64

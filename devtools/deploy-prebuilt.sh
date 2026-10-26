@@ -40,6 +40,10 @@ git fetch --no-tags origin refs/heads/work:refs/remotes/origin/work >/dev/null 2
   printf '%s\n' 'Stale deployment skipped: requested SHA is not origin/work HEAD.'
   exit 0
 }
+current_source() {
+  git fetch --no-tags origin refs/heads/work:refs/remotes/origin/work >/dev/null 2>&1 || return 1
+  [[ "$sha" == "$(git rev-parse refs/remotes/origin/work)" ]]
+}
 for private_file in .factlens-deploy-target .env.production; do
   if git cat-file -e "$sha:$private_file" 2>/dev/null; then
     fail 'Target commit must not track host-private files.'
@@ -169,6 +173,8 @@ sync "$state" "$HOME"
 git merge --ff-only "$sha" >/dev/null 2>&1 || fail 'Fast-forward update failed.'
 git_switched=1
 [[ $(git rev-parse HEAD) == "$sha" ]] || fail 'Checkout does not match requested SHA.'
+stage=import-source-check
+current_source || fail 'Source changed before image import; rollout rejected.'
 stage=import
 gzip -dc "$incoming/images.tar.gz" | docker load >/dev/null 2>&1
 new_api=$(docker image inspect --format '{{.Id}}' "factlens-api:$sha" 2>/dev/null)
@@ -198,7 +204,9 @@ active_work=$(docker --host=unix:///var/run/docker.sock exec -i "$database_conta
   THEN 'busy' ELSE 'idle' END;" 2>/dev/null)
 [[ $active_work == idle ]] || fail 'Active jobs or uploads detected; retry during maintenance.'
 # shortcut: requests can arrive after this check; ingress draining needs a separate approved change.
+stage=rollout-source-check
 preserved || fail 'Database or Redis container changed before deployment.'
+current_source || fail 'Source changed before application replacement; rollout rejected.'
 printf '%s\n' "$sha" > "$recovery"
 sync "$recovery" "$HOME"
 stage=up

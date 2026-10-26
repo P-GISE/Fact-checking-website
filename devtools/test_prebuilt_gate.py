@@ -185,6 +185,23 @@ class ArtifactGateTests(unittest.TestCase):
 
 
 class WorkflowBoundaryTests(unittest.TestCase):
+    @unittest.skipIf(os.name=='nt','root ownership boundary executes on the actual Linux CI runner')
+    def test_root_owned_private_measurement_is_read_without_relaxing_mode(self):
+        root=Path(__file__).resolve().parents[1]
+        script=(root/'devtools/measure-prebuilt-import.sh').read_text()
+        line=next(row.strip() for row in script.splitlines() if 'cat -- "$benchmark/measurement.json"' in row)
+        with tempfile.TemporaryDirectory() as directory:
+            source=Path(directory)/'source.json';source.write_text('{"synthetic":true}\n')
+            target=Path(directory)/'measurement.json'
+            subprocess.run(['sudo','install','-o','0','-g','0','-m','600',str(source),str(target)],check=True)
+            try:
+                with self.assertRaises(PermissionError):target.read_text()
+                result=subprocess.check_output(['bash','-c','benchmark="$1"; '+line,'read-boundary',directory],text=True)
+                self.assertEqual(json.loads(result),{'synthetic':True})
+                self.assertEqual(target.stat().st_mode & 0o777,0o600)
+                self.assertEqual(target.stat().st_uid,0)
+            finally:subprocess.run(['sudo','rm','-f','--',str(target)],check=True)
+
     def test_image_sca_zero_coverage_findings_and_tool_errors_fail_closed(self):
         root=Path(__file__).resolve().parents[1]
         script=(root/'devtools/scan-prebuilt-images.sh').read_text()
