@@ -30,6 +30,12 @@ test('effective memory respects finite cgroup budget and fails closed on unknown
   assert.equal(effectiveMemory(mem,'max','0').freeBytes,13000000*1024);
   assert.throws(()=>effectiveMemory('missing','max','0'));assert.throws(()=>effectiveMemory(mem,'8','unknown'));
 });
+test('memory source diagnostics preserve the exact conservative minimum without crediting cgroup cache',()=>{
+  const mem='MemTotal: 16000000 kB\nMemAvailable: 4000000 kB\nCached: 8000000 kB\n';
+  const host=effectiveMemory(mem,'16000000000','1000000000');assert.equal(host.freeBytes,4000000*1024);assert.equal(host.limitingMemorySource,'host');assert.equal(host.hostAvailableBytes,4000000*1024);
+  const group=effectiveMemory(mem,'8000000000','7000000000');assert.equal(group.freeBytes,1000000000);assert.equal(group.cgroupHeadroomBytes,1000000000);assert.equal(group.limitingMemorySource,'cgroup');
+  assert.equal(effectiveMemory(mem,String(4000000*1024),'0').limitingMemorySource,'tie');assert.equal(effectiveMemory(mem,'max','0').cgroupHeadroomBytes,null);
+});
 test('signals only the own new session group, never an unrelated group',()=>{
   const sent=[];const snap=()=>({rows:[{pid:20,group:10,session:10}]});
   signalOwnedGroup(10,20,'SIGTERM',snap,(...args)=>sent.push(args));assert.deepEqual(sent,[[-10,'SIGTERM']]);

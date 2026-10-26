@@ -22,6 +22,7 @@ const npm = resolveNpmEntry(process.execPath);
 const heapMb = process.env.OMNIROUTE_REBUILD_HEAP_MB || '4096';
 const profile=resolveProfile(process.platform,process.env.OMNIROUTE_REBUILD_PROFILE,heapMb);
 export const buildMode = profile.bundler;
+export function fullBuildEnv(base,parallelism){assert.equal(parallelism,1,'webpack_parallelism_policy');return {...offlineBuildEnv(base),NEXT_WEBPACK_PARALLELISM:'1'};}
 let contractPhase='contract';
 const assertionReasons=['installed_root_symlink','workspace_path_escape','workspace_realpath_escape','installed_link_outside_pinned_inputs','installed_special_file','unsupported_source_entry_mode','source_path_escape','source_symlink','unexpected_dependency_overlay_bytes','tracked_source_bytes_changed','overlay_target_not_tracked','unexpected_untracked_or_ignored_source_input','installed_dependencies_seal_required','unexpected_install_seal_boundary','invalid_install_seal','unexpected_generated_output_boundary','non_blob_source_entry','installed_input_tree_changed',...lifecycleAssertionReasons];
 export function contractDiagnostic(error,phase='contract'){
@@ -224,7 +225,7 @@ async function main() {
   assert.equal(audit.metadata.vulnerabilities.total, 0, 'runtime_advisories_remain');
   verifyLocalNodeGyp(source,plan.buildNodeGyp);
   const buildAuthorization=authorizeBuildTransition(source,installSeal.lifecycle,lifecycleBinding);
-  await run(`full-${buildMode}-build`, process.execPath, [npm, 'run', 'build'],{env:offlineBuildEnv(isolatedEnv())});
+  await run(`full-${buildMode}-build`, process.execPath, [npm, 'run', 'build'],{env:fullBuildEnv(isolatedEnv(),plan.buildWebpackParallelism)});
   await run('postbuild-workers', process.execPath, ['scripts/build/colocate-standalone.mjs']);
   const builtLifecycle=captureBuiltLifecycle(source,installSeal.lifecycle,lifecycleBinding,buildAuthorization);
   verifySourceInputs(source,plan.commit,patches,installSeal.directories,inputDigest,isolatedEnv(),['.build','dist'],{seal:builtLifecycle,binding:lifecycleBinding});

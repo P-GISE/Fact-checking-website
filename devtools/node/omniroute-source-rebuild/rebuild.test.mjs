@@ -3,7 +3,7 @@ import test from 'node:test';
 import { mkdtempSync, mkdirSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { patchManifest, confined } from './rebuild.mjs';
+import { patchManifest, confined,fullBuildEnv } from './rebuild.mjs';
 
 test('patches pinned dependencies and nested override without mutating input', () => {
   const original = { name: 'omniroute', version: '3.8.52', dependencies: { next: '16.3.8', react: '19.2.8' }, overrides: { 'monaco-editor': { dompurify: '^3.4.14' } } };
@@ -23,4 +23,9 @@ test('build paths reject siblings, parent traversal and junctions', () => {
   const target = join(root, 'target'); mkdirSync(target);
   symlinkSync(target, join(root, 'link'), 'junction');
   assert.throws(() => confined(root, join(root, 'link', 'output')));
+});
+test('full-build module concurrency is exactly one without mutating base or disabling artifact features',()=>{
+  const base={NODE_OPTIONS:'--max-old-space-size=8192',OMNIROUTE_USE_TURBOPACK:'0',NEXT_WEBPACK_PARALLELISM:'99'};
+  assert.deepEqual(fullBuildEnv(base,1),{...base,NEXT_WEBPACK_PARALLELISM:'1',npm_config_offline:'true'});assert.equal(base.NEXT_WEBPACK_PARALLELISM,'99');
+  for(const invalid of [undefined,'1',0,2,-1,1.5,true,NaN])assert.throws(()=>fullBuildEnv(base,invalid));
 });

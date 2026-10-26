@@ -52,7 +52,8 @@ async function main() {
   let outputBytes=0;const stdoutDiagnostics=diagnosticCollector(record.executionId);const stderrDiagnostics=diagnosticCollector(record.executionId);
   child.stdout.on('data',chunk=>{outputBytes+=chunk.length;stdoutDiagnostics.push(chunk);});child.stderr.on('data',chunk=>{outputBytes+=chunk.length;stderrDiagnostics.push(chunk);});
   const adapter=ownedLinuxAdapter(child,process.pid);
-  const result=await guardProcess({child,parentPid:process.pid,snapshot:adapter.snapshot,softTree:pid=>adapter.signal(pid,'SIGTERM'),hardTree:pid=>adapter.signal(pid,'SIGKILL'),delay,now:Date.now,signalBus:process,floorBytes:3*GiB,timeoutMs:30*60*1000,outputExceeded:()=>outputBytes>2*1024*1024});
+  let minimumSnapshot=null,peakObservedOwnedProcesses=0,peakObservedOwnedNodeProcesses=0;
+  const result=await guardProcess({child,parentPid:process.pid,snapshot:()=>{const state=adapter.snapshot();if(!minimumSnapshot||state.freeBytes<minimumSnapshot.freeBytes)minimumSnapshot={freeBytes:state.freeBytes,hostAvailableBytes:state.hostAvailableBytes,cgroupHeadroomBytes:state.cgroupHeadroomBytes,limitingMemorySource:state.limitingMemorySource};const members=state.ownedGroupMembers??[];peakObservedOwnedProcesses=Math.max(peakObservedOwnedProcesses,members.length);peakObservedOwnedNodeProcesses=Math.max(peakObservedOwnedNodeProcesses,members.filter(row=>row.node).length);return state;},softTree:pid=>adapter.signal(pid,'SIGTERM'),hardTree:pid=>adapter.signal(pid,'SIGKILL'),delay,now:Date.now,signalBus:process,floorBytes:3*GiB,timeoutMs:30*60*1000,outputExceeded:()=>outputBytes>2*1024*1024});
   record.finishedAt=new Date().toISOString();record.minimumFreeBytes=result.minimumFree;record.status=result.status;record.primaryStopReason=result.reason??null;record.cleanupUnresolved=result.unresolved;record.remainingOwnedProcesses=result.remaining.length;record.remainingOwnedNodeProcesses=result.remaining.filter(r=>r.node).length;
   record.remainingUncertainGroupProcesses=result.remaining.filter(r=>r.ownership==='uncertain').length;
   try{record.childReaped=await confirmReaped(child);}catch{record.childReaped=false;record.status='child_not_reaped';}
@@ -63,7 +64,9 @@ async function main() {
   if(record.status==='build_pass_smoke_pending'&&!record.receiptBinding)record.status='receipt_missing';
   const diagnostics={lastPassedStage:stdoutDiagnostics.summary().lastPassedStage,buildFailure:stderrDiagnostics.summary().buildFailure??stdoutDiagnostics.summary().buildFailure};
   record.diagnostics=diagnostics;
-  writeFileSync(attemptPath,JSON.stringify(record,null,2)+'\n');process.stdout.write(JSON.stringify({attempt:record.attempt,status:record.status,remainingOwnedNodeProcesses:record.remainingOwnedNodeProcesses,...diagnostics})+'\n');
+  const number=value=>Number.isSafeInteger(value)&&value>=0?value:null;
+  const memory={initialFreeBytes:number(record.initialFreeBytes),minimumFreeBytes:number(record.minimumFreeBytes),floorBytes:record.floorBytes,totalEffectiveBytes:number(record.totalEffectiveBytes),hostAvailableBytesAtMinimum:number(minimumSnapshot?.hostAvailableBytes),cgroupHeadroomBytesAtMinimum:number(minimumSnapshot?.cgroupHeadroomBytes),limitingSourceAtMinimum:['host','cgroup','tie'].includes(minimumSnapshot?.limitingMemorySource)?minimumSnapshot.limitingMemorySource:'unverified',peakObservedOwnedProcesses,peakObservedOwnedNodeProcesses};record.memoryDiagnostics=memory;
+  writeFileSync(attemptPath,JSON.stringify(record,null,2)+'\n');process.stdout.write(JSON.stringify({attempt:record.attempt,status:record.status,remainingOwnedNodeProcesses:record.remainingOwnedNodeProcesses,...diagnostics,memory})+'\n');
   assert.equal(record.status,'build_pass_smoke_pending');assert.equal(record.cleanupUnresolved,false);assert.equal(record.remainingOwnedProcesses,0);assert.equal(record.childReaped,true);assert.equal(record.initialUnrelatedNodeProcessesStillPresent,true);
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url))main().catch(()=>{process.stderr.write('{"guarded_linux_build":"not_passed","rawOutputSaved":false}\n');process.exitCode=1;});

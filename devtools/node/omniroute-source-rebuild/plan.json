@@ -1,6 +1,7 @@
 {
   "schema": 1,
   "lifecycleSchema": 1,
+  "buildWebpackParallelism": 1,
   "buildNodeGyp": {
     "version": "12.4.0",
     "integrity": "sha512-OMcPNvqTCFUnNaBlmdgq+lfNqY7gTiSmNRDjY3uAXRyudeKZEZxu3CLtjMQrx4zZxCX2b/mpNqTtwuCJgXhHkw=="
