@@ -46,6 +46,14 @@ test('native local pin and offline environment block remote fallback without dis
     assert.deepEqual(offlineBuildEnv({SYNTHETIC:'value'}),{SYNTHETIC:'value',npm_config_offline:'true'});
   }finally{f.clean();}
 });
+test('official integrity-verified node-gyp raw manifest string bin is accepted without accepting other paths',()=>{
+  const f=fixture();try{const policy={version:'12.4.0',integrity:'sha512-OMcPNvqTCFUnNaBlmdgq+lfNqY7gTiSmNRDjY3uAXRyudeKZEZxu3CLtjMQrx4zZxCX2b/mpNqTtwuCJgXhHkw=='};f.write('package-lock.json',JSON.stringify({packages:{'node_modules/node-gyp':{...policy,bin:{'node-gyp':'bin/node-gyp.js'}}}}));
+    f.write('node_modules/node-gyp/bin/node-gyp.js','synthetic-tool');const manifest=bin=>f.write('node_modules/node-gyp/package.json',JSON.stringify({version:'12.4.0',bin}));const resolveBin=()=>join(f.root,'node_modules/node-gyp/bin/node-gyp.js');
+    manifest('./bin/node-gyp.js');assert.doesNotThrow(()=>verifyLocalNodeGyp(f.root,policy,resolveBin));
+    f.write('node_modules/node-gyp/package.json',JSON.stringify({version:'11.5.0',bin:'./bin/node-gyp.js'}));assert.throws(()=>verifyLocalNodeGyp(f.root,policy,resolveBin),error=>error.code==='ERR_ASSERTION'&&error.message.startsWith('lifecycle_node_gyp_installed_version'));manifest('./bin/node-gyp.js');
+    for(const bad of ['../bin/node-gyp.js','bin/../bin/node-gyp.js','synthetic-other',{'node-gyp':'../bin/node-gyp.js'}]){manifest(bad);assert.throws(()=>verifyLocalNodeGyp(f.root,policy,resolveBin));}
+  }finally{f.clean();}
+});
 test('preexisting env, arbitrary env content, copied package mutation and unexpected paths fail closed',()=>{
   const f=fixture();try{
     f.write('.env','synthetic-preexisting');assert.throws(()=>verifyPristineSource(f.root,f.commit,{},process.env));rmSync(join(f.root,'.env'));

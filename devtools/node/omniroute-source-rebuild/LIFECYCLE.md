@@ -22,3 +22,11 @@ node-gyp은 루트 lock의 12.4.0 및 integrity를 사용한다. full build 직�
 [공식 node-gyp12.4.0](https://raw.githubusercontent.com/nodejs/node-gyp/v12.4.0/lib/build.js)은 Python symlink를 build/node_gyp_bins에 만들고 make 종료 후 제거한다. 잔존 외부 symlink를 따라 읽거나 예외로 허용하지 않는다. Makefile에 들어간 절대경로도 내용은 출력하지 않고 digest만 취급한다. 정상 Linux native 결과가 없거나 복제본이 다르면 후보는 실패한다.
 
 합성 fixture는 pristine→installed→built→packaged를 순서대로 검증하고 기존 guard의 정당 생성물 거절과 인계 후 통과를 함께 확인한다. 기존 env, 임의 key/파일, 1byte 변경, valid salt의 사후 변경, 조기 compiler/CLI/plugin 출력, 원본 lock 변경, nonce 변경, CLI 원본 metadata 변조, 외부 compiler symlink, local node-gyp 경로/버전 변경은 거절한다. 동일 OS 관리자가 코드와 증거를 함께 바꾸는 공격에 대한 불변 서명은 아니다.
+
+## Node-gyp manifest 표기 수정 후보
+
+CI40358745058은 runtime-audit까지 통과한 뒤 full compile 전 lifecycle_node_gyp_pin assertion으로 실패했다. 기존 이유는 lock version·integrity·installed version·bin 네 검사에 공통이므로 그 실행에서 어느 검사가 먼저 실패했는지는 확정하지 않는다.
+
+공식 registry의 node-gyp12.4.0 tarball을 메모리에만 내려받아 plan의 SHA512와 동일함을 확인했다. 실제 package.json의 bin은 문자열 `./bin/node-gyp.js`이며 registry JSON의 정규화된 객체 형태와 다르다. 기존 검사 함수는 객체만 가정해 이 공식 raw manifest를 거절하는 오류를 재현했다. 후보는 정확히 같은 `bin/node-gyp.js` 파일을 가리키는 문자열/객체 표기만 받아들이고 version·integrity·실제 bin 경로·기존 전체 설치 seal은 유지한다. 원인 분류도 고정 enum 네 개로 구분한다.
+
+과거 Windows cache의 installed11.5.0/root lock12.4.0 불일치는 별개 사실이며 허용하지 않는다. bin 표기를 고친 fixture에서도 잘못 설치된11.5.0·임의 상대경로는 계속 거절한다. 로컬 함수 RED→GREEN과 전체53/53 회귀는 추가 Linux full build 성공을 의미하지 않는다. 의존성 변경·업그레이드·build·CI·commit·push는 미실행이며 root 검토 대기다.
