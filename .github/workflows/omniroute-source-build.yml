@@ -1,0 +1,40 @@
+name: OmniRoute isolated source rebuild
+on:
+  pull_request:
+    paths:
+      - 'devtools/node/omniroute-source-rebuild/**'
+      - '.github/workflows/omniroute-source-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: omniroute-source-build-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  source-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.20.0'
+      - name: Python prerequisite
+        run: python3 -c 'import sys; assert sys.version_info[:2] == (3, 12)'
+      - name: Guard and receipt regression tests
+        shell: bash
+        run: node --test devtools/node/omniroute-source-rebuild/*.test.mjs
+      - name: One fresh official full source build
+        env:
+          OMNIROUTE_REBUILD_PROFILE: linux-webpack-8192-20261026
+          OMNIROUTE_REBUILD_HEAP_MB: '8192'
+        run: node devtools/node/omniroute-source-rebuild/guarded-linux-build.mjs
+      - name: Bound receipt and actual isolated CLI HTTP smoke
+        env:
+          OMNIROUTE_REBUILD_PROFILE: linux-webpack-8192-20261026
+          OMNIROUTE_REBUILD_HEAP_MB: '8192'
+        run: |
+          node devtools/node/omniroute-source-rebuild/smoke.mjs
+          node devtools/node/omniroute-source-rebuild/rebuild.mjs --verify
