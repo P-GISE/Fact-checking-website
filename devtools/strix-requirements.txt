@@ -1,0 +1,2 @@
+strix-agent==1.7.0+pgise.security1
+litellm==1.106.4+pgise.security1

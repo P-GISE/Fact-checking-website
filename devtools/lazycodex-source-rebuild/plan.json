@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "upstream_version": "5.1.33",
+  "derivative": "pgise.security1-zod4.6.6",
+  "source_commit": "7a752ab5a88c2d255b926aff1c687b6d91758d02",
+  "source_url": "https://codeload.github.com/code-yeongyu/oh-my-openagent/tar.gz/7a752ab5a88c2d255b926aff1c687b6d91758d02",
+  "source_sha256": "b99aca096a292fe0aace5b8299408a6290417dea2a72d8f386449c7a1600e3da",
+  "source_prefix": "oh-my-openagent-7a752ab5a88c2d255b926aff1c687b6d91758d02",
+  "official_build_script": "script/build-codex-install.ts",
+  "official_build_script_sha256": "c8a5d050989b085f035e849494e73d98fdacf90d13ab4ad021a9e9d0a58a9893",
+  "official_license": "LICENSE.md",
+  "official_license_sha256": "b61ac928f152d13517328263e6bee9175b928f9ab696a2d2ca2b6cfd961ddc32",
+  "bundle_relative": "packages/omo-codex/scripts/install-dist/install-local.mjs",
+  "wrapper_relative": "packages/omo-codex/scripts/install-local.mjs",
+  "wrapper_sha256": "6e10fc2df82197ad0db6ae00de9dd2b2ad99343c3e8cd85a913075130af3a6d2",
+  "original_npm_bundle_sha256": "db6c3a820056d526d929dece0bf5c32971622b041ed398b3efb199163173c670",
+  "workspace_packages": [
+    "utils",
+    "telemetry-core",
+    "omo-config-core"
+  ],
+  "omitted_documentation_symlinks": [
+    ".claude/commands",
+    ".claude/skills",
+    "CLAUDE.md"
+  ],
+  "bun_version": "1.4.4",
+  "bun_checksums_url": "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/SHASUMS256.txt",
+  "bun_checksums_sha256": "86629f14fe256b487ceba5170217e13787c49d0cc0fe4bb6397ce5767d3b8f65",
+  "runtimes": {
+    "win32": {
+      "archive": "bun-windows-x64.zip",
+      "sha256": "cd2c0fccc78f3ede1f50ca827a15f063eda13d4d150a3d0674f4f6e323d864a5",
+      "member": "bun-windows-x64/bun.exe"
+    },
+    "linux": {
+      "archive": "bun-linux-x64.zip",
+      "sha256": "bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c",
+      "member": "bun-linux-x64/bun"
+    }
+  }
+}

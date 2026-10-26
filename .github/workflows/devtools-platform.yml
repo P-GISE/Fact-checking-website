@@ -1,0 +1,96 @@
+name: Default development tool checks
+on:
+  push:
+    branches: [main]
+    paths: ['devtools/**', 'scripts/security/**', 'tests/**', '.github/workflows/devtools-platform.yml']
+  pull_request:
+    branches: [main]
+    paths: ['devtools/**', 'scripts/security/**', 'tests/**', '.github/workflows/devtools-platform.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: devtools-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  local-consumers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      DO_NOT_TRACK: '1'
+      OMO_TELEMETRY_DISABLED: '1'
+      HF_HUB_OFFLINE: '1'
+      LITELLM_LOCAL_MODEL_COST_MAP: 'True'
+      UV_PYTHON_DOWNLOADS: never
+    steps:
+      - name: Create job-only home and cache roots
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/fact-devtools-home/config" "$RUNNER_TEMP/fact-devtools-cache" "$RUNNER_TEMP/fact-devtools-tmp"
+          {
+            printf 'HOME=%s\n' "$RUNNER_TEMP/fact-devtools-home"
+            printf 'CODEX_HOME=%s\n' "$RUNNER_TEMP/fact-devtools-home/codex"
+            printf 'XDG_CONFIG_HOME=%s\n' "$RUNNER_TEMP/fact-devtools-home/config"
+            printf 'XDG_CACHE_HOME=%s\n' "$RUNNER_TEMP/fact-devtools-cache"
+            printf 'UV_CACHE_DIR=%s\n' "$RUNNER_TEMP/fact-devtools-cache/uv"
+            printf 'npm_config_cache=%s\n' "$RUNNER_TEMP/fact-devtools-cache/npm"
+            printf 'GOMODCACHE=%s\n' "$RUNNER_TEMP/fact-devtools-cache/go"
+            printf 'TMPDIR=%s\n' "$RUNNER_TEMP/fact-devtools-tmp"
+          } >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.20.0'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Pinned official uv and isolated directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$HOME" "$XDG_CACHE_HOME" "$TMPDIR" "$RUNNER_TEMP/fact-uv"
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            https://github.com/astral-sh/uv/releases/download/0.12.9/uv-x86_64-unknown-linux-gnu.tar.gz \
+            --output "$RUNNER_TEMP/fact-uv/uv.tar.gz"
+          printf '%s  %s\n' ec7a99cd05e0cd7f80243f135ce1361c76835cb0ee60055d14d20eba8eba1460 "$RUNNER_TEMP/fact-uv/uv.tar.gz" | sha256sum --check --status
+          tar -xzf "$RUNNER_TEMP/fact-uv/uv.tar.gz" -C "$RUNNER_TEMP/fact-uv" uv-x86_64-unknown-linux-gnu/uv
+          printf '%s\n' "$RUNNER_TEMP/fact-uv/uv-x86_64-unknown-linux-gnu" >> "$GITHUB_PATH"
+          printf 'uv status=verified version=0.12.9\n'
+      - name: Hash-locked builds and actual isolated consumers
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          # Captured output is discarded, never uploaded as cache, artifact or raw logs.
+          quiet() {
+            local label="$1"; shift
+            if "$@" >/dev/null 2>&1; then
+              printf 'check=%s status=pass\n' "$label"
+            else
+              printf 'check=%s status=failed\n' "$label"
+              return 1
+            fi
+          }
+          quiet builder_venv uv venv --python "$(command -v python)" .devtools/security-builder
+          builder=.devtools/security-builder/bin/python
+          quiet builder_hashlock uv pip install --python "$builder" --require-hashes -r devtools/security-builder.lock.txt
+          quiet regression "$builder" -m pytest tests -q
+          quiet vendor_source "$builder" -m scripts.security.python_overlays
+          quiet iron_source_license "$builder" -m scripts.security.build_ironlaws
+          for tool in headroom strix ironlaws; do
+            quiet "${tool}_venv" uv venv --python "$(command -v python)" ".devtools/$tool"
+            quiet "${tool}_hashlock" uv pip install --python ".devtools/$tool/bin/python" --find-links .devtools/patched-wheels --require-hashes -r "devtools/$tool.lock.txt"
+            quiet "${tool}_dependencies" uv pip check --python ".devtools/$tool/bin/python"
+          done
+          quiet node_integrity npm ci --prefix devtools/node --no-audit --no-fund
+          # Rebuild pins official source, Bun checksum manifest, compiler and dependency lock.
+          quiet lazy_source_rebuild "$builder" devtools/lazycodex-source-rebuild/rebuild.py
+          quiet lazy_installed_overlay "$builder" devtools/lazycodex-source-rebuild/install.py
+          "$builder" scripts/security/verify_linux_consumers.py
+      # No install.sh/skill linking, repository indexing, provider calls, or OmniRoute execution.
+      # No secrets, cache actions, raw output files or artifact upload steps.

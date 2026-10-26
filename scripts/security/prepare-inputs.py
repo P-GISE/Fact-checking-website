@@ -7,7 +7,7 @@ import sys
 def prepare(folder: Path):
     tree = folder / 'inputs/tree'
     mapping = {}
-    for source in sorted(tree.rglob('requirements.lock')):
+    for source in sorted(set(tree.rglob('requirements.lock')) | set(tree.glob('devtools/*.lock.txt'))):
         if source.is_symlink() or not source.resolve().is_relative_to(tree.resolve()):
             raise ValueError('Pip lock input must be a tracked regular file inside the exported tree')
         relative = source.relative_to(tree)

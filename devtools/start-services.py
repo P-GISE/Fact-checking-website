@@ -4,11 +4,13 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import signal
+import sys
 import time
 import urllib.request
 
-BASE = Path('/workspace/.devtools')
 ROOT = Path(__file__).resolve().parent.parent
+BASE = ROOT / '.devtools'
 
 def probe(url):
     try:
@@ -25,30 +27,41 @@ def start(name, command, url, ready, extra_env):
         print(f'{name}: already ready')
         return
     env = dict(os.environ, **extra_env)
-    with (BASE / 'logs' / f'{name}.log').open('a') as output:
-        process = subprocess.Popen(command, cwd=ROOT, env=env, stdout=output,
-                                   stderr=subprocess.STDOUT, start_new_session=True)
+    process = subprocess.Popen(command, cwd=ROOT, env=env, stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL, start_new_session=True)
     (BASE / 'state' / f'{name}.pid').write_text(str(process.pid) + '\n')
     deadline = time.monotonic() + 60
     while time.monotonic() < deadline:
         if process.poll() is not None:
-            raise SystemExit(f'{name}: exited {process.returncode}; inspect {BASE}/logs/{name}.log')
+            raise SystemExit(f'{name}: exited {process.returncode}; verified startup failed')
         data = probe(url)
         if data is not None and ready(data):
             print(f'{name}: ready')
             return
         time.sleep(1)
-    raise SystemExit(f'{name}: readiness timeout; inspect {BASE}/logs/{name}.log')
+    os.killpg(process.pid, signal.SIGTERM)
+    try:
+        process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        process.wait(timeout=10)
+    raise SystemExit(f'{name}: readiness timeout; new child stopped')
 
-for directory in ['logs', 'state', 'state/omniroute', 'config', 'cache']:
+# Until the full official source build passes, refuse before starting any service.
+if os.name != 'posix':
+    raise SystemExit('Optional gateway supervisor requires Linux; no services were started')
+if subprocess.run([sys.executable, str(ROOT / 'devtools/run.py'), 'omniroute', '--version'], cwd=ROOT).returncode:
+    raise SystemExit('OmniRoute verified source rebuild is pending; services were not started')
+
+for directory in ['state', 'state/omniroute', 'config', 'cache']:
     (BASE / directory).mkdir(parents=True, exist_ok=True)
 common = {'XDG_CONFIG_HOME': str(BASE / 'config'), 'XDG_CACHE_HOME': str(BASE / 'cache'),
           'HF_HOME': str(BASE / 'huggingface'), 'HEADROOM_BEACON': 'off', 'DO_NOT_TRACK': '1'}
-start('omniroute', [str(BASE / 'node/node_modules/.bin/omniroute'), 'serve', '--port', '20128',
-                   '--no-open', '--no-tray', '--log'],
+start('omniroute', [sys.executable, str(ROOT / 'devtools/run.py'), 'omniroute', 'serve', '--port', '20128',
+                   '--no-open', '--no-tray'],
       'http://127.0.0.1:20128/api/health', lambda d: d.get('status') == 'ok',
       dict(common, DATA_DIR=str(BASE / 'state/omniroute'), HOSTNAME='127.0.0.1', NO_UPDATE_NOTIFIER='1'))
-start('headroom', [str(BASE / 'python/bin/headroom'), 'proxy', '--host', '127.0.0.1', '--port', '8787',
+start('headroom', [sys.executable, str(ROOT / 'devtools/run.py'), 'headroom', 'proxy', '--host', '127.0.0.1', '--port', '8787',
                   '--stateless', '--lossless', '--disable-kompress', '--disable-kompress-fallback',
                   '--no-subscription-tracking', '--no-telemetry',
                   '--anthropic-api-url', 'http://127.0.0.1:20128',

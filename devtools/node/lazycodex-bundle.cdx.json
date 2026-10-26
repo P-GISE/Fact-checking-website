@@ -1,0 +1,56 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "application",
+      "name": "lazycodex-ai-installer-security-overlay",
+      "version": "5.1.33"
+    },
+    "properties": [
+      {
+        "name": "verified_bundle_relative_path",
+        "value": "packages/omo-codex/scripts/install-dist/install-local.mjs"
+      },
+      {
+        "name": "verified_bundle_sha256",
+        "value": "7b5228933e2d3694a806c876d037a4ec51748fac4b433e992c2dde47c655d21a"
+      },
+      {
+        "name": "source_sha256",
+        "value": "b99aca096a292fe0aace5b8299408a6290417dea2a72d8f386449c7a1600e3da"
+      },
+      {
+        "name": "derivative",
+        "value": "pgise.security1-zod4.6.6"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "@posthog/core",
+      "purl": "pkg:npm/%40posthog/core@1.60.1",
+      "type": "library",
+      "version": "1.60.1"
+    },
+    {
+      "name": "jsonc-parser",
+      "purl": "pkg:npm/jsonc-parser@3.3.1",
+      "type": "library",
+      "version": "3.3.1"
+    },
+    {
+      "name": "posthog-node",
+      "purl": "pkg:npm/posthog-node@5.52.4",
+      "type": "library",
+      "version": "5.52.4"
+    },
+    {
+      "name": "zod",
+      "purl": "pkg:npm/zod@4.6.6",
+      "type": "library",
+      "version": "4.6.6"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+headroom-ai[proxy,mcp]==0.41.0
+litellm==1.106.4+pgise.security1

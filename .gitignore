@@ -5,3 +5,10 @@ strix_runs/
 .env
 .env.*
 !.env.example
+
+# Isolated, reproducible developer-tool builds and fixtures
+.devtools/
+devtools/node/node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
