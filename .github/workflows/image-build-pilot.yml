@@ -1,0 +1,25 @@
+name: FactLens image size pilot (no publication)
+on:
+  pull_request:
+    branches: [work]
+    paths:
+      - .github/workflows/image-build-pilot.yml
+      - scripts/security/factlens-image-pilot.sh
+permissions:
+  contents: read
+concurrency:
+  group: factlens-image-pilot-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-size-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Build three production Dockerfiles and measure temporary combined gzip
+        env:
+          PILOT_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PILOT_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: bash scripts/security/factlens-image-pilot.sh

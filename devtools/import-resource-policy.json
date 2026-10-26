@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "status": "unmeasured",
+  "method": "isolated-daemon-stream-load-v1",
+  "platform": "linux/amd64",
+  "disk_reserve_bytes": 10737418240,
+  "reason": "No isolated Docker daemon/client/decompressor peak-memory and OOM measurement has been executed. Production import is blocked."
+}
