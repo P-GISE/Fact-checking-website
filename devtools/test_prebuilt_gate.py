@@ -227,6 +227,7 @@ class WorkflowBoundaryTests(unittest.TestCase):
             self.assertIn("github.ref == 'refs/heads/work'",job)
         self.assertLess(build.index('python3 devtools/build-prebuilt.py'),build.index('actions/upload-artifact@'))
         self.assertLess(deploy.index('fetch-prebuilt-run-evidence.py'),deploy.index('Prepare pinned SSH'))
+        self.assertIn('"set -eu; umask 077; test ! -L .factlens-incoming;',deploy)
         self.assertIn('retention-days: 1',build)
         self.assertIn('compression-level: 0',build)
 

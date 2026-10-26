@@ -204,7 +204,7 @@ jobs:
           [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
           connection=(-i "$RUNNER_TEMP/factlens-ssh/key" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$RUNNER_TEMP/factlens-ssh/known_hosts" -o ConnectTimeout=15)
           incoming=".factlens-incoming/$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-          ssh "${connection[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "umask 077; test ! -L .factlens-incoming; mkdir -p -m 700 .factlens-incoming; mkdir -m 700 '$incoming'"
+          ssh "${connection[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "set -eu; umask 077; test ! -L .factlens-incoming; mkdir -p -m 700 .factlens-incoming; mkdir -m 700 '$incoming'"
           scp "${connection[@]}" -P "$DEPLOY_PORT" "$RUNNER_TEMP/factlens-download/images.tar.gz" "$RUNNER_TEMP/factlens-download/manifest.json" "$DEPLOY_USER@$DEPLOY_HOST:$incoming/"
           ssh "${connection[@]}" -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "cd factlens && bash -s -- '$DEPLOY_SHA' '$GITHUB_RUN_ID' '$GITHUB_RUN_ATTEMPT'" < devtools/deploy-prebuilt.sh | tee "$RUNNER_TEMP/factlens-prebuilt.log"
           grep -Fx "Deployed ${DEPLOY_SHA}; loopback and public health ready; database and Redis containers preserved." "$RUNNER_TEMP/factlens-prebuilt.log" || grep -Fx 'Stale deployment skipped: requested SHA is not origin/work HEAD.' "$RUNNER_TEMP/factlens-prebuilt.log"
