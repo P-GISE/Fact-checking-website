@@ -13,7 +13,7 @@ import { receiptBinding } from './guard-attestation.mjs';
 const here=dirname(fileURLToPath(import.meta.url));const root=resolve(here,'../../..');
 const cache=join(root,'.tools/omniroute-security-build');const attemptPath=join(cache,`attempt-${linuxProfile}.json`);
 const GiB=1024**3;
-const stages=new Set(['git-init','git-origin','git-fetch','git-checkout','source-pin','source-archive','source-manifest','source-clean','source-lock','locked-patch-check','locked-patch','install','native-hydration','native-sqlite','runtime-audit','full-webpack-build','full-turbopack-build','postbuild-workers','package-cli','contract']);
+const stages=new Set(['git-init','git-origin','git-fetch','git-checkout','source-pin','source-tree','source-archive','source-manifest','source-clean','source-lock','locked-patch-check','locked-patch','install','native-hydration','native-sqlite','runtime-audit','full-webpack-build','full-turbopack-build','postbuild-workers','package-cli','contract']);
 const categories=new Set(['deadline','spawn','output_limit','terminated','module_resolution','dependency_resolution','heap_limit','command_failed','archive','assertion','runtime']);
 export function diagnosticSummary(value) {
   if(value?.omniroute_security_build!=='fail'||!stages.has(value.stage)||!categories.has(value.category))return null;
@@ -40,7 +40,7 @@ async function main() {
   assert(!existsSync(join(cache,'source')),'fresh_linux_source_required');
   const env=isolatedEnv();verifyLinuxEnv(env);const initial=linuxSnapshot();assert(initial.freeBytes>=12*GiB,'fresh_effective_free_below_12GiB');
   mkdirSync(cache,{recursive:true});
-  const names=['rebuild.mjs','guarded-linux-build.mjs','source-inputs.mjs','installed-tree.mjs','platform-profile.mjs','linux-processes.mjs','process-guard.mjs','guard-attestation.mjs','smoke.mjs','tcp-refusal.mjs','plan.json','source-lock.patch'];
+  const names=['rebuild.mjs','archive-policy.mjs','guarded-linux-build.mjs','source-inputs.mjs','installed-tree.mjs','platform-profile.mjs','linux-processes.mjs','process-guard.mjs','guard-attestation.mjs','smoke.mjs','tcp-refusal.mjs','plan.json','source-lock.patch'];
   const hashes=Object.fromEntries(names.map(name=>[name,createHash('sha256').update(readFileSync(join(here,name))).digest('hex')]));
   const record={attempt:linuxProfile,executionId:randomUUID(),profile:linuxProfile,platform:'linux',arch:process.arch,node:process.version,bundler:'webpack',heapMb:8192,startedAt:new Date().toISOString(),initialFreeBytes:initial.freeBytes,totalEffectiveBytes:initial.totalBytes,cgroupBudgetsChecked:initial.memoryBudgetsChecked,floorBytes:3*GiB,timeoutMinutes:30,hashes,status:'running',rawOutputSaved:false};
   writeFileSync(attemptPath,JSON.stringify(record,null,2)+'\n',{flag:'wx'});

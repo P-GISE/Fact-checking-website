@@ -8,6 +8,7 @@ import { verifySourceInputs } from './source-inputs.mjs';
 import { resolveNpmEntry, resolveProfile, assertPinnedNode } from './platform-profile.mjs';
 import { installedTreeDigest } from './installed-tree.mjs';
 import { verifyGuardAttestation } from './guard-attestation.mjs';
+import { canonicalArchiveArgs,canonicalGitEnv,verifyCommitTree } from './archive-policy.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const project = resolve(here, '../../..');
@@ -150,10 +151,12 @@ async function main() {
     await run('git-fetch', 'git', ['fetch', '--depth', '1', 'origin', plan.commit]);
     await run('git-checkout', 'git', ['-c', 'core.autocrlf=false', '-c', 'core.eol=lf', 'checkout', '--detach', 'FETCH_HEAD']);
   }
-  assert.equal((await run('source-pin', 'git', ['rev-parse', 'HEAD'])).trim(), plan.commit);
+  const actualCommit=(await run('source-pin', 'git', ['--no-replace-objects','rev-parse', 'HEAD'],{env:canonicalGitEnv(isolatedEnv())})).trim();
+  const actualTree=(await run('source-tree', 'git', ['--no-replace-objects','rev-parse', `${plan.commit}^{tree}`],{env:canonicalGitEnv(isolatedEnv())})).trim();
+  verifyCommitTree(actualCommit,actualTree,plan);
   const archiveHash = await new Promise((accept, reject) => {
     const hash = createHash('sha256');
-    const archive = spawn('git', ['archive', '--format=tar', plan.commit], { cwd: source, env: isolatedEnv(), windowsHide: true });
+    const archive = spawn('git', canonicalArchiveArgs(plan.commit), { cwd: source, env: canonicalGitEnv(isolatedEnv()), windowsHide: true });
     archive.stdout.on('data', (chunk) => hash.update(chunk)); archive.stderr.on('data', () => {});
     archive.once('error', () => reject(new RebuildFailure('source-archive', 'spawn')));
     archive.once('close', (code) => code === 0 ? accept(hash.digest('hex')) : reject(new RebuildFailure('source-archive', 'archive', code)));

@@ -29,3 +29,11 @@ Windows 전용 과거 adapter와 시험은 재현·회귀용으로 포함하지�
 후속 후보는 guard의 원문 미보존 정책을 유지하면서 고정 allowlist의 마지막 통과 stage와 실패 stage/category/0~255 exitcode만 출력한다. 줄4096자를 넘거나 파싱/enum 검증에 실패한 내용은 버리고 독립 stdout/stderr 경계를 유지한다. 기존 메모리·heap·timeout·소유권·완료 검증 경계는 바꾸지 않았다. 추가 빌드/CI 재실행은 없으며 workflow/수정본 검토를 기다린다. 진단 합성3개를 추가한 Windows 회귀43/43 통과는 Linux 실제 빌드 성공을 의미하지 않는다.
 
 진단은 builder가 출력한 UUIDv4 executionId가 현재 guard attempt nonce와 일치할 때만 채택한다. stale/missing/partial/악성 enum JSON과 비밀 marker가 요약에 들어오지 않는 회귀를 포함하며 기존 failure.json을 출력하지 않는다. nonce는 진단 연결용이며 악의적인 동일 프로세스에 대한 암호학적 신뢰 경계는 아니다.
+
+## Archive 원본 내용 동등성 확인과 canonical 후보
+
+두 번째 Linux CI40342761651은 source-pin 다음 contract assertion에서 중단됐다. 코드는 이 구간의 archive SHA 검사를 지목하며 전체 compile 진입 증거는 없다. 같은 shallow 공식 commit에서 ambient autocrlf=true는 기존 Windows archive SHA3d8ff6...9395/843151360bytes를 재현하고 false는53b014...e4ec/834549760bytes를 만들었다. Git의 archive 변환은 [공식 archive.c](https://github.com/git/git/blob/v2.55.0/archive.c)의 convert_to_working_tree 경로와 [공식 설정 문서](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration)에 근거한다. [archive 문서](https://git-scm.com/docs/git-archive)는 tar.umask 및 export 속성 영향을 설명한다.
+
+독립 Python 표준 tarfile streaming 감사 `audit-archive-content.py SOURCE`는 canonical tar의 원본26001개 파일을 fixed Git tree의 mode/path/blob 원문과 모두 비교했다. 활성 export-ignore/export-subst는0, 추출/원문 출력0이다. canonical tar SHA는53b014bcf694e1d8416b792d0304f3411598141dcd60f51fdb0f7d891fe0e4ec, raw-content manifest SHA는7bb6c2bed545b7b844854a382b6825cebdbe32b8c5a2957fa1a10f6a2ae15098이다.
+
+새 후보는 command-local core.autocrlf=false/core.eol=lf/tar.umask=0002와 replacement objects 금지를 강제하고 고정 commit/tree b2f3332f645ad60de52f12a4a484eb288693f0ea를 확인한 뒤 canonical SHA 하나만 허용한다. 이전 Windows SHA는 plan의 historical 필드와 이전 commit/evidence에 보존한다. 기존 tracked raw bytes·허용2개 overlay·설치 seal·plan/receipt/attempt 연결은 그대로다. 다양한 ambient autocrlf/eol/umask에서도 synthetic canonical archive 동일, commit/tree 변조 거절과 기존 파일1byte변조·stale plan/receipt 거절을 포함한45/45 회귀가 Windows에서 통과했다. 실제 source build·추가 Linux CI는 실행하지 않았으며 root 검토 대기다.
