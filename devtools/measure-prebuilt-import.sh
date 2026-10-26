@@ -44,12 +44,25 @@ fi
 cp --reflink=never -- "$6" "$benchmark/images.tar.gz"
 [[ $(sha256sum "$benchmark/images.tar.gz" | cut -d' ' -f1) == "$digest" ]]
 daemon_pid=''
+containerd_pid=''
 cleanup() {
   if [[ -n $daemon_pid ]]; then kill "$daemon_pid" 2>/dev/null || true; wait "$daemon_pid" 2>/dev/null || true; fi
+  if [[ -n $containerd_pid ]]; then kill "$containerd_pid" 2>/dev/null || true; wait "$containerd_pid" 2>/dev/null || true; fi
 }
 trap cleanup EXIT
+printf 'version = 2\ndisabled_plugins = ["io.containerd.grpc.v1.cri", "io.containerd.nri.v1.nri"]\n' > "$benchmark/containerd.toml"
+containerd --config "$benchmark/containerd.toml" --address "$benchmark/containerd.sock" \
+  --root "$benchmark/containerd-root" --state "$benchmark/containerd-state" > "$benchmark/containerd.log" 2>&1 &
+containerd_pid=$!
+for _ in {1..60}; do
+  if timeout 3s ctr --address "$benchmark/containerd.sock" version >/dev/null 2>&1; then break; fi
+  kill -0 "$containerd_pid" 2>/dev/null || exit 1
+  sleep 1
+done
+timeout 3s ctr --address "$benchmark/containerd.sock" version >/dev/null 2>&1
 printf '{}\n' > "$benchmark/daemon-config.json"
 dockerd --config-file="$benchmark/daemon-config.json" --host="$socket" --data-root="$benchmark/data" --exec-root="$benchmark/exec" \
+  --containerd="$benchmark/containerd.sock" --containerd-namespace=moby --containerd-plugins-namespace=plugins.moby \
   --pidfile="$benchmark/docker.pid" --bridge=none --iptables=false \
   --ip-forward=false --ip-masq=false > "$benchmark/daemon.log" 2>&1 &
 daemon_pid=$!
@@ -59,13 +72,22 @@ for _ in {1..90}; do
   sleep 1
 done
 docker --host="$socket" info >/dev/null 2>&1
+isolation_checker="$(dirname "$(realpath "${BASH_SOURCE[0]}")")/check-import-isolation.py"
+python3 "$isolation_checker" "$benchmark" "$daemon_pid" "$containerd_pid" \
+  "$(command -v dockerd)" "$(command -v containerd)" > "$benchmark/isolation-before.json"
 docker --host="$socket" info --format '{"server_version":"{{.ServerVersion}}","driver":"{{.Driver}}","driver_status":{{json .DriverStatus}}}' > "$benchmark/runtime.json"
 docker --host="$socket" version --format '{{json .Server.Components}}' > "$benchmark/components.json"
 # gzip, client, daemon and daemon-owned containerd share this measured cgroup.
 gzip -dc "$benchmark/images.tar.gz" | docker --host="$socket" load >/dev/null
 for component in api worker web; do
   docker --host="$socket" image inspect "factlens-$component:$sha" >/dev/null
+  # Force first-use snapshot unpack without starting the app or running a migration.
+  cid=$(docker --host="$socket" create --pull=never --network none --entrypoint /bin/true "factlens-$component:$sha")
+  [[ $cid =~ ^[0-9a-f]{64}$ ]]
+  docker --host="$socket" rm -v "$cid" >/dev/null
 done
+python3 "$isolation_checker" "$benchmark" "$daemon_pid" "$containerd_pid" \
+  "$(command -v dockerd)" "$(command -v containerd)" > "$benchmark/isolation-after.json"
 cgroup=$(awk -F: '$1=="0" {print $3}' /proc/self/cgroup)
 [[ $cgroup == /* && -f /sys/fs/cgroup$cgroup/memory.peak ]]
 python3 - "$benchmark/measurement.json" "$digest" "$run_url" \
@@ -76,6 +98,10 @@ out,digest,url,folder=sys.argv[1:]; group=Path(folder)
 events=dict(line.split() for line in (group/'memory.events').read_text().splitlines())
 peak=int((group/'memory.peak').read_text())
 runtime=json.loads((Path(out).parent/'runtime.json').read_text())
+before=json.loads((Path(out).parent/'isolation-before.json').read_text())
+after=json.loads((Path(out).parent/'isolation-after.json').read_text())
+if before.get('verified') is not True or after.get('verified') is not True:
+    raise SystemExit('Private process isolation proof required')
 if int(events.get('oom',0)) or int(events.get('oom_kill',0)) or peak<=0:
     raise SystemExit('Import measurement failed: OOM or invalid accounting')
 Path(out).write_text(json.dumps({'schema':1,'status':'measurement-requires-review',
@@ -85,5 +111,7 @@ Path(out).write_text(json.dumps({'schema':1,'status':'measurement-requires-revie
     'docker_server_version':runtime['server_version'],'docker_driver':runtime['driver'],
     'docker_driver_status':runtime['driver_status'],
     'docker_server_components':json.loads((Path(out).parent/'components.json').read_text()),
+    'isolation_verified':True,'isolation_version':2,'isolation_before':before,'isolation_after':after,
+    'measurement_scope':'fresh-copy + private dockerd/containerd + stream-load + create/unpack; no app start',
     'kernel_release':os.uname().release,'kernel_architecture':os.uname().machine},sort_keys=True)+'\n')
 PY

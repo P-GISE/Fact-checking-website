@@ -71,19 +71,23 @@ printf '{"Results":[{"Class":"os-pkgs","Packages":[{}],"Vulnerabilities":%s},{"C
     def measurement(self):
         return {'status':'measurement-requires-review','method':'isolated-daemon-stream-load-v1',
                 'platform':'linux/amd64','peak_total_bytes':123456789,'oom_events':0,
+                'isolation_verified':True,'isolation_version':2,
+                'isolation_before':{'verified':True},'isolation_after':{'verified':True},
                 'docker_server_version':'29.1.3','docker_driver':'overlayfs',
                 'docker_driver_status':[['driver-type','io.containerd.snapshotter.v1']]}
 
     def test_real_measurement_never_auto_approves_a_production_policy(self):
         summary,exit_code=self.summarize(self.measurement())
         self.assertEqual(exit_code,0)
-        self.assertTrue(summary['runtime_equivalent_to_s2'])
+        self.assertTrue(summary['docker_engine_driver_match'])
+        self.assertFalse(summary['runtime_equivalent_to_s2'])
         self.assertFalse(summary['production_envelope_approved'])
         self.assertEqual(summary['uploaded_artifacts'],0)
 
     def test_failures_zero_or_wrong_runtime_cannot_become_a_production_baseline(self):
         for change in ({'peak_total_bytes':0},{'oom_events':1},{'docker_driver':'overlay2'},
-                       {'docker_server_version':'28.0.0'},{'docker_driver_status':[]}):
+                       {'docker_server_version':'28.0.0'},{'docker_driver_status':[]},
+                       {'isolation_verified':False},{'isolation_after':{'verified':False}}):
             data=self.measurement();data.update(change)
             summary,exit_code=self.summarize(data)
             self.assertNotEqual(exit_code,0)

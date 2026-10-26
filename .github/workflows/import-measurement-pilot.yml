@@ -16,6 +16,8 @@ on:
       - devtools/prepare-docker29-pilot.sh
       - devtools/verify-pilot-docker29.py
       - devtools/test_docker29_pilot.py
+      - devtools/check-import-isolation.py
+      - devtools/test_import_isolation.py
 permissions:
   contents: read
 concurrency:
@@ -37,6 +39,7 @@ jobs:
           python3 -m unittest discover -s devtools -p test_import_measurement_pilot.py -v
           python3 -m unittest discover -s devtools -p test_runtime_image_contracts.py -v
           python3 -m unittest discover -s devtools -p test_docker29_pilot.py -v
+          python3 -m unittest discover -s devtools -p test_import_isolation.py -v
           bash -n devtools/verify-runtime-images.sh
       - name: Prepare SHA-verified private Docker29 pilot tools without starting image
         id: private-docker
