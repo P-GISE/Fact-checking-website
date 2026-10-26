@@ -73,6 +73,7 @@ printf '{"Results":[{"Class":"os-pkgs","Packages":[{}],"Vulnerabilities":%s},{"C
                 'platform':'linux/amd64','peak_total_bytes':123456789,'oom_events':0,
                 'isolation_verified':True,'isolation_version':2,
                 'isolation_before':{'verified':True},'isolation_after':{'verified':True},
+                'memory_max_bytes':768*1024**2,'memory_swap_max_bytes':0,'memory_swap_peak_bytes':0,
                 'docker_server_version':'29.1.3','docker_driver':'overlayfs',
                 'docker_driver_status':[['driver-type','io.containerd.snapshotter.v1']]}
 
@@ -95,6 +96,23 @@ printf '{"Results":[{"Class":"os-pkgs","Packages":[{}],"Vulnerabilities":%s},{"C
         for status,sca in ((1,0),(0,1),(2,0)):
             _,exit_code=self.summarize(self.measurement(),status,sca)
             self.assertNotEqual(exit_code,0)
+
+    def test_bounded_import_rejects_missing_limits_swap_or_peak_above_cap(self) -> None:
+        measurement=self.measurement()
+        measurement.update({'memory_max_bytes':768*1024**2,'memory_swap_max_bytes':0,
+                            'memory_swap_peak_bytes':0})
+        _,status=self.summarize(measurement)
+        self.assertEqual(status,0)
+        for change in ({'memory_max_bytes':3*1024**3},{'memory_max_bytes':None},
+                       {'memory_swap_max_bytes':None},{'memory_swap_max_bytes':1024},
+                       {'memory_swap_peak_bytes':1},{'memory_swap_peak_bytes':None},
+                       {'peak_total_bytes':768*1024**2+1}):
+            with self.subTest(change=change):
+                candidate={**measurement,**change}
+                summary,status=self.summarize(candidate)
+                self.assertNotEqual(status,0)
+                self.assertNotIn('peak_total_bytes',summary['measurement'])
+                self.assertFalse(summary['production_envelope_approved'])
 
 
 if __name__=='__main__':unittest.main()

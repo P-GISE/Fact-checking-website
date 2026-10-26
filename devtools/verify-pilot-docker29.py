@@ -9,7 +9,7 @@ import sys
 
 def verify(directory,profile):
     if (profile.get('kind')!='ci-pilot-only' or profile.get('version')!='29.1.3'
-            or profile.get('platform')!='linux/amd64' or profile.get('memory_max_bytes')!=3*1024**3):
+            or profile.get('platform')!='linux/amd64' or profile.get('memory_max_bytes')!=768*1024**2):
         raise ValueError('Invalid pilot runtime profile')
     required={'docker','dockerd','containerd','containerd-shim-runc-v2','ctr','runc','docker-proxy','docker-init'}
     hashes=profile.get('binary_sha256',{})

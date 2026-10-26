@@ -5,7 +5,7 @@
   "platform": "linux/amd64",
   "required_driver": "overlayfs",
   "required_snapshotter": "io.containerd.snapshotter.v1",
-  "memory_max_bytes": 3221225472,
+  "memory_max_bytes": 805306368,
   "binary_sha256": {
     "docker": "226408f543344f0d2bfc84c7df4243c5364baccf509e8984d04e1e62c74efac0",
     "containerd": "ce0db2ca9c41800c87f22b1dce24ce14faeabfd2329dbdf5b8161984a8183f45",

@@ -43,7 +43,8 @@ class Docker29PilotTests(unittest.TestCase):
             for forbidden in ('PILOT_DOCKER29_TOOL_DIR','docker29-pilot-profile','prepare-docker29-pilot'):
                 self.assertNotIn(forbidden,source,name)
         helper=(ROOT/'devtools/measure-prebuilt-import.sh').read_text()
-        self.assertIn('--property=MemoryMax=3G',helper)
+        self.assertIn('--property=MemoryMax=768M',helper)
+        self.assertIn('--property=MemorySwapMax=0',helper)
         self.assertIn('export PATH="$7:/usr/sbin:/usr/bin:/sbin:/bin"',helper)
         self.assertNotIn('--feature',helper)
 

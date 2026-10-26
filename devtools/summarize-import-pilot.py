@@ -12,13 +12,22 @@ def summarize(measurement,measurement_status,sca_status):
            and measurement.get('isolation_verified') is True and measurement.get('isolation_version')==2
            and measurement.get('isolation_before',{}).get('verified') is True
            and measurement.get('isolation_after',{}).get('verified') is True
-           and type(measurement.get('peak_total_bytes')) is int and measurement['peak_total_bytes']>0)
+           and type(measurement.get('peak_total_bytes')) is int
+           and 0<measurement['peak_total_bytes']<=768*1024**2
+           and type(measurement.get('memory_max_bytes')) is int
+           and measurement['memory_max_bytes']==768*1024**2
+           and type(measurement.get('memory_swap_max_bytes')) is int
+           and measurement['memory_swap_max_bytes']==0
+           and type(measurement.get('memory_swap_peak_bytes')) is int
+           and measurement['memory_swap_peak_bytes']==0)
     equivalent=(measurement.get('docker_server_version')=='29.1.3'
                 and measurement.get('docker_driver')=='overlayfs'
                 and ['driver-type','io.containerd.snapshotter.v1'] in measurement.get('docker_driver_status',[]))
     keys=('method','platform','peak_total_bytes','oom_events','docker_server_version','docker_driver',
           'docker_driver_status','docker_server_components','kernel_release','kernel_architecture','image_archive_sha256','measurement_run_url',
-          'isolation_verified','isolation_version','isolation_before','isolation_after','measurement_scope')
+          'isolation_verified','isolation_version','isolation_before','isolation_after','measurement_scope',
+          'memory_max_bytes','memory_swap_max_bytes','memory_swap_peak_bytes',
+          'resource_limits_before','memory_events','memory_stat_bytes')
     result={'measurement_status':'SUCCESS' if valid else 'FAILED_OR_UNASSESSED',
             'image_sca_status':'SUCCESS' if sca_status==0 else 'FAILED_OR_UNASSESSED',
             'docker_engine_driver_match':equivalent,'runtime_equivalent_to_s2':False,
