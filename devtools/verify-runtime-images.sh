@@ -9,7 +9,7 @@ docker run "${options[@]}" --entrypoint node "$api" --check /app/apps/api/dist/s
 docker run "${options[@]}" --entrypoint node "$api" --input-type=module \
   -e "await Promise.all(['express','multer','pg','redis','zod'].map(name=>import(name))); if(process.getuid()!==1000) process.exit(1)"
 docker run "${options[@]}" --entrypoint sh "$api" -ec \
-  '! command -v npm; ! command -v npx; ! command -v yarn; test ! -d /usr/local/lib/node_modules; test -f /app/apps/api/migrations/005_account_deletion.sql'
+  'for tool in npm npx yarn; do if command -v "$tool" >/dev/null; then exit 1; fi; done; test ! -d /usr/local/lib/node_modules; test ! -d /app/node_modules/typescript; test ! -d /app/node_modules/vitest; test -f /app/apps/api/migrations/005_account_deletion.sql'
 docker run "${options[@]}" --tmpfs /tmp:rw,noexec,nosuid,size=32m,mode=1777 --entrypoint nginx "$web" -t
 docker run "${options[@]}" --entrypoint python "$worker" -c \
   'import os,ssl,sqlite3,psycopg,pydantic_core,jiter; assert os.getuid()==1000; assert ssl.OPENSSL_VERSION'

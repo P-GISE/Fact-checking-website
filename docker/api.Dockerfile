@@ -13,7 +13,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY apps/api/package.json apps/api/package.json
 COPY apps/web/package.json apps/web/package.json
-RUN --mount=type=secret,id=proxy_ca NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca npm ci --omit=dev --workspace apps/api --include-workspace-root --no-audit --no-fund
+RUN --mount=type=secret,id=proxy_ca NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca npm ci --omit=dev --workspace apps/api --include-workspace-root --omit=optional --no-audit --no-fund
 
 FROM node:24-alpine3.24
 ARG FACTLENS_SOURCE_REVISION=unknown
