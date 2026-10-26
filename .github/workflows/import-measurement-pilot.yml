@@ -9,6 +9,9 @@ on:
       - devtools/scan-prebuilt-images.sh
       - devtools/summarize-import-pilot.py
       - devtools/test_import_measurement_pilot.py
+      - devtools/verify-runtime-images.sh
+      - devtools/test_runtime_image_contracts.py
+      - docker/**
 permissions:
   contents: read
 concurrency:
@@ -26,7 +29,10 @@ jobs:
         with:
           persist-credentials: false
       - name: Verify pilot isolation and classification contracts
-        run: python3 -m unittest discover -s devtools -p test_import_measurement_pilot.py -v
+        run: |
+          python3 -m unittest discover -s devtools -p test_import_measurement_pilot.py -v
+          python3 -m unittest discover -s devtools -p test_runtime_image_contracts.py -v
+          bash -n devtools/verify-runtime-images.sh
       - name: Build three local images, measure isolated load, and summarize image SCA
         env:
           PILOT_HEAD_SHA: ${{ github.event.pull_request.head.sha }}

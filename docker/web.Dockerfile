@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:24-bookworm-slim AS build
+FROM node:24-alpine3.24 AS build
 WORKDIR /app
 COPY package*.json ./
 COPY apps/api/package.json apps/api/package.json
@@ -8,10 +8,11 @@ RUN --mount=type=secret,id=proxy_ca NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca np
 COPY apps/web apps/web
 RUN npm run build --workspace apps/web
 FROM nginxinc/nginx-unprivileged:stable-alpine
+USER root
+RUN --mount=type=secret,id=proxy_ca,target=/etc/apk/ca.pem apk upgrade --no-cache
 ARG NGINX_CONFIG=nginx.conf
 COPY docker/${NGINX_CONFIG} /etc/nginx/conf.d/default.conf
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html
 
-USER root
 RUN chmod -R a+rX /usr/share/nginx/html && chmod a+r /etc/nginx/conf.d/default.conf
 USER nginx

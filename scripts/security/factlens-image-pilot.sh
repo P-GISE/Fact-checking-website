@@ -27,6 +27,7 @@ for component in api web worker; do
   metadata=$(docker image inspect --format '{{.Id}}|{{.Size}}|{{.Architecture}}|{{.Os}}' "$tag")
   printf '%s|%s\n' "$component" "$metadata" >> "$pilot_temp/images.txt"
 done
+bash devtools/verify-runtime-images.sh "$GITHUB_SHA" "$measure"
 # Local runner temporary file only: no upload-artifact, docker push, GHCR, SSH, app start, or deployment.
 docker save "${images[@]}" | gzip -n -6 > "$pilot_temp/images.tar.gz"
 gzip -t "$pilot_temp/images.tar.gz"

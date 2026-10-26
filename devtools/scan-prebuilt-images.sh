@@ -25,13 +25,14 @@ if int(status) not in (0,1) or not Path(report).is_file():raise SystemExit('Imag
 rows=json.loads(Path(report).read_text()).get('Results',[])
 os_packages=sum(len(row.get('Packages') or []) for row in rows if row.get('Class')=='os-pkgs')
 libraries=sum(len(row.get('Packages') or []) for row in rows if row.get('Class')=='lang-pkgs')
-findings=[entry for row in rows for entry in row.get('Vulnerabilities') or []]
+findings=[{**entry,'Class':row.get('Class'),'Type':row.get('Type'),'Target':row.get('Target')}
+          for row in rows for entry in row.get('Vulnerabilities') or []]
 print(json.dumps({'component':component,'os_packages':os_packages,'library_packages':libraries,
     'critical':sum(row.get('Severity')=='CRITICAL' for row in findings),
     'high':sum(row.get('Severity')=='HIGH' for row in findings)}))
 for entry in findings:
     print(json.dumps({'component':component,**{key:entry.get(key) for key in
-          ('VulnerabilityID','PkgName','InstalledVersion','FixedVersion','Severity')}}))
+          ('Class','Type','Target','VulnerabilityID','PkgName','InstalledVersion','FixedVersion','Severity')}}))
 if not os_packages or (component in ('api','worker') and not libraries):
     raise SystemExit('Image package coverage UNASSESSED')
 if int(status) or findings:raise SystemExit('Image High/Critical blocks publication')
