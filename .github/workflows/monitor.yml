@@ -54,7 +54,7 @@ jobs:
             | python3 -c 'import json,sys; assert json.load(sys.stdin).get("status")=="ready"'
       - name: Assume metadata-only offsite inspection role
         if: vars.FACTLENS_OFFSITE_ENABLED == 'true'
-        uses: aws-actions/configure-aws-credentials@ff871ab82db5d1d904d5b2a74b710d951e730e8b
+        uses: aws-actions/configure-aws-credentials@ce2ec50a23cfb8aacf5544bea7a651d803d626f6
         with:
           role-to-assume: ${{ vars.FACTLENS_BACKUP_INSPECT_ROLE }}
           aws-region: ap-northeast-2
