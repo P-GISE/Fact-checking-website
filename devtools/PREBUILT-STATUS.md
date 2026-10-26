@@ -16,6 +16,10 @@ Implemented and tested:
   links, device entries or duplicate paths; exactly three source-specific tags;
   expected config IDs, linux/amd64, revision labels, runtime command/user contracts,
   and API migration-control marker.
+- Artifact API identity and ZIP validators reject wrong repository/work/SHA/run/
+  attempt/name/ID, expired artifacts, mismatched outer digest, extra ZIP entries,
+  links/encryption/oversized files, wrong inner manifest and archive checksum. These
+  are validation helpers only: no artifact download/publication is wired yet.
 - Import preflight validates checksum, archive and private environment ownership;
   observes available memory and both scratch/Docker disk free space. An exact-bundle
   measured policy with no OOM and reserve is mandatory. Disk floor remains 10 GiB,
@@ -42,6 +46,6 @@ Still required before publication or production activation:
 5. Independent review and explicit activation approval. Existing approved services,
    cron, tunnel and DB remain outside this source change.
 
-Local validation: meaningful initial RED (missing implementation), then ten tests
+Local validation: meaningful initial RED (missing implementation), then thirteen tests
 with adversarial subcases GREEN; syntax compilation and diff whitespace checks.
 Linux execution is supplied by the existing verify job, not claimed until observed.

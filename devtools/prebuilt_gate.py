@@ -6,6 +6,7 @@ import re
 import sys
 import hashlib
 import tarfile
+import zipfile
 from pathlib import PurePosixPath
 from pathlib import Path
 
@@ -73,6 +74,51 @@ def validate_archive(archive, sha, expected_ids, expanded_limit):
 def require(condition, message):
     if not condition:
         raise GateError(message)
+
+
+def validate_artifact(metadata, artifact_id, run_id, sha, attempt, expected_digest):
+    require(type(artifact_id) is int and artifact_id > 0 and
+            bool(re.fullmatch('sha256:[0-9a-f]{64}', expected_digest)), 'Invalid expected artifact identity')
+    require(metadata.get('id') == artifact_id and metadata.get('expired') is False,
+            'Missing or expired artifact')
+    require(metadata.get('name') == f'factlens-images-{sha}-{run_id}-{attempt}', 'Artifact name mismatch')
+    require(metadata.get('digest') == expected_digest, 'Artifact API digest mismatch')
+    workflow = metadata.get('workflow_run') or {}
+    require(workflow.get('id') == run_id and workflow.get('head_sha') == sha and
+            workflow.get('head_branch') == 'work' and workflow.get('repository_id') == 1420151819 and
+            workflow.get('head_repository_id') == 1420151819, 'Artifact source mismatch')
+    require(type(metadata.get('size_in_bytes')) is int and
+            0 < metadata['size_in_bytes'] <= 451 * 1024**2, 'Artifact size limit')
+
+
+def validate_artifact_zip(path, expected_digest, sha, run_id, attempt):
+    require(path.is_file() and not path.is_symlink() and path.stat().st_size <= 451 * 1024**2,
+            'Invalid artifact ZIP')
+    with path.open('rb') as stream:
+        require('sha256:' + hashlib.file_digest(stream, 'sha256').hexdigest() == expected_digest,
+                'Downloaded artifact digest mismatch')
+    with zipfile.ZipFile(path) as archive:
+        entries = archive.infolist()
+        require(len(entries) == 3 and {row.filename for row in entries} ==
+                {'images.tar.gz', 'manifest.json', 'checksums.sha256'}, 'Unexpected artifact files')
+        for row in entries:
+            require((row.external_attr >> 16) & 0o170000 in (0, 0o100000) and
+                    not row.is_dir() and not row.flag_bits & 1, 'Unsafe artifact entry type')
+            limit = 450 * 1024**2 if row.filename == 'images.tar.gz' else 1024**2
+            require(0 < row.file_size <= limit, 'Artifact file size limit')
+        manifest = json.loads(archive.read('manifest.json'))
+        require(manifest.get('schema') == 1 and manifest.get('sha') == sha and
+                manifest.get('run_id') == run_id and manifest.get('run_attempt') == attempt,
+                'Inner manifest source mismatch')
+        digest = manifest.get('archive_sha256', '')
+        require(bool(re.fullmatch('[0-9a-f]{64}', digest)), 'Invalid inner digest')
+        require(archive.read('checksums.sha256') == (digest + '  images.tar.gz\n').encode(),
+                'Inner checksum declaration mismatch')
+        hasher = hashlib.sha256()
+        with archive.open('images.tar.gz') as stream:
+            for block in iter(lambda: stream.read(1024**2), b''): hasher.update(block)
+        require(hasher.hexdigest() == digest, 'Inner archive digest mismatch')
+        return manifest
 
 
 def validate_run(run, jobs, sha, run_id, attempt, current_work_sha):

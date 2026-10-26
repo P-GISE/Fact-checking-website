@@ -6,8 +6,9 @@ import tarfile
 import io
 import json
 import hashlib
+import zipfile
 from pathlib import Path
-from prebuilt_gate import validate_run, validate_resources, validate_archive, GateError
+from prebuilt_gate import validate_run, validate_resources, validate_archive, validate_artifact, validate_artifact_zip, GateError
 
 
 SHA = 'a' * 40
@@ -135,6 +136,43 @@ class ArchiveGateTests(unittest.TestCase):
             with self.assertRaises(GateError):validate_archive(path,SHA,ids,1024**2)
             path,ids=self.make(directory)
             with self.assertRaises(GateError):validate_archive(path,SHA,ids,1)
+
+
+class ArtifactGateTests(unittest.TestCase):
+    def metadata(self):
+        return {'id':34,'name':f'factlens-images-{SHA}-12-2','expired':False,
+                'digest':'sha256:'+'c'*64,'size_in_bytes':100,'workflow_run':{
+                    'id':12,'head_sha':SHA,'head_branch':'work','repository_id':1420151819,
+                    'head_repository_id':1420151819}}
+
+    def test_exact_artifact_metadata(self):
+        validate_artifact(self.metadata(),34,12,SHA,2,'sha256:'+'c'*64)
+
+    def test_wrong_expired_or_other_source_artifact(self):
+        for field,value in (('id',35),('expired',True),('name','other'),('digest','sha256:'+'d'*64)):
+            m=self.metadata();m[field]=value
+            with self.subTest(field=field),self.assertRaises(GateError):
+                validate_artifact(m,34,12,SHA,2,'sha256:'+'c'*64)
+        m=self.metadata();m['workflow_run']['head_repository_id']=1
+        with self.assertRaises(GateError):validate_artifact(m,34,12,SHA,2,'sha256:'+'c'*64)
+
+    def test_zip_digest_inner_provenance_and_exact_files(self):
+        for attack in (None,'digest','source','extra','inner'):
+            with self.subTest(attack=attack),tempfile.TemporaryDirectory() as directory:
+                path=Path(directory)/'artifact.zip';content=b'synthetic archive'
+                digest=hashlib.sha256(content).hexdigest()
+                manifest={'schema':1,'sha':SHA,'run_id':12,'run_attempt':2,'archive_sha256':digest}
+                if attack=='source':manifest['run_attempt']=1
+                with zipfile.ZipFile(path,'w') as output:
+                    output.writestr('manifest.json',json.dumps(manifest))
+                    output.writestr('checksums.sha256',digest+'  images.tar.gz\n')
+                    output.writestr('images.tar.gz',content if attack!='inner' else b'changed')
+                    if attack=='extra':output.writestr('../escape',b'no')
+                outer='sha256:'+hashlib.sha256(path.read_bytes()).hexdigest()
+                if attack=='digest':outer='sha256:'+'d'*64
+                if attack:
+                    with self.assertRaises(GateError):validate_artifact_zip(path,outer,SHA,12,2)
+                else:self.assertEqual(validate_artifact_zip(path,outer,SHA,12,2),manifest)
 
 
 if __name__ == '__main__': unittest.main()
