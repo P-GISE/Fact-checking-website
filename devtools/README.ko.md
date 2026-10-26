@@ -71,3 +71,10 @@ Iron Laws는 source commit2b98ecd687ed1e2aaedc13ff243f9a9a401fa4fa·tar SHA를 i
 공통 cache_io는 cache anchor의 기존 상위 경로까지 lstat/reparse·containment를 확인한 뒤 mkdir/파일쓰기/atomic rename을 진행합니다. 새 파일은 O_EXCL과 가능한 플랫폼의 O_NOFOLLOW를 사용합니다. 캐시 안의 정상 파일과 기존 성공 bundle/receipt는 지우지 않았습니다. matching partial source는 기존 inode/mtime를 유지합니다. 같은 OS 계정/관리자가 동시에 경로를 교체하는 공격을 완전히 막는 lock이나 OS sandbox는 아닙니다.
 
 실제 Windows junction negative 시험에서 외부 신규 파일·폴더0, 기존 sentinel 내용보존을 확인했습니다. source/dependency/artifact/installed parent와 wheel producer/intake가 같은 bounded I/O를 사용합니다. 분리된 source intake와 runtime intake helper의 SHA도 receipt에 묶습니다. 기존 bundle을 재컴파일하지 않고 전체 cached source·공식 marker·같은 실제 bundle·guarded CLI/dry-run을 다시 검증해 새 receipt에 연결했습니다. Linux 실제 CI는 독립 재검토 전 계속 보류합니다.
+
+
+### 플랫폼 간 파생 wheel 재현성
+
+파생 wheel은 원본 코드·native payload·LICENSE·WHEEL 태그와 복사한 ZIP entry 메타데이터를 보존합니다. 새 provenance, RECORD와 Iron Laws에 추가하는 LICENSE entry만 ZIP `create_system=0`, 1980-01-01 시각, 명시한 mode로 고정합니다. RECORD/LICENSE는 기존 wheel의 생성 방식과 같은 0664, provenance는 0644를 사용합니다. `create_system=0`은 ZIP 생성 메타데이터이며 실행 대상 OS나 wheel ABI 태그를 바꾸지 않습니다.
+
+운영체제의 ZIP 기본값 0/3을 바꾸는 실제 repack/package_license 회귀시험이 있습니다. 실제 Windows·Linux upstream wheel 네 개에서도 두 기본값으로 생성한 여덟 결과가 모두 기존 lock의 SHA256과 같았습니다. 따라서 이 수정으로 패키지 버전·원본 payload·양 플랫폼 lock hash는 바뀌지 않습니다. 첫 Linux CI는 Headroom hashlock 단계에서 실패했지만 원문 오류를 저장하지 않았으므로, 재현된 메타데이터 결함을 그 실패의 유일 원인으로 단정하지 않습니다. 수정 후 실제 Linux 설치는 별도 검토·실행 결과로 확인합니다.

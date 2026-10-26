@@ -16,6 +16,7 @@ import stat
 import sys
 from tempfile import TemporaryDirectory
 from typing import Final, Iterator, Mapping
+from zipfile import ZipInfo
 
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name, parse_wheel_filename
@@ -59,6 +60,20 @@ SPECS: Final = (
         RequirementPatch('litellm>=1.101.0', 'litellm==1.106.4+pgise.security1'),
     )),
 )
+
+
+class MetadataWheelFile(WheelFile):
+    """Canonicalize only newly generated ZIP entries; preserve copied upstream info."""
+
+    def writestr(self, zinfo_or_arcname: str | ZipInfo, data: str | bytes | bytearray | memoryview,
+                 compress_type: int | None = None) -> None:
+        if isinstance(zinfo_or_arcname, str):
+            info = ZipInfo(zinfo_or_arcname, date_time=(1980, 1, 1, 0, 0, 0))
+            info.create_system = 0
+            info.compress_type = self.compression
+            info.external_attr = (stat.S_IFREG | 0o664) << 16
+            zinfo_or_arcname = info
+        super().writestr(zinfo_or_arcname, data, compress_type)
 
 
 def repack_wheel(source: Path, destination: Path, spec: OverlaySpec, expected_sha256: str) -> BuiltOverlay:
@@ -124,7 +139,7 @@ def repack_wheel(source: Path, destination: Path, spec: OverlaySpec, expected_sh
             with new_file(destination, candidate):
                 pass
             checked_path(destination, candidate)
-            with fixed_zip_time(), WheelFile(candidate, 'w') as output:
+            with fixed_zip_time(), MetadataWheelFile(candidate, 'w') as output:
                 for info in sorted(original.infolist(), key=lambda value: value.filename):
                     if info.is_dir() or info.filename == original.record_path:
                         continue
@@ -137,8 +152,8 @@ def repack_wheel(source: Path, destination: Path, spec: OverlaySpec, expected_sh
                     target = copy(info)
                     target.filename = renamed
                     output.writestr(target, metadata if info.filename == old_info + '/METADATA' else original.read(info.filename))
-                from zipfile import ZipInfo
                 provenance = ZipInfo(new_info + '/PGISE-SECURITY-OVERLAY.json', date_time=(1980, 1, 1, 0, 0, 0))
+                provenance.create_system = 0
                 provenance.external_attr = (stat.S_IFREG | 0o644) << 16
                 output.writestr(provenance, json.dumps(proof, sort_keys=True, indent=2).encode())
             with WheelFile(candidate) as verified:

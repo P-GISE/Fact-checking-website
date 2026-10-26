@@ -51,3 +51,24 @@ def test_packaging_overlay_keeps_original_code_and_adds_license(tmp_path: Path) 
         assert b'License-File: licenses/LICENSE\n' in metadata
         for name in checked.namelist():
             checked.read(name)
+
+def test_iron_license_and_record_metadata_are_host_independent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from zipfile import ZipInfo
+    import hashlib
+    original = tmp_path / 'iron_laws-1.7.0-py3-none-any.whl'
+    with WheelFile(original, 'w') as output:
+        output.writestr('iron_laws/__init__.py', b'ORIGINAL_PAYLOAD = True\n')
+        output.writestr('iron_laws-1.7.0.dist-info/METADATA', 'Metadata-Version: 2.4\nName: iron-laws\nVersion: 1.7.0\n\n')
+        output.writestr('iron_laws-1.7.0.dist-info/WHEEL', 'Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n')
+    original_init = ZipInfo.__init__
+    hashes = []
+    for host_default in (0, 3):
+        def initialize(self, *args, **kwargs):
+            original_init(self, *args, **kwargs)
+            self.create_system = host_default
+        monkeypatch.setattr(ZipInfo, '__init__', initialize)
+        folder = tmp_path / str(host_default)
+        folder.mkdir()
+        derived = package_license(original, folder, b'Synthetic original license\n', 'a' * 64, 'b' * 40)
+        hashes.append(hashlib.sha256(derived.read_bytes()).hexdigest())
+    assert hashes[0] == hashes[1]

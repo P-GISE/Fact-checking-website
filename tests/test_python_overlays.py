@@ -129,3 +129,27 @@ def test_installed_verifier_refuses_original_vendor_version(tmp_path: Path, monk
     monkeypatch.setattr(verify_installed_overlays, 'distribution', lambda _name: OriginalDistribution())
     with pytest.raises(ValueError, match='installed_version'):
         verify_installed_overlays.verify(tmp_path, 'headroom')
+
+def test_repack_generated_zip_metadata_is_independent_of_host_default(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    source = original_wheel(tmp_path)
+    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    original_init = ZipInfo.__init__
+    results = []
+    for host_default in (0, 3):
+        def initialize(self, *args, **kwargs):
+            original_init(self, *args, **kwargs)
+            self.create_system = host_default
+        monkeypatch.setattr(ZipInfo, '__init__', initialize)
+        results.append(repack_wheel(source, tmp_path / str(host_default), specification(), digest))
+    assert results[0].sha256 == results[1].sha256
+    with ZipFile(source) as original, ZipFile(results[1].path) as derived:
+        for entry in original.infolist():
+            if entry.filename.endswith('/RECORD'):
+                continue
+            name = entry.filename.replace('sample-1.0.0.dist-info/', 'sample-1.0.0+pgise.security1.dist-info/')
+            actual = derived.getinfo(name)
+            assert (actual.create_system, actual.external_attr, actual.date_time) == (entry.create_system, entry.external_attr, entry.date_time)
+        for name, mode in (('PGISE-SECURITY-OVERLAY.json', 0o644), ('RECORD', 0o664)):
+            actual = derived.getinfo('sample-1.0.0+pgise.security1.dist-info/' + name)
+            assert actual.create_system == 0 and actual.external_attr == (stat.S_IFREG | mode) << 16
+            assert actual.date_time == (1980, 1, 1, 0, 0, 0)

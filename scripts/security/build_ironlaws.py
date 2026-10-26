@@ -16,7 +16,7 @@ from urllib.request import Request, build_opener
 from wheel.wheelfile import WheelFile
 
 from scripts.security.cache_io import CacheBoundaryError, atomic_bytes, checked_path, ensure_directory, new_file
-from scripts.security.python_overlays import NoRedirect, OverlayError, OverlaySpec, digest_file, fixed_zip_time, repack_wheel
+from scripts.security.python_overlays import NoRedirect, OverlayError, OverlaySpec, MetadataWheelFile, digest_file, fixed_zip_time, repack_wheel
 
 
 def package_license(original: Path, folder: Path, license_bytes: bytes, source_sha256: str, commit: str) -> Path:
@@ -25,7 +25,7 @@ def package_license(original: Path, folder: Path, license_bytes: bytes, source_s
     destination = folder / 'licensed' / staged.path.name
     ensure_directory(folder, destination.parent)
     checked_path(folder, destination)
-    with WheelFile(staged.path) as incoming, fixed_zip_time(), WheelFile(destination, 'w') as output:
+    with WheelFile(staged.path) as incoming, fixed_zip_time(), MetadataWheelFile(destination, 'w') as output:
         for entry in incoming.infolist():
             if entry.filename == incoming.record_path:
                 continue
