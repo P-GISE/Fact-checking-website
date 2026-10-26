@@ -6,11 +6,14 @@ umask 077
 [[ "$PILOT_BASE_SHA" =~ ^[0-9a-f]{40}$ ]]
 [[ "$(git rev-parse HEAD)" == "$GITHUB_SHA" ]]
 [[ -s /etc/ssl/certs/ca-certificates.crt ]]
+measure=${PILOT_MEASURE_IMPORT:-false}
+[[ $measure == true || $measure == false ]]
 pilot_temp=$(mktemp -d "${RUNNER_TEMP:?}/factlens-image-size.XXXXXX")
 trap 'rm -rf -- "$pilot_temp"' EXIT
 images=()
 for component in api web worker; do
   tag="factlens-${component}-ci-pilot:${GITHUB_SHA}"
+  if [[ $measure == true ]]; then tag="factlens-${component}:${GITHUB_SHA}"; fi
   args=(--progress=plain --file "docker/${component}.Dockerfile" --tag "$tag"
         --label "org.opencontainers.image.revision=$GITHUB_SHA"
         --build-arg "FACTLENS_SOURCE_REVISION=$GITHUB_SHA"
@@ -24,10 +27,11 @@ for component in api web worker; do
   metadata=$(docker image inspect --format '{{.Id}}|{{.Size}}|{{.Architecture}}|{{.Os}}' "$tag")
   printf '%s|%s\n' "$component" "$metadata" >> "$pilot_temp/images.txt"
 done
+bash devtools/verify-runtime-images.sh "$GITHUB_SHA" "$measure"
 # Local runner temporary file only: no upload-artifact, docker push, GHCR, SSH, app start, or deployment.
 docker save "${images[@]}" | gzip -n -6 > "$pilot_temp/images.tar.gz"
 gzip -t "$pilot_temp/images.tar.gz"
-python3 - "$pilot_temp" "$GITHUB_SHA" "$PILOT_HEAD_SHA" "$PILOT_BASE_SHA" <<'PY'
+python3 - "$pilot_temp" "$GITHUB_SHA" "$PILOT_HEAD_SHA" "$PILOT_BASE_SHA" "$measure" <<'PY'
 from pathlib import Path
 import hashlib
 import json
@@ -45,6 +49,7 @@ with tarfile.open(archive, 'r:gz') as bundle:
     manifest = json.load(bundle.extractfile('manifest.json'))
     tags = [tag for row in manifest for tag in row.get('RepoTags', [])]
 expected = sorted(f"factlens-{row['component']}-ci-pilot:{sys.argv[2]}" for row in images)
+if sys.argv[5]=='true':expected=sorted(f"factlens-{row['component']}:{sys.argv[2]}" for row in images)
 if sorted(tags) != expected or len(images) != 3:
     raise SystemExit('Combined Docker archive does not contain exactly the three expected images')
 with archive.open('rb') as stream:
@@ -58,3 +63,14 @@ print('FACTLENS_IMAGE_PILOT_RESULT=' + json.dumps({
     'production_credentials_used': False, 'temporary_bundle_cleanup': 'on-exit trap',
 }, sort_keys=True))
 PY
+if [[ $measure == true ]]; then
+  digest=$(sha256sum "$pilot_temp/images.tar.gz" | cut -d' ' -f1)
+  measurement_status=0
+  measurement_args=("$pilot_temp/images.tar.gz" "$digest" "$GITHUB_SHA")
+  if [[ -n ${PILOT_DOCKER29_TOOL_DIR:-} ]]; then measurement_args+=("$PILOT_DOCKER29_TOOL_DIR"); fi
+  bash devtools/measure-prebuilt-import.sh "${measurement_args[@]}" \
+    > "$pilot_temp/measurement.json" || measurement_status=$?
+  sca_status=0
+  bash devtools/scan-prebuilt-images.sh "$GITHUB_SHA" || sca_status=$?
+  python3 devtools/summarize-import-pilot.py "$pilot_temp/measurement.json" "$measurement_status" "$sca_status"
+fi
