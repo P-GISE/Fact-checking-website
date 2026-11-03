@@ -27,6 +27,7 @@ jobs:
   security:
     uses: ./.github/workflows/security-gate.yml
   measurement-only:
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
     needs: security
     runs-on: ubuntu-24.04
     timeout-minutes: 30

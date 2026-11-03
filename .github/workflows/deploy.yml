@@ -73,7 +73,10 @@ jobs:
       - name: Verify prebuilt provenance and resource rejection contracts
         run: |
           python -m unittest discover -s devtools -p test_prebuilt_gate.py -v
-          bash -n devtools/measure-prebuilt-import.sh devtools/deploy-prebuilt.sh devtools/scan-prebuilt-images.sh
+          python -m unittest discover -s devtools -p test_release_import_contract.py -v
+          for script in devtools/measure-prebuilt-import.sh devtools/deploy-prebuilt.sh devtools/scan-prebuilt-images.sh devtools/prepare-docker29-release.sh; do
+            bash -n "$script"
+          done
           python -m unittest discover -s devtools -p test_deploy_prebuilt.py -v
 
   deploy:
@@ -141,9 +144,16 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Prepare private release measurement runtime
+        id: measurement-tools
+        env:
+          FACTLENS_PREBUILT_ENABLED: ${{ vars.FACTLENS_PREBUILT_ENABLED }}
+          ARTIFACT_STORAGE_APPROVED: ${{ vars.FACTLENS_ARTIFACT_STORAGE_APPROVED }}
+        run: bash devtools/prepare-docker29-release.sh
       - name: Build and measure within reviewed import and storage envelope
         env:
           ARTIFACT_STORAGE_APPROVED: ${{ vars.FACTLENS_ARTIFACT_STORAGE_APPROVED }}
+          FACTLENS_MEASUREMENT_TOOL_DIR: ${{ steps.measurement-tools.outputs.tool-dir }}
         run: python3 devtools/build-prebuilt.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         id: publish

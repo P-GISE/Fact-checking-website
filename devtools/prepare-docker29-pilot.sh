@@ -20,6 +20,6 @@ for name in docker dockerd containerd containerd-shim-runc-v2 ctr runc docker-pr
   docker cp "$cid:/usr/local/bin/$name" "$tools/$name"
   chmod 700 "$tools/$name"
 done
-python3 devtools/verify-pilot-docker29.py "$tools" "$profile"
+python3 devtools/verify-pilot-docker29.py "$tools" "$profile" >/dev/null
 printf 'tool-dir=%s\n' "$tools" >> "$GITHUB_OUTPUT"
 printf '%s\n' 'Private Docker29 pilot binaries copied and SHA-verified; image/container not started; global PATH unchanged.'

@@ -449,3 +449,8 @@ TASK-023을 이어 같은 표의 헤더/캡션/주석을 한정된 후보로 서
 ## 최신 작업 기록 — 배포 실행 명령 구체화 (2026-10-19)
 
 가이드 기준 다음은 실제 서버 적용이다. 원격 접속 도구 부재를 재확인했고08에 비중단 빌드→유지보수/백업→전환/관리자생성의 명령을 추가했다. 복구 범위/비밀값 보호·운영볼륨보존을 명시했다. 기존 검증 수치는 유지하며 이번 제품 테스트/서버 적용은 재실행하지 않았다.10 §61 참조.
+
+
+## 최근 작업 기록 — CI-only import 증명 계약 보완 (2026-11-04)
+
+독립 clone에서 release profile·source/run/attempt/digest·isolationV2·private 도구 mode/inode/절대경로와 엄격한 OOM counter 계약을 보완하고 독립 재검토 CLEAR/APPROVE를 확인했다. 전체 devtools52건 중49통과·Windows Linux전용3skip, transaction mock44시나리오 통과는 앞선 로컬 결과다. 이번은 work 대상 source-only draft PR 준비이며 일반 Linux security/verify만 실행한다. draft의 heavy pilot job은 건너뛰고 ready에서는 원래 실측 대상으로 돌아가므로 별도 검토 전 ready/병합하지 않는다. unmeasured·1536MiB guard·운영 flags/DB/서버를 유지하고 새 실측·artifact 발행·운영 승격은 없다. 현재 RAM 부족·runtime 동등성·artifact 저장 여유는 미해결이며 상세08/09/10 §79/99 후속을 따른다.

@@ -9,7 +9,7 @@ import shutil
 import stat
 import subprocess
 import sys
-from prebuilt_gate import validate_resources, validate_archive, sha256_file, GateError
+from prebuilt_gate import validate_resources, validate_archive, sha256_file, validate_release_envelope, GateError
 
 
 def main():
@@ -18,6 +18,8 @@ def main():
     parser.add_argument('--manifest',type=Path,required=True)
     parser.add_argument('--policy',type=Path,required=True)
     parser.add_argument('--sha',required=True)
+    parser.add_argument('--run-id',type=int,required=True)
+    parser.add_argument('--attempt',type=int,required=True)
     args=parser.parse_args()
     try:
         for path in (args.archive,args.manifest,args.policy):
@@ -31,7 +33,14 @@ def main():
                 or env.stat().st_uid!=os.getuid()): raise GateError('Private environment owner/mode required')
         manifest=json.loads(args.manifest.read_text());policy=json.loads(args.policy.read_text())
         policy=policy.get('import_policy',policy)
-        if manifest.get('sha')!=args.sha or manifest.get('schema')!=1:
+        profile=json.loads(Path(__file__).with_name('docker29-release-profile.json').read_text())
+        envelope=json.loads(Path(__file__).with_name('import-resource-policy.json').read_text())
+        validate_release_envelope(envelope,profile)
+        if (policy.get('reserve_bytes')!=envelope['reserve_bytes'] or
+                not 0<policy.get('peak_total_bytes',0)<=envelope['max_import_peak_bytes']):
+            raise GateError('Manifest exceeds source-reviewed measurement envelope')
+        if (manifest.get('sha')!=args.sha or manifest.get('schema')!=1 or
+                manifest.get('run_id')!=args.run_id or manifest.get('run_attempt')!=args.attempt):
             raise GateError('Manifest source/schema mismatch')
         digest=sha256_file(args.archive)
         if digest!=manifest['archive_sha256']: raise GateError('Archive checksum mismatch')
@@ -44,7 +53,9 @@ def main():
         docker_root=Path(observed)
         if not docker_root.is_absolute() or not docker_root.is_dir(): raise GateError('Invalid Docker root')
         validate_resources(policy,digest,memory,shutil.disk_usage(args.archive.parent).free,
-                           shutil.disk_usage(docker_root).free,args.archive.stat().st_size,expanded)
+                           shutil.disk_usage(docker_root).free,args.archive.stat().st_size,expanded,
+                           sha=args.sha,run_id=args.run_id,attempt=args.attempt,
+                           profile=profile)
         subprocess.run(['docker','--host=unix:///var/run/docker.sock','compose','--env-file','.env.production',
                         '-f','compose.production.yaml','config','--quiet'],check=True,capture_output=True)
     except (GateError,OSError,ValueError,TypeError,KeyError,subprocess.CalledProcessError):
