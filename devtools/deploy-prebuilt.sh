@@ -137,12 +137,12 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 [[ -f .env.production && ! -L .env.production ]] || fail 'Private environment required.'
 cp -p .env.production "$scratch/private-env"
-for helper in prebuilt-preflight.py prebuilt_gate.py; do
+for helper in prebuilt-preflight.py prebuilt_gate.py docker29-release-profile.json import-resource-policy.json; do
   git show "$sha:devtools/$helper" > "$scratch/$helper" || fail 'Missing reviewed source helper.'
 done
 python3 "$scratch/prebuilt-preflight.py" --archive "$incoming/images.tar.gz" \
   --manifest "$incoming/manifest.json" --policy "$incoming/manifest.json" \
-  --sha "$sha" >/dev/null 2>&1
+  --sha "$sha" --run-id "$2" --attempt "$3" >/dev/null 2>&1
 database_container=$("${compose[@]}" ps -q postgres 2>/dev/null)
 redis_container=$("${compose[@]}" ps -q redis 2>/dev/null)
 [[ $database_container =~ ^[a-zA-Z0-9_-]+$ && $redis_container =~ ^[a-zA-Z0-9_-]+$ ]] || fail 'Expected existing database and Redis containers.'

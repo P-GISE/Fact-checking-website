@@ -11,7 +11,7 @@ gate=importlib.util.module_from_spec(spec);spec.loader.exec_module(gate)
 class ImportIsolationTests(unittest.TestCase):
     def test_helper_cannot_auto_reuse_host_containerd_and_proves_before_after_unpack(self):
         script=(ROOT/'devtools/measure-prebuilt-import.sh').read_text()
-        for required in ('containerd --config "$benchmark/containerd.toml" --address "$benchmark/containerd.sock"',
+        for required in ('"$containerd_bin" --config "$benchmark/containerd.toml" --address "$benchmark/containerd.sock"',
                          '--root "$benchmark/containerd-root" --state "$benchmark/containerd-state"',
                          '--containerd="$benchmark/containerd.sock"','isolation-before.json','isolation-after.json',
                          'create --pull=never --network none --entrypoint /bin/true'):

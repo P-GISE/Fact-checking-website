@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from test_release_import_contract import posix_tool_metadata
 
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('verify_tools',ROOT/'devtools/verify-pilot-docker29.py')
@@ -17,16 +18,19 @@ class Docker29PilotTests(unittest.TestCase):
             profile=json.loads((ROOT/'devtools/docker29-pilot-profile.json').read_text())
             for name in profile['binary_sha256']:
                 data=('synthetic-'+name).encode();(root/name).write_bytes(data)
+                (root/name).chmod(0o700)
                 profile['binary_sha256'][name]=hashlib.sha256(data).hexdigest()
-            module.verify(root,profile)
-            (root/'docker').write_bytes(b'tampered')
-            with self.assertRaises(ValueError):module.verify(root,profile)
-            (root/'docker').unlink()
-            with self.assertRaises(ValueError):module.verify(root,profile)
-            (root/'docker').write_bytes(b'synthetic-docker');(root/'extra').write_bytes(b'no')
-            with self.assertRaises(ValueError):module.verify(root,profile)
-            (root/'extra').unlink();profile['kind']='production'
-            with self.assertRaises(ValueError):module.verify(root,profile)
+            with posix_tool_metadata(root):
+                module.verify(root,profile)
+                (root/'docker').write_bytes(b'tampered')
+                with self.assertRaises(ValueError):module.verify(root,profile)
+                (root/'docker').unlink()
+                with self.assertRaises(ValueError):module.verify(root,profile)
+                (root/'docker').write_bytes(b'synthetic-docker');(root/'docker').chmod(0o700)
+                (root/'extra').write_bytes(b'no')
+                with self.assertRaises(ValueError):module.verify(root,profile)
+                (root/'extra').unlink();profile['kind']='production'
+                with self.assertRaises(ValueError):module.verify(root,profile)
 
     def test_private_prepare_does_not_start_install_or_change_global_path(self):
         script=(ROOT/'devtools/prepare-docker29-pilot.sh').read_text()
@@ -44,7 +48,7 @@ class Docker29PilotTests(unittest.TestCase):
                 self.assertNotIn(forbidden,source,name)
         helper=(ROOT/'devtools/measure-prebuilt-import.sh').read_text()
         self.assertIn('--property=MemoryMax=3G',helper)
-        self.assertIn('export PATH="$7:/usr/sbin:/usr/bin:/sbin:/bin"',helper)
+        self.assertIn('export PATH="$tool_dir:/usr/sbin:/usr/bin:/sbin:/bin"',helper)
         self.assertNotIn('--feature',helper)
 
 

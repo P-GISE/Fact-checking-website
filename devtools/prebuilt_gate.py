@@ -155,17 +155,109 @@ def validate_run(run, jobs, sha, run_id, attempt, current_work_sha):
                 'Prerequisite did not succeed for this exact source/attempt')
 
 
-def validate_resources(policy, digest, available_memory, scratch_free, docker_free,
-                       compressed_bytes, expanded_bytes):
-    require(isinstance(policy, dict) and policy.get('schema') == 1 and
-            policy.get('status') == 'measured', 'Measured import policy required')
-    require(policy.get('method') == 'isolated-daemon-stream-load-v1' and
-            policy.get('platform') == 'linux/amd64' and policy.get('oom_events') == 0,
-            'Unsupported or OOM measurement')
+def runtime_profile_digest(profile):
+    return hashlib.sha256(json.dumps(profile, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
+def validate_release_profile(profile):
+    require(isinstance(profile, dict) and profile.get('kind') == 'ci-release-measurement-only' and
+            profile.get('platform') == 'linux/amd64' and profile.get('version') == '29.1.3' and
+            profile.get('required_driver') == 'overlayfs' and
+            profile.get('required_snapshotter') == 'io.containerd.snapshotter.v1' and
+            type(profile.get('memory_max_bytes')) is int and profile['memory_max_bytes'] == 3 * 1024**3,
+            'Pinned CI release measurement profile required')
+    hashes = profile.get('binary_sha256')
+    require(isinstance(hashes, dict) and set(hashes) ==
+            {'docker', 'dockerd', 'containerd', 'containerd-shim-runc-v2', 'ctr', 'runc', 'docker-proxy', 'docker-init'} and
+            all(isinstance(value, str) and re.fullmatch('[0-9a-f]{64}', value) for value in hashes.values()),
+            'Complete pinned binary profile required')
+
+
+def validate_release_envelope(policy, profile):
+    validate_release_profile(profile)
+    require(isinstance(policy, dict) and policy.get('status') == 'approved-measurement-envelope',
+            'Reviewed measured import envelope required before building/publishing')
+    for field in ('max_import_peak_bytes', 'reserve_bytes'):
+        require(type(policy.get(field)) is int and policy[field] > 0, 'Invalid reviewed measurement envelope')
     require(bool(re.fullmatch(r'https://github\.com/P-GISE/Fact-checking-website/actions/runs/[0-9]+',
-                             policy.get('measurement_run_url', ''))), 'Measurement evidence required')
+                             policy.get('baseline_run_url', ''))), 'Actual baseline measurement evidence required')
+    require(policy.get('runtime_profile_sha256') == runtime_profile_digest(profile),
+            'Reviewed measurement runtime profile mismatch')
+
+
+def validate_import_measurement(policy, digest, sha, run_id, attempt, profile, *, status='measured'):
+    require(isinstance(policy, dict) and type(policy.get('schema')) is int and policy['schema'] == 1 and
+            status in ('measured', 'measurement-requires-review') and policy.get('status') == status,
+            'Measured import policy required')
+    validate_release_profile(profile)
+    require(bool(re.fullmatch('[0-9a-f]{40}', sha or '')) and type(run_id) is int and run_id > 0 and
+            type(attempt) is int and attempt > 0, 'Exact measurement source/run/attempt required')
+    require(policy.get('source_sha') == sha and type(policy.get('measurement_run_id')) is int and
+            policy['measurement_run_id'] == run_id and type(policy.get('measurement_run_attempt')) is int and
+            policy['measurement_run_attempt'] == attempt and
+            policy.get('measurement_run_url') ==
+            f'https://github.com/P-GISE/Fact-checking-website/actions/runs/{run_id}',
+            'Measurement source/run/attempt mismatch')
     require(bool(re.fullmatch('[0-9a-f]{64}', digest)) and
             policy.get('image_archive_sha256') == digest, 'Measurement bundle mismatch')
+    require(policy.get('runtime_profile_sha256') == runtime_profile_digest(profile) and
+            policy.get('runtime_profile_kind') == profile['kind'], 'Measurement runtime profile mismatch')
+    require(policy.get('method') == 'isolated-daemon-stream-load-v1' and
+            policy.get('platform') == profile.get('platform') == 'linux/amd64' and
+            type(policy.get('oom_events')) is int and policy['oom_events'] == 0 and
+            type(policy.get('peak_total_bytes')) is int and
+            0 < policy['peak_total_bytes'] <= profile.get('memory_max_bytes', 0),
+            'Unsupported or OOM measurement')
+    require(policy.get('docker_server_version') == profile.get('version') and
+            policy.get('docker_driver') == profile.get('required_driver') and
+            isinstance(policy.get('docker_driver_status'), list) and
+            ['driver-type', profile.get('required_snapshotter')] in policy['docker_driver_status'],
+            'Measured runtime differs from source profile')
+    require(type(policy.get('tool_identity_version')) is int and policy['tool_identity_version'] == 1,
+            'Pinned executable tool identity proof required')
+    previous_tools = None
+    for key in ('tool_identity_before', 'tool_identity_after'):
+        identities = policy.get(key)
+        require(isinstance(identities, dict) and set(identities) == set(profile['binary_sha256']),
+                'All private runtime tool identities required')
+        for name, identity in identities.items():
+            require(isinstance(identity, dict) and type(identity.get('device')) is int and identity['device'] >= 0 and
+                    type(identity.get('inode')) is int and identity['inode'] > 0 and
+                    type(identity.get('mode')) is int and identity['mode'] == 0o700 and
+                    identity.get('executable') is True and
+                    identity.get('binary_sha256') == profile['binary_sha256'][name],
+                    'Private runtime tool executable/inode/digest mismatch')
+        require(previous_tools is None or identities == previous_tools, 'Private tool identity drift during import')
+        previous_tools = identities
+    require(policy.get('isolation_verified') is True and type(policy.get('isolation_version')) is int and
+            policy['isolation_version'] == 2, 'Private isolation v2 proof required')
+    previous = None
+    for key in ('isolation_before', 'isolation_after'):
+        proof = policy.get(key)
+        require(isinstance(proof, dict) and proof.get('verified') is True, 'Private daemon proof required')
+        processes = proof.get('processes')
+        require(isinstance(processes, dict) and set(processes) == {'dockerd', 'containerd'},
+                'Both private daemon identities required')
+        groups = set(); pids = set()
+        for name, process in processes.items():
+            require(isinstance(process, dict) and type(process.get('pid')) is int and process['pid'] > 1 and
+                    process.get('cgroup_matches_measurement') is True and
+                    process.get('private_address_and_paths') is True and
+                    process.get('binary_sha256') == profile.get('binary_sha256', {}).get(name),
+                    'Private daemon PID/binary/paths mismatch')
+            group = process.get('cgroup', '')
+            require(isinstance(group, str) and group.startswith('0::/') and '\n' not in group and
+                    group.endswith(f'/factlens-import-measure-{run_id}-{attempt}.service'),
+                    'Daemon outside exact measured run cgroup')
+            groups.add(group); pids.add(process['pid'])
+        require(len(groups) == 1 and len(pids) == 2, 'Distinct daemons in one measured cgroup required')
+        require(previous is None or processes == previous, 'Daemon identity changed during import')
+        previous = processes
+
+
+def validate_resources(policy, digest, available_memory, scratch_free, docker_free,
+                       compressed_bytes, expanded_bytes, *, sha=None, run_id=None, attempt=None, profile=None):
+    validate_import_measurement(policy, digest, sha, run_id, attempt, profile)
     for key in ('peak_total_bytes', 'reserve_bytes', 'disk_reserve_bytes'):
         require(type(policy.get(key)) is int and policy[key] > 0, 'Invalid measured resource policy')
     require(policy['disk_reserve_bytes'] >= 10 * 1024**3, 'Disk reserve must preserve original 10 GiB floor')

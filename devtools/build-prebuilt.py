@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-from prebuilt_gate import validate_archive, sha256_file, GateError
+from prebuilt_gate import validate_archive, sha256_file, validate_import_measurement, validate_release_envelope, GateError
 
 
 def command(*args):
@@ -23,12 +23,18 @@ def main():
     if not re.fullmatch('[0-9a-f]{40}',sha) or command('git','rev-parse','HEAD')!=sha:
         raise GateError('Source checkout mismatch')
     policy=json.loads(Path('devtools/import-resource-policy.json').read_text())
-    if policy.get('status')!='approved-measurement-envelope':raise GateError('Reviewed measured import envelope required before building/publishing')
-    for field in ('max_import_peak_bytes','reserve_bytes'):
-        if type(policy.get(field)) is not int or policy[field]<=0:raise GateError('Invalid reviewed measurement envelope')
-    if not re.fullmatch(r'https://github\.com/P-GISE/Fact-checking-website/actions/runs/[0-9]+',policy.get('baseline_run_url','')):
-        raise GateError('Actual baseline measurement evidence required')
+    profile_path=Path('devtools/docker29-release-profile.json').resolve(strict=True)
+    profile=json.loads(profile_path.read_text())
+    validate_release_envelope(policy,profile)
     if os.environ.get('ARTIFACT_STORAGE_APPROVED')!='true':raise GateError('Artifact storage budget unapproved')
+    tool_value=os.environ.get('FACTLENS_MEASUREMENT_TOOL_DIR','')
+    if not tool_value:raise GateError('Private release measurement tools required')
+    tools=Path(tool_value)
+    if (tools.is_symlink() or tools.parent.resolve()!=Path(os.environ['RUNNER_TEMP']).resolve()
+            or not tools.name.startswith('factlens-docker29.')):
+        raise GateError('Private release measurement tool directory mismatch')
+    subprocess.run([sys.executable,'devtools/verify-pilot-docker29.py',str(tools),str(profile_path),
+                    'ci-release-measurement-only'],check=True,stdout=subprocess.DEVNULL)
     output=Path(os.environ['RUNNER_TEMP'])/'factlens-release';output.mkdir(mode=0o700,exist_ok=False)
     ids={};tags=[]
     for component in ('api','web','worker'):
@@ -50,10 +56,10 @@ def main():
     if archive.stat().st_size>450*1024**2:raise GateError('Combined image artifact exceeds reviewed size envelope')
     expanded=validate_archive(archive,sha,ids,8*1024**3)
     digest=sha256_file(archive)
-    measurement=json.loads(command('bash','devtools/measure-prebuilt-import.sh',str(archive),digest,sha))
-    if (measurement.get('status')!='measurement-requires-review' or measurement.get('oom_events')!=0
-            or measurement.get('image_archive_sha256')!=digest
-            or not 0<measurement.get('peak_total_bytes',0)<=policy['max_import_peak_bytes']):
+    measurement=json.loads(command('bash','devtools/measure-prebuilt-import.sh',str(archive),digest,sha,
+                                   str(tools),str(profile_path)))
+    validate_import_measurement(measurement,digest,sha,run,attempt,profile,status='measurement-requires-review')
+    if measurement['peak_total_bytes']>policy['max_import_peak_bytes']:
         raise GateError('Current exact-bundle import exceeds reviewed measured envelope')
     # Source-reviewed envelope authorizes the formula, while every build gets actual exact-bundle evidence.
     measured={**measurement,'status':'measured','reserve_bytes':policy['reserve_bytes']}

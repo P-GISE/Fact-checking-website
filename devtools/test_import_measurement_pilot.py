@@ -14,7 +14,7 @@ class ImportPilotTests(unittest.TestCase):
     def test_private_daemon_cannot_inherit_host_configuration(self):
         script=(ROOT/'devtools/measure-prebuilt-import.sh').read_text()
         self.assertIn("printf '{}\\n' > \"$benchmark/daemon-config.json\"",script)
-        self.assertIn('dockerd --config-file="$benchmark/daemon-config.json"',script)
+        self.assertIn('"$dockerd_bin" --config-file="$benchmark/daemon-config.json"',script)
         self.assertLess(script.index('umask 077'),script.index('daemon-config.json'))
         self.assertNotIn('/etc/docker/daemon.json',script)
         self.assertNotIn('--feature',script)

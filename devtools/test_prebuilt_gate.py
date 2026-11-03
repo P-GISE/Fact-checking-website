@@ -12,6 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 from prebuilt_gate import validate_run, validate_resources, validate_archive, validate_artifact, validate_artifact_zip, normalize_action_digest, GateError
+from test_release_import_contract import measurement as release_measurement, context as resource_context
 
 
 SHA = 'a' * 40
@@ -61,11 +62,7 @@ class RunGateTests(unittest.TestCase):
 
 class ResourceGateTests(unittest.TestCase):
     def policy(self):
-        return {'schema': 1, 'status': 'measured', 'method': 'isolated-daemon-stream-load-v1',
-                'image_archive_sha256': 'c' * 64, 'peak_total_bytes': 512 * 1024**2,
-                'reserve_bytes': 256 * 1024**2, 'disk_reserve_bytes': 10 * 1024**3,
-                'measurement_run_url': 'https://github.com/P-GISE/Fact-checking-website/actions/runs/123',
-                'oom_events': 0, 'platform': 'linux/amd64'}
+        return release_measurement()
 
     def test_unmeasured_policy_fails(self):
         for policy in ({}, {'schema': 1, 'status': 'unmeasured'}, None):
@@ -76,10 +73,10 @@ class ResourceGateTests(unittest.TestCase):
         p = self.policy(); mem = p['peak_total_bytes'] + p['reserve_bytes']
         # Same filesystem: reserve + compressed archive + expanded images + rollback images.
         disk = 10 * 1024**3 + 300 + 600 + 600
-        validate_resources(p, 'c' * 64, mem, disk, disk, 300, 600)
+        validate_resources(p, 'c' * 64, mem, disk, disk, 300, 600, **resource_context())
         for memory, scratch, docker in ((mem-1,disk,disk),(mem,disk-1,disk),(mem,disk,disk-1)):
             with self.assertRaises(GateError):
-                validate_resources(p, 'c'*64, memory, scratch, docker, 300, 600)
+                validate_resources(p, 'c'*64, memory, scratch, docker, 300, 600, **resource_context())
 
     def test_wrong_bundle_oom_or_untrusted_measurement_rejected(self):
         for field, value in (('image_archive_sha256','d'*64), ('oom_events',1),
@@ -87,7 +84,7 @@ class ResourceGateTests(unittest.TestCase):
                              ('peak_total_bytes',0), ('platform','linux/arm64')):
             p=self.policy(); p[field]=value
             with self.subTest(field=field), self.assertRaises(GateError):
-                validate_resources(p,'c'*64,10**12,10**12,10**12,300,600)
+                validate_resources(p,'c'*64,10**12,10**12,10**12,300,600, **resource_context())
 
 
 class ArchiveGateTests(unittest.TestCase):

@@ -18,7 +18,9 @@ def summarize(measurement,measurement_status,sca_status):
                 and ['driver-type','io.containerd.snapshotter.v1'] in measurement.get('docker_driver_status',[]))
     keys=('method','platform','peak_total_bytes','oom_events','docker_server_version','docker_driver',
           'docker_driver_status','docker_server_components','kernel_release','kernel_architecture','image_archive_sha256','measurement_run_url',
-          'isolation_verified','isolation_version','isolation_before','isolation_after','measurement_scope')
+          'isolation_verified','isolation_version','isolation_before','isolation_after','measurement_scope',
+          'source_sha','measurement_run_id','measurement_run_attempt','runtime_profile_sha256','runtime_profile_kind',
+          'tool_identity_version','tool_identity_before','tool_identity_after')
     result={'measurement_status':'SUCCESS' if valid else 'FAILED_OR_UNASSESSED',
             'image_sca_status':'SUCCESS' if sca_status==0 else 'FAILED_OR_UNASSESSED',
             'docker_engine_driver_match':equivalent,'runtime_equivalent_to_s2':False,

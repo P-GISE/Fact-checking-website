@@ -2,6 +2,7 @@ name: FactLens import measurement and image SCA pilot (no publication)
 on:
   pull_request:
     branches: [work]
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - .github/workflows/import-measurement-pilot.yml
       - scripts/security/factlens-image-pilot.sh
@@ -27,6 +28,7 @@ jobs:
   security:
     uses: ./.github/workflows/security-gate.yml
   measurement-only:
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
     needs: security
     runs-on: ubuntu-24.04
     timeout-minutes: 30
