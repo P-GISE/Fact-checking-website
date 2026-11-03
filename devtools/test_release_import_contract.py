@@ -84,6 +84,7 @@ def posix_tool_metadata(root, nonexecutable=None):
 class ReleaseImportContractTests(unittest.TestCase):
     def test_draft_pr_skips_heavy_pilot_but_keeps_light_verification(self):
         pilot = (ROOT / '.github/workflows/import-measurement-pilot.yml').read_text()
+        self.assertIn('types: [opened, synchronize, reopened, ready_for_review]', pilot)
         job = pilot.split('\n  measurement-only:', 1)[1]
         condition = re.search(r'^    if: (.+)$', job, re.MULTILINE)
         self.assertIsNotNone(condition)
